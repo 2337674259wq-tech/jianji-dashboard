@@ -36,10 +36,8 @@ body{
 }
 h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;letter-spacing:-.025em}
 
-/* ── Container ── */
 .wrap{max-width:1240px;margin:0 auto;padding:0 28px}
 
-/* ── HERO ── */
 .hero{
     position:relative;overflow:hidden;
     padding:90px 0 64px;margin-bottom:0;
@@ -65,7 +63,6 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 .hero-stat .num{font-size:38px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;color:var(--accent);letter-spacing:-.04em;line-height:1}
 .hero-stat .lbl{font-size:11.5px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
 
-/* ── Section ── */
 .sec{padding:56px 0}
 .sec-hd{margin-bottom:30px}
 .sec-hd .kicker{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:8px}
@@ -73,16 +70,23 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 .sec-hd .sub{font-size:14px;color:var(--text3)}
 .divider{width:100%;height:1px;background:var(--border)}
 
-/* ── Cards ── */
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
 .card{
-    position:relative;background:var(--card);border-radius:var(--radius);padding:28px 24px 22px;
+    position:relative;background:var(--card);border-radius:var(--radius);padding:28px 24px 38px;
     border:1px solid var(--border);overflow:hidden;
-    transition:transform .25s ease,box-shadow .25s ease;
+    cursor:pointer;
+    transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
     background-image:
         radial-gradient(circle at 100% 0%, rgba(0,85,232,.015) 0%, transparent 50%);
 }
-.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--border2)}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.card::after{
+    content:'→';position:absolute;bottom:10px;right:16px;
+    font-size:14px;color:var(--accent);opacity:0;
+    transition:opacity .2s ease,transform .2s ease;
+    transform:translateX(-4px);font-weight:700;
+}
+.card:hover::after{opacity:1;transform:translateX(0)}
 .card-bar{position:absolute;top:0;left:0;right:0;height:3px}
 .card-bar.bar-red{background:var(--red)}
 .card-bar.bar-blue{background:var(--accent)}
@@ -93,17 +97,25 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 .card-meta{font-size:11.5px;color:var(--text2);margin-bottom:8px}
 .card-desc{font-size:12.5px;color:var(--text3);line-height:1.5}
 
-/* ── Stage cards ── */
 .stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 @media(max-width:768px){.stage-grid{grid-template-columns:1fr}}
 .stage-card{
     display:flex;gap:20px;align-items:flex-start;
-    background:var(--card);border-radius:var(--radius);padding:28px 26px;
-    border:1px solid var(--border);
-    transition:transform .25s ease,box-shadow .25s ease;
+    background:var(--card);border-radius:var(--radius);padding:28px 38px 28px 26px;
+    border:1px solid var(--border);cursor:pointer;
+    transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
     background-image:linear-gradient(135deg, rgba(0,85,232,.02) 0%, transparent 50%);
+    position:relative;
 }
-.stage-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.stage-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.stage-card::after{
+    content:'→';position:absolute;top:50%;right:16px;
+    transform:translateY(-50%) translateX(-4px);
+    font-size:18px;color:var(--accent);opacity:0;
+    transition:opacity .2s ease,transform .2s ease;
+    font-weight:700;
+}
+.stage-card:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
 .stage-num{
     font-size:40px;font-weight:800;color:var(--accent);opacity:.08;
     font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;
@@ -114,7 +126,6 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 .stage-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px}
 .stage-desc{font-size:13px;color:var(--text3);line-height:1.5}
 
-/* ── Info cards ── */
 .info-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
 @media(max-width:768px){.info-row{grid-template-columns:1fr}}
 .info-card{
@@ -125,7 +136,6 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 }
 .info-card strong{color:var(--text);font-weight:600}
 
-/* ── Stats section ── */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 @media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
 .stat-panel{
@@ -143,7 +153,6 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 .bar-fill.fill-purple{background:var(--purple)}
 .bar-num{font-size:11.5px;color:var(--text3);min-width:36px;font-weight:500;text-align:left}
 
-/* ── KPI row ── */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
 @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
 .kpi{
@@ -153,11 +162,9 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 .kpi .val{font-size:42px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;letter-spacing:-.04em}
 .kpi .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;font-weight:600}
 
-/* ── Footer ── */
 footer{padding:32px 0;text-align:center;font-size:12.5px;color:var(--text3)}
 footer span{color:var(--accent);font-weight:500}
 
-/* ── Scroll reveal ── */
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s cubic-bezier(.16,1,.3,1)}
 .reveal.visible{opacity:1;transform:translateY(0)}
 .reveal:nth-child(1){transition-delay:0s}
@@ -165,13 +172,63 @@ footer span{color:var(--accent);font-weight:500}
 .reveal:nth-child(3){transition-delay:.08s}
 .reveal:nth-child(4){transition-delay:.12s}
 .reveal:nth-child(5){transition-delay:.16s}
+
+/* ── Modal ── */
+.modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.45);
+    display:flex;align-items:center;justify-content:center;
+    z-index:1000;opacity:0;pointer-events:none;
+    transition:opacity .25s ease;
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.modal-overlay.active{opacity:1;pointer-events:auto}
+.modal-box{
+    background:var(--card);border-radius:var(--radius);
+    max-width:640px;width:90vw;max-height:80vh;
+    overflow-y:auto;padding:40px 36px 32px;
+    position:relative;
+    transform:translateY(20px) scale(.96);
+    transition:transform .3s cubic-bezier(.16,1,.3,1);
+    box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+.modal-overlay.active .modal-box{transform:translateY(0) scale(1)}
+.modal-close{
+    position:absolute;top:14px;right:18px;
+    width:32px;height:32px;border-radius:50%;
+    border:1px solid var(--border);background:var(--card);
+    cursor:pointer;font-size:18px;display:flex;align-items:center;
+    justify-content:center;color:var(--text3);
+    transition:all .2s ease;
+}
+.modal-close:hover{background:var(--bg);color:var(--text);border-color:var(--border2)}
+.modal-tag{
+    display:inline-block;padding:3px 12px;border-radius:6px;
+    font-size:11px;font-weight:600;background:rgba(0,85,232,.06);
+    color:var(--accent);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px;
+}
+.modal-box h2{font-size:26px;font-weight:700;margin-bottom:12px;line-height:1.25}
+.modal-difficulty{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:20px}
+.modal-box .detail-section{margin-bottom:22px}
+.modal-box .detail-section h4{
+    font-size:12px;text-transform:uppercase;letter-spacing:.8px;
+    color:var(--accent);margin-bottom:8px;font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC",sans-serif;
+}
+.modal-box .detail-section p,.modal-box .detail-section ul,.modal-box .detail-section ol{
+    font-size:14px;color:var(--text2);line-height:1.7;
+}
+.modal-box .detail-section ul,.modal-box .detail-section ol{padding-left:18px}
+.modal-box .detail-section li{margin-bottom:6px;font-size:14px;color:var(--text2);line-height:1.65}
+
+@media(max-width:768px){
+    .modal-box{padding:28px 22px 24px;max-width:95vw}
+    .modal-box h2{font-size:21px}
+}
 </style>
 </head>
 <body>
 
 <div class="wrap">
 
-<!-- ═══ Hero ═══ -->
 <header class="hero">
     <div class="label">🎬 DAILY TOPIC SYSTEM</div>
     <h1>拍摄<em>+</em>剪辑<br>选题系统</h1>
@@ -186,74 +243,77 @@ footer span{color:var(--accent);font-weight:500}
 
 <div class="divider"></div>
 
-<!-- ═══ 今日选题 ═══ -->
 <section class="sec">
-    <div class="sec-hd"><div class="kicker">Today's Picks</div><h2>🔥 今日推荐选题</h2><p class="sub">2026-06-28 · 每日清晨 8:57 自动刷新 · 双击桌面图标打开</p></div>
-    <div class="card-grid"><div class="card reveal" data-reveal>
-    <div class="card-bar bar-red"></div>
-    <span class="card-medal">🥇</span>
+    <div class="sec-hd"><div class="kicker">Today's Picks</div><h2>🔥 今日推荐选题</h2><p class="sub">2026-06-28 · 点击任意卡片查看完整制作指南</p></div>
+    <div class="card-grid">
+<div class="card reveal" data-reveal onclick="openTopic('reverse-effect')">
+    <div class="card-bar bar-red"></div><span class="card-medal">🥇</span>
     <span class="card-tag">剪映基础操作</span>
     <h3>倒放效果：让视频变魔术的秘密</h3>
-    <div class="card-meta">⭐ · 20s · 涨粉高</div>
+    <div class="card-meta">⭐ 入门 · 20s · 涨粉高</div>
     <p class="card-desc">视觉效果强，容易传播</p>
-</div><div class="card reveal" data-reveal>
-    <div class="card-bar bar-red"></div>
-    <span class="card-medal">🥈</span>
+</div>
+<div class="card reveal" data-reveal onclick="openTopic('symmetry-composition')">
+    <div class="card-bar bar-red"></div><span class="card-medal">🥈</span>
     <span class="card-tag">拍摄技巧</span>
     <h3>对称构图：强迫症看了极度舒适</h3>
-    <div class="card-meta">⭐ · 20s · 涨粉高</div>
+    <div class="card-meta">⭐ 入门 · 20s · 涨粉高</div>
     <p class="card-desc">对称画面天然适合短视频</p>
-</div><div class="card reveal" data-reveal>
-    <div class="card-bar bar-blue"></div>
-    <span class="card-medal">🥉</span>
+</div>
+<div class="card reveal" data-reveal onclick="openTopic('jianying-interface')">
+    <div class="card-bar bar-blue"></div><span class="card-medal">🥉</span>
     <span class="card-tag">剪映基础操作</span>
     <h3>剪映界面速览：5分钟认识所有功能区</h3>
-    <div class="card-meta">⭐ · 3min · 涨粉中</div>
+    <div class="card-meta">⭐ 入门 · 3min · 涨粉中</div>
     <p class="card-desc">给纯新手的第一条视频，降低门槛</p>
-</div><div class="card reveal" data-reveal>
-    <div class="card-bar bar-blue"></div>
-    <span class="card-medal">4️⃣</span>
+</div>
+<div class="card reveal" data-reveal onclick="openTopic('import-footage')">
+    <div class="card-bar bar-blue"></div><span class="card-medal">4️⃣</span>
     <span class="card-tag">剪映基础操作</span>
     <h3>导入素材的3种方式，第3种最方便</h3>
-    <div class="card-meta">⭐ · 2min · 涨粉中</div>
+    <div class="card-meta">⭐ 入门 · 2min · 涨粉中</div>
     <p class="card-desc">解决新手最常问的问题</p>
-</div><div class="card reveal" data-reveal>
-    <div class="card-bar bar-purple"></div>
-    <span class="card-medal">5️⃣</span>
+</div>
+<div class="card reveal" data-reveal onclick="openTopic('breakdown-viral')">
+    <div class="card-bar bar-purple"></div><span class="card-medal">5️⃣</span>
     <span class="card-tag">热门跟拍</span>
     <h3>某条500万播放的视频怎么剪的？逐帧拆解</h3>
-    <div class="card-meta">⭐⭐⭐ · 4min · 涨粉高</div>
+    <div class="card-meta">⭐⭐⭐ 进阶 · 4min · 涨粉高</div>
     <p class="card-desc">爆款拆解是流量密码</p>
-</div></div>
+</div>
+</div>
 </section>
 
 <div class="divider"></div>
 
-<!-- ═══ 内容日历 ═══ -->
 <section class="sec">
-    <div class="sec-hd"><div class="kicker">Content Calendar</div><h2>🗓️ 200期内容日历</h2><p class="sub">三阶段渐进 · 从小白到进阶 · 覆盖11大分类</p></div>
-    <div class="stage-grid"><div class="stage-card reveal" data-reveal>
+    <div class="sec-hd"><div class="kicker">Content Calendar</div><h2>🗓️ 200期内容日历</h2><p class="sub">三阶段渐进 · 从小白到进阶 · 覆盖11大分类 · 点击各阶段查看详情</p></div>
+    <div class="stage-grid">
+<div class="stage-card reveal" data-reveal onclick="openPhase('phase1')">
     <div class="stage-num">01</div>
     <div class="stage-content">
         <h4>冷启动期<span>第 1–30 期</span></h4>
         <p class="stage-title">剪映基础 + 拍摄入门</p>
         <p class="stage-desc">面向零基础 · 快速上手 · 12基础 · 6拍摄 · 3跟拍 · 9其他</p>
     </div>
-</div><div class="stage-card reveal" data-reveal>
+</div>
+<div class="stage-card reveal" data-reveal onclick="openPhase('phase2')">
     <div class="stage-num">02</div>
     <div class="stage-content">
         <h4>增长期<span>第 31–100 期</span></h4>
         <p class="stage-title">转场 · 卡点 · 调色 · 蒙版</p>
         <p class="stage-desc">系统技能进阶 · 建立专业度 · 12调色 · 10转场 · 8卡点 · 40其他</p>
     </div>
-</div><div class="stage-card reveal" data-reveal>
+</div>
+<div class="stage-card reveal" data-reveal onclick="openPhase('phase3')">
     <div class="stage-num">03</div>
     <div class="stage-content">
         <h4>成熟期<span>第 101–200 期</span></h4>
         <p class="stage-title">案例实战 + 抠像合成</p>
         <p class="stage-desc">深度壁垒 · IP护城河 · 20案例 · 15蒙版 · 15拍摄 · 50其他</p>
     </div>
-</div></div>
+</div>
+</div>
     <div class="info-row">
         <div class="info-card"><strong>📐 内容节奏</strong><br>30% 爆款 · 50% 干货 · 20% 深度 · 每3–4条干货穿插1条爆款，每8条穿插1条深度案例</div>
         <div class="info-card"><strong>⚡ 更新建议</strong><br>前期日更 · 稳定期隔日更 · 提前储备1–2周选题 · 每周复盘数据调整方向</div>
@@ -262,7 +322,6 @@ footer span{color:var(--accent);font-weight:500}
 
 <div class="divider"></div>
 
-<!-- ═══ 数据统计 ═══ -->
 <section class="sec">
     <div class="sec-hd"><div class="kicker">Statistics</div><h2>📊 数据概览</h2></div>
     <div class="kpi-row">
@@ -273,74 +332,213 @@ footer span{color:var(--accent);font-weight:500}
     </div>
     <div class="stats-grid" style="margin-top:24px">
         <div class="stat-panel reveal" data-reveal><h3>📂 11大分类覆盖</h3><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">拍摄技巧</span>
-    <div class="bar-track"><div class="bar-fill" style="width:14.499999999999998%"></div></div>
-    <span class="bar-num">29</span>
+    <span class="bar-label">拍摄技巧</span><div class="bar-track"><div class="bar-fill" style="width:14.5%"></div></div><span class="bar-num">29</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">调色教程</span>
-    <div class="bar-track"><div class="bar-fill" style="width:12.0%"></div></div>
-    <span class="bar-num">24</span>
+    <span class="bar-label">调色教程</span><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><span class="bar-num">24</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">案例实战</span>
-    <div class="bar-track"><div class="bar-fill" style="width:11.0%"></div></div>
-    <span class="bar-num">22</span>
+    <span class="bar-label">案例实战</span><div class="bar-track"><div class="bar-fill" style="width:11%"></div></div><span class="bar-num">22</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">蒙版&关键帧</span>
-    <div class="bar-track"><div class="bar-fill" style="width:10.5%"></div></div>
-    <span class="bar-num">21</span>
+    <span class="bar-label">蒙版&关键帧</span><div class="bar-track"><div class="bar-fill" style="width:10.5%"></div></div><span class="bar-num">21</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">转场特效</span>
-    <div class="bar-track"><div class="bar-fill" style="width:10.0%"></div></div>
-    <span class="bar-num">20</span>
+    <span class="bar-label">转场特效</span><div class="bar-track"><div class="bar-fill" style="width:10%"></div></div><span class="bar-num">20</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">卡点节奏</span>
-    <div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div>
-    <span class="bar-num">15</span>
+    <span class="bar-label">卡点节奏</span><div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div><span class="bar-num">15</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">文字动画</span>
-    <div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div>
-    <span class="bar-num">15</span>
+    <span class="bar-label">文字动画</span><div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div><span class="bar-num">15</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">抠像&合成</span>
-    <div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div>
-    <span class="bar-num">15</span>
+    <span class="bar-label">抠像&合成</span><div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div><span class="bar-num">15</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">音频处理</span>
-    <div class="bar-track"><div class="bar-fill" style="width:7.000000000000001%"></div></div>
-    <span class="bar-num">14</span>
+    <span class="bar-label">音频处理</span><div class="bar-track"><div class="bar-fill" style="width:7%"></div></div><span class="bar-num">14</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">热门跟拍</span>
-    <div class="bar-track"><div class="bar-fill" style="width:6.5%"></div></div>
-    <span class="bar-num">13</span>
+    <span class="bar-label">热门跟拍</span><div class="bar-track"><div class="bar-fill" style="width:6.5%"></div></div><span class="bar-num">13</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">剪映基础操作</span>
-    <div class="bar-track"><div class="bar-fill" style="width:6.0%"></div></div>
-    <span class="bar-num">12</span>
+    <span class="bar-label">剪映基础操作</span><div class="bar-track"><div class="bar-fill" style="width:6%"></div></div><span class="bar-num">12</span>
 </div></div>
         <div class="stat-panel reveal" data-reveal><h3>📈 内容类型分布</h3><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">爆款</span>
-    <div class="bar-track"><div class="bar-fill fill-red" style="width:22.0%"></div></div>
-    <span class="bar-num">44</span>
+    <span class="bar-label">爆款</span><div class="bar-track"><div class="bar-fill fill-red" style="width:22%"></div></div><span class="bar-num">44</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">干货</span>
-    <div class="bar-track"><div class="bar-fill fill-blue" style="width:68.5%"></div></div>
-    <span class="bar-num">137</span>
+    <span class="bar-label">干货</span><div class="bar-track"><div class="bar-fill fill-blue" style="width:68.5%"></div></div><span class="bar-num">137</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">深度</span>
-    <div class="bar-track"><div class="bar-fill fill-purple" style="width:9.5%"></div></div>
-    <span class="bar-num">19</span>
+    <span class="bar-label">深度</span><div class="bar-track"><div class="bar-fill fill-purple" style="width:9.5%"></div></div><span class="bar-num">19</span>
 </div></div>
     </div>
 </section>
 
-<footer><p>数据截止 2026-06-28 · 每日 <span>8:57</span> 自动刷新 · 点击桌面 <span>🎬 剪辑选题系统</span> 图标</p></footer>
+<footer><p>数据截止 2026-06-28 · 每日 <span>8:57</span> 自动刷新 · 点击任意卡片查看完整制作指南</p></footer>
+</div>
+
+<!-- ═══ Modal ═══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box" id="modal-box"></div>
 </div>
 
 <script>
-const rvl = document.querySelectorAll('.reveal');
-const obs = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting) e.target.classList.add('visible')})},{threshold:.08});
-rvl.forEach(el=>obs.observe(el));
-window.addEventListener('load',()=>{rvl.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight) el.classList.add('visible')})});
+// ═══ Topic data ═══
+const TOPICS = {
+    'reverse-effect': {
+        tag: '剪映基础操作',
+        title: '倒放效果：让视频变魔术的秘密',
+        difficulty: '⭐ 入门 · 约 20 秒 · 涨粉潜力：高',
+        overview: '倒放（Reverse）是短视频平台涨粉最快的特效之一。把日常动作反过来播放，会产生强烈的视觉冲击和"魔术感"——水从杯子倒流回瓶子、撕碎的纸张复原、人从地面飞回屋顶……观众会忍不住反复播放。',
+        steps: [
+            '打开剪映，导入一段 5–15 秒的视频素材（推荐动作清晰、方向性强的）',
+            '在时间线上点中素材 → 底部找到"倒放"按钮',
+            '点击后视频自动反转，背景音乐也会跟着反转（可关掉原声单独加 BGM）',
+            '微调：原视频末尾对着成片开头，确保动作衔接流畅',
+            '导出 1080p 60fps，加标题"见证奇迹的时刻"或类似悬念文字'
+        ],
+        tips: '最佳素材：倒水、跳跃、扔东西、撕纸、化妆、写字。这些动作倒放后的"反物理感"最强，播放量通常在 10 万以上。'
+    },
+    'symmetry-composition': {
+        tag: '拍摄技巧',
+        title: '对称构图：强迫症看了极度舒适',
+        difficulty: '⭐ 入门 · 约 20 秒 · 涨粉潜力：高',
+        overview: '对称构图是视觉舒适度的天花板。人的大脑天生喜欢对称——建筑、倒影、走廊、隧道……对称画面天然适合短视频的竖屏格式，配合舒缓 BGM 和慢镜头，播放完成率极高。',
+        steps: [
+            '打开手机相机，切换到 1x 或 2x 镜头（广角会畸变，破坏对称）',
+            '打开网格线（设置 → 相机 → 网格），确保中心线对齐',
+            '寻找对称场景：地铁长廊、对称建筑、水面倒影、旋转楼梯、对称路灯',
+            '保持手机绝对水平，慢慢推进或横移——切忌手抖',
+            '导入剪映，加冷色调滤镜降低饱和度，放慢 0.5x，配环境音'
+        ],
+        tips: '最佳时间：清晨或黄昏，光线柔和、影子对称。雨后的水面倒影是最天然的对称素材，拍摄时蹲到最低位置让水天线在画面正中。'
+    },
+    'jianying-interface': {
+        tag: '剪映基础操作',
+        title: '剪映界面速览：5分钟认识所有功能区',
+        difficulty: '⭐ 入门 · 约 3 分钟 · 涨粉潜力：中',
+        overview: '给纯新手的第一条视频。很多人手机装了剪映但没打开过——因为感觉"看起来很复杂"。这条视频的目标就是用 3 分钟让零基础用户心里有底，降低使用门槛。',
+        steps: [
+            '屏幕录制剪映打开的一瞬间（"点击开始创作"的镜头）',
+            '用画中画 + 红圈标注 4 个核心区域：素材区、预览区、时间线、工具栏',
+            '每讲一个区域停留 15 秒，不要快进——新手需要消化',
+            '演示一个最简单的操作：导入照片 → 加文字 → 导出 → 让观众感受到"我也能做"',
+            '结尾：鼓励观众打开剪映试一下，评论区交作业'
+        ],
+        tips: '核心不是教技能，而是"消除恐惧"。语速慢一点，语气像朋友在教朋友，不要用太多术语。'
+    },
+    'import-footage': {
+        tag: '剪映基础操作',
+        title: '导入素材的3种方式：第3种最方便',
+        difficulty: '⭐ 入门 · 约 2 分钟 · 涨粉潜力：中',
+        overview: '很多新手的第一道坎就是"怎么把视频放进剪映"。其实剪映有 3 种导入方式，第三种一键操作最高效，但 90% 的人不知道。',
+        steps: [
+            '方式一：剪映 → 开始创作 → 从相册选取 → 适合一次导入多个素材',
+            '方式二：相册里点"分享" → "用剪映打开" → 适合只处理一个视频',
+            '方式三（重点）：相册长按视频 → 拖动到剪映图标 → 一键导入——最快',
+            '对比三种方式的速度差异，突出第三种的高效',
+            '顺便演示：导入后如何调整素材顺序和删除多余片段'
+        ],
+        tips: '适合做成"冷知识"风格——前 3 秒先展示第三种方式的效果，制造"还有这操作？"的好奇感，再倒回去讲前两种。'
+    },
+    'breakdown-viral': {
+        tag: '热门跟拍 · 爆款拆解',
+        title: '某条500万播放的视频怎么剪的？逐帧拆解',
+        difficulty: '⭐⭐⭐ 进阶 · 约 4 分钟 · 涨粉潜力：高',
+        overview: '爆款拆解是短视频领域经久不衰的流量密码。观众天然好奇"这条视频为什么火"——你不需要原创内容，你只需要拆解别人已经验证过的好内容。',
+        steps: [
+            '选一条最近 3 天内播放量 >100 万的短视频（剪辑向、转场向优先）',
+            '0.5x 慢放逐帧分析：开场钩子、音乐切入时机、转场类型、高潮节奏',
+            '标注时间轴：00:00 钩子 / 00:02 铺垫 / 00:08 高潮 / 00:15 结尾 CTA',
+            '在剪映里复刻一个 10 秒片段，对比原版和你的版本',
+            '结尾总结：这条视频火的核心原因是 ____（一句话）'
+        ],
+        tips: '一定要用画中画 + 标注 + 慢镜头，让观众"看到"剪辑师的思维过程。不要只讲"这个转场好"，要讲"为什么好"——情绪节奏、视觉引导、音乐卡点配合。'
+    }
+};
+
+const PHASES = {
+    'phase1': {
+        tag: '冷启动期 · 第 1–30 期',
+        title: '剪映基础 + 拍摄入门',
+        difficulty: '面向零基础 · 快速上手',
+        overview: '第一个月的目标是让账号快速渡过冷启动期。内容聚焦在"新手友好"——每个视频都应该让观众产生"这个我也能做"的感觉。选题以基础操作和入门拍摄为主，配合少量热门跟拍制造爆款。',
+        steps: [
+            '12 期剪映基础操作：界面、导入导出、剪辑分割、变速、文字、滤镜、转场、贴纸、画中画、蒙版入门、关键帧入门、倒放',
+            '6 期拍摄技巧：持机姿势、构图法则、光线基础、运镜（推拉摇移跟）、手机设置、收音入门',
+            '3 期热门跟拍：当周最火的 1–2 个挑战或模版，跟拍即可',
+            '9 期其他方向：音频处理、卡点、文字动画等——各做 1 期试水，看数据反馈'
+        ],
+        tips: '每期控制在 20 秒以内。前 10 期固定发布时间（如每天 12:00），保持更新频率比内容质量更重要。第 15 期后复盘数据，找到 2–3 个高播放方向加大投入。'
+    },
+    'phase2': {
+        tag: '增长期 · 第 31–100 期',
+        title: '转场 · 卡点 · 调色 · 蒙版',
+        difficulty: '系统技能进阶 · 建立专业度',
+        overview: '第二到第三个月是建立专业壁垒的关键期。内容从"这也太简单了"升级到"这个有点东西"——观众开始把你的账号当作学习资源而不是消遣，为后续商业化打基础。',
+        steps: [
+            '12 期调色教程：色温色调、曲线、HSL、LUT 导入、风格化调色（日系/港风/复古/电影感）',
+            '10 期转场特效：缩放、旋转、遮罩、闪光、模糊转场、匹配剪辑',
+            '8 期卡点节奏：鼓点对齐、节奏型卡点、变速卡点、画面抖动配合',
+            '40 期其他：蒙版进阶、关键帧动画、抠像合成、文字动画、高级滤镜叠加'
+        ],
+        tips: '可适当拉长到 30–60 秒，增加"教程感"。每期加"作业提示"（如"试试用今天的技巧剪一段 5 秒视频"），评论区互动率会大幅提升。'
+    },
+    'phase3': {
+        tag: '成熟期 · 第 101–200 期',
+        title: '案例实战 + 抠像合成',
+        difficulty: '深度壁垒 · 打造 IP 护城河',
+        overview: '第四个月开始，内容是壁垒。别人可以复制你的教程，但复制不了你做过 100 期后积累的手感和判断力。转向案例实战——每期完成一个完整的剪辑作品，展示从选素材到出片的完整流程。',
+        steps: [
+            '20 期案例实战：VLOG、美食视频、旅行短片、产品展示、音乐 MV——每期一个完整案例',
+            '15 期蒙版进阶：路径动画、形变蒙版、文字蒙版、双重曝光、局部调色',
+            '15 期拍摄升级：灯光布置、多机位、稳定器使用、帧率创意（升格/降格）',
+            '50 期综合：AI 工具辅助、绿幕抠像、跟踪合成、声音设计、批量制作技巧'
+        ],
+        tips: '可考虑出"系列视频"（如"30 天 VLOG 挑战"），每系列 5–7 期，连载形式增加粉丝粘性。同时开始准备付费内容——把最擅长的技能打包成系统课程。'
+    }
+};
+
+function openTopic(key) {
+    const t = TOPICS[key]; if (!t) return;
+    const box = document.getElementById('modal-box');
+    const overlay = document.getElementById('modal-overlay');
+    box.innerHTML =
+        '<button class="modal-close" onclick="closeModal()">✕</button>' +
+        '<div class="modal-tag">' + t.tag + '</div>' +
+        '<h2>' + t.title + '</h2>' +
+        '<div class="modal-difficulty">' + t.difficulty + '</div>' +
+        '<div class="detail-section"><h4>📖 内容概述</h4><p>' + t.overview + '</p></div>' +
+        '<div class="detail-section"><h4>🛠️ 制作步骤</h4><ol>' + t.steps.map(function(s){return '<li>'+s+'</li>'}).join('') + '</ol></div>' +
+        '<div class="detail-section"><h4>💡 创作建议</h4><p>' + t.tips + '</p></div>';
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function openPhase(key) {
+    const p = PHASES[key]; if (!p) return;
+    const box = document.getElementById('modal-box');
+    const overlay = document.getElementById('modal-overlay');
+    box.innerHTML =
+        '<button class="modal-close" onclick="closeModal()">✕</button>' +
+        '<div class="modal-tag">' + p.tag + '</div>' +
+        '<h2>' + p.title + '</h2>' +
+        '<div class="modal-difficulty">' + p.difficulty + '</div>' +
+        '<div class="detail-section"><h4>📖 阶段概述</h4><p>' + p.overview + '</p></div>' +
+        '<div class="detail-section"><h4>📋 内容规划</h4><ul>' + p.steps.map(function(s){return '<li>'+s+'</li>'}).join('') + '</ul></div>' +
+        '<div class="detail-section"><h4>💡 运营建议</h4><p>' + p.tips + '</p></div>';
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+// ═══ Scroll reveal ═══
+var rvl = document.querySelectorAll('.reveal');
+var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: .08});
+rvl.forEach(function(el) { obs.observe(el); });
+window.addEventListener('load', function() {
+    rvl.forEach(function(el) {
+        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible');
+    });
+});
 </script>
 </body>
 </html>
