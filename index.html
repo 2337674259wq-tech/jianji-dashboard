@@ -6,8 +6,7 @@
 <title>🎬 剪辑选题系统</title>
 <style>
 /* ══════════════════════════════════════════
-   DESIGN SYSTEM — Segoe UI Variable + Noto Sans SC
-   Pure CSS textures & patterns — no external images
+   DESIGN SYSTEM + MG ANIMATIONS
    ══════════════════════════════════════════ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -33,11 +32,16 @@ body{
     font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
     background:var(--bg);color:var(--text);
     -webkit-font-smoothing:antialiased;line-height:1.55;
+    overflow-x:hidden;
 }
 h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;letter-spacing:-.025em}
 
-.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+/* ═══ Canvas Particles ═══ */
+#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.6}
 
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+/* ═══ Hero ═══ */
 .hero{
     position:relative;overflow:hidden;
     padding:90px 0 64px;margin-bottom:0;
@@ -53,24 +57,53 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
         linear-gradient(90deg, rgba(0,85,232,0.04) 1px, transparent 1px);
     background-size:48px 48px;
     opacity:.5;
+    animation:gridShift 20s linear infinite;
 }
-.hero .label{position:relative;display:inline-block;padding:5px 18px;border-radius:20px;background:rgba(0,85,232,.07);color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.6px;margin-bottom:20px}
-.hero h1{position:relative;font-size:clamp(38px,5.5vw,72px);font-weight:700;line-height:1.08;margin-bottom:16px;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero .sub{position:relative;font-size:clamp(16px,2vw,20px);color:var(--text2);max-width:520px;font-weight:400;margin-bottom:36px}
-.hero-stats{position:relative;display:flex;gap:40px;flex-wrap:wrap}
+@keyframes gridShift{0%{transform:translate(0,0)}100%{transform:translate(48px,24px)}}
+
+/* Hero glow orb */
+.hero-glow{
+    position:absolute;width:500px;height:500px;
+    border-radius:50%;filter:blur(120px);opacity:.12;
+    background:radial-gradient(circle, var(--accent), transparent 70%);
+    pointer-events:none;z-index:0;
+    animation:glowFloat 8s ease-in-out infinite;
+}
+.hero-glow.g1{top:-200px;left:10%;animation-delay:0s}
+.hero-glow.g2{top:20%;right:-150px;animation-delay:-4s;background:radial-gradient(circle, #7a1eb8, transparent 70%);opacity:.08}
+@keyframes glowFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.15)}66%{transform:translate(-20px,10px) scale(.9)}}
+
+.hero .label{position:relative;display:inline-block;padding:5px 18px;border-radius:20px;background:rgba(0,85,232,.07);color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.6px;margin-bottom:20px;z-index:1}
+.hero h1{position:relative;font-size:clamp(38px,5.5vw,72px);font-weight:700;line-height:1.08;margin-bottom:16px;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;z-index:1}
+.hero h1 em{font-style:normal;color:var(--accent);display:inline-block;
+    background:linear-gradient(135deg, #0055e8 0%, #7a1eb8 50%, #0055e8 100%);
+    background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+    animation:shimmer 3s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+.hero .sub{position:relative;font-size:clamp(16px,2vw,20px);color:var(--text2);max-width:520px;font-weight:400;margin-bottom:36px;z-index:1}
+.hero-stats{position:relative;display:flex;gap:40px;flex-wrap:wrap;z-index:1}
 .hero-stat{text-align:left}
-.hero-stat .num{font-size:38px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;color:var(--accent);letter-spacing:-.04em;line-height:1}
+.hero-stat .num{font-size:38px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;color:var(--accent);letter-spacing:-.04em;line-height:1;transition:transform .3s ease}
+.hero-stat:hover .num{transform:scale(1.1)}
 .hero-stat .lbl{font-size:11.5px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
 
-.sec{padding:56px 0}
+/* ═══ Section ═══ */
+.sec{padding:56px 0;position:relative}
 .sec-hd{margin-bottom:30px}
 .sec-hd .kicker{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:8px}
 .sec-hd h2{font-size:clamp(25px,3.2vw,38px);font-weight:700;margin-bottom:4px}
 .sec-hd .sub{font-size:14px;color:var(--text3)}
-.divider{width:100%;height:1px;background:var(--border)}
+.divider{width:100%;height:1px;background:var(--border);position:relative;overflow:hidden}
+.divider::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+    background:linear-gradient(90deg, transparent, rgba(0,85,232,.15), transparent);
+    animation:dividerShine 4s ease-in-out infinite;
+}
+@keyframes dividerShine{0%{left:-60%}100%{left:160%}}
 
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+/* ═══ Cards ═══ */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;perspective:1000px}
 .card{
     position:relative;background:var(--card);border-radius:var(--radius);padding:28px 24px 38px;
     border:1px solid var(--border);overflow:hidden;
@@ -78,8 +111,9 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
     transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
     background-image:
         radial-gradient(circle at 100% 0%, rgba(0,85,232,.015) 0%, transparent 50%);
+    transform-style:preserve-3d;
 }
-.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(0,85,232,.1);border-color:var(--accent)}
 .card::after{
     content:'→';position:absolute;bottom:10px;right:16px;
     font-size:14px;color:var(--accent);opacity:0;
@@ -87,27 +121,36 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
     transform:translateX(-4px);font-weight:700;
 }
 .card:hover::after{opacity:1;transform:translateX(0)}
-.card-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.card::before{
+    content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(0,85,232,.04) 0%, transparent 50%);
+    pointer-events:none;opacity:0;transition:opacity .3s ease;z-index:0;
+}
+.card:hover::before{opacity:1}
+.card>*{position:relative;z-index:1}
+.card-bar{position:absolute;top:0;left:0;right:0;height:3px;z-index:2}
 .card-bar.bar-red{background:var(--red)}
 .card-bar.bar-blue{background:var(--accent)}
 .card-bar.bar-purple{background:var(--purple)}
-.card-medal{font-size:26px;position:absolute;top:12px;right:16px;opacity:.12}
+.card-medal{font-size:26px;position:absolute;top:12px;right:16px;opacity:.12;transition:opacity .3s ease,transform .3s ease}
+.card:hover .card-medal{opacity:.25;transform:scale(1.2) rotate(-5deg)}
 .card-tag{display:inline-block;padding:2px 10px;border-radius:6px;font-size:10.5px;font-weight:600;background:rgba(0,85,232,.06);color:var(--accent);margin-bottom:10px}
 .card h3{font-size:14.5px;font-weight:600;line-height:1.35;margin-bottom:8px}
 .card-meta{font-size:11.5px;color:var(--text2);margin-bottom:8px}
 .card-desc{font-size:12.5px;color:var(--text3);line-height:1.5}
 
+/* ═══ Stage cards ═══ */
 .stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 @media(max-width:768px){.stage-grid{grid-template-columns:1fr}}
 .stage-card{
     display:flex;gap:20px;align-items:flex-start;
     background:var(--card);border-radius:var(--radius);padding:28px 38px 28px 26px;
     border:1px solid var(--border);cursor:pointer;
-    transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+    transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;
     background-image:linear-gradient(135deg, rgba(0,85,232,.02) 0%, transparent 50%);
-    position:relative;
+    position:relative;overflow:hidden;
 }
-.stage-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.stage-card:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,85,232,.08);border-color:var(--accent)}
 .stage-card::after{
     content:'→';position:absolute;top:50%;right:16px;
     transform:translateY(-50%) translateX(-4px);
@@ -117,15 +160,18 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
 }
 .stage-card:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
 .stage-num{
-    font-size:40px;font-weight:800;color:var(--accent);opacity:.08;
+    font-size:40px;font-weight:800;color:var(--accent);opacity:.06;
     font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;
     letter-spacing:-.04em;line-height:1;flex-shrink:0;width:48px;text-align:center;
+    transition:opacity .3s ease,transform .3s ease;
 }
+.stage-card:hover .stage-num{opacity:.15;transform:scale(1.15)}
 .stage-content h4{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:10px}
 .stage-content h4 span{font-size:12px;font-weight:500;color:var(--accent);letter-spacing:.2px}
 .stage-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px}
 .stage-desc{font-size:13px;color:var(--text3);line-height:1.5}
 
+/* ═══ Info cards ═══ */
 .info-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
 @media(max-width:768px){.info-row{grid-template-columns:1fr}}
 .info-card{
@@ -133,47 +179,74 @@ h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","M
     border:1px solid var(--border);
     background-image:linear-gradient(135deg, rgba(0,85,232,.015) 0%, transparent 50%);
     font-size:13.5px;color:var(--text2);line-height:1.6;
+    transition:transform .25s ease,box-shadow .25s ease;
 }
+.info-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
 .info-card strong{color:var(--text);font-weight:600}
 
+/* ═══ Stats ═══ */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 @media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
 .stat-panel{
     background:var(--card);border-radius:var(--radius);padding:28px;
     border:1px solid var(--border);
     background-image:radial-gradient(circle at 100% 0%, rgba(0,85,232,.02) 0%, transparent 50%);
+    transition:transform .25s ease,box-shadow .25s ease;
 }
+.stat-panel:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
 .stat-panel h3{font-size:16px;font-weight:700;margin-bottom:22px}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
 .bar-label{font-size:11.5px;color:var(--text2);min-width:90px;text-align:right;font-weight:500}
-.bar-track{flex:1;height:6px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;background:var(--accent);transition:width 1s cubic-bezier(.16,1,.3,1)}
+.bar-track{flex:1;height:6px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;position:relative}
+.bar-track::after{content:'';position:absolute;top:0;left:0;height:100%;width:0;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent);
+    animation:barShine 2s ease-in-out infinite;
+}
+@keyframes barShine{0%{width:0;left:0}50%{width:30%}100%{width:0;left:100%}}
+.bar-fill{height:100%;border-radius:3px;background:var(--accent);width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
 .bar-fill.fill-red{background:var(--red)}
 .bar-fill.fill-blue{background:var(--accent)}
 .bar-fill.fill-purple{background:var(--purple)}
 .bar-num{font-size:11.5px;color:var(--text3);min-width:36px;font-weight:500;text-align:left}
 
+/* ═══ KPI ═══ */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
 @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
 .kpi{
     background:var(--card);border-radius:var(--radius);padding:24px;
     border:1px solid var(--border);text-align:center;
+    transition:transform .25s ease,box-shadow .25s ease;
+    position:relative;overflow:hidden;
 }
-.kpi .val{font-size:42px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;letter-spacing:-.04em}
-.kpi .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;font-weight:600}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.kpi .val{font-size:42px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;letter-spacing:-.04em;position:relative;z-index:1}
+.kpi .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;font-weight:600;position:relative;z-index:1}
+.kpi-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:80px;height:80px;border-radius:50%;border:2px solid rgba(0,85,232,.06);
+    pointer-events:none;transition:transform .4s ease;
+}
+.kpi:hover .kpi-ring{transform:translate(-50%,-50%) scale(1.3);border-color:rgba(0,85,232,.12)}
 
-footer{padding:32px 0;text-align:center;font-size:12.5px;color:var(--text3)}
+footer{padding:32px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}
 footer span{color:var(--accent);font-weight:500}
 
+/* ═══ Reveal ═══ */
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s cubic-bezier(.16,1,.3,1)}
 .reveal.visible{opacity:1;transform:translateY(0)}
 .reveal:nth-child(1){transition-delay:0s}
-.reveal:nth-child(2){transition-delay:.04s}
-.reveal:nth-child(3){transition-delay:.08s}
-.reveal:nth-child(4){transition-delay:.12s}
-.reveal:nth-child(5){transition-delay:.16s}
+.reveal:nth-child(2){transition-delay:.05s}
+.reveal:nth-child(3){transition-delay:.1s}
+.reveal:nth-child(4){transition-delay:.15s}
+.reveal:nth-child(5){transition-delay:.2s}
 
-/* ── Modal ── */
+/* ═══ Floating emojis (decoration) ═══ */
+.float-emoji{position:absolute;pointer-events:none;opacity:.07;font-size:60px;z-index:0;animation:floatEmoji 12s ease-in-out infinite}
+.float-emoji.e1{top:20%;left:5%;font-size:50px;animation-delay:0s}
+.float-emoji.e2{top:50%;right:8%;font-size:70px;animation-delay:-4s}
+.float-emoji.e3{top:75%;left:3%;font-size:45px;animation-delay:-8s}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-20px) rotate(5deg)}50%{transform:translateY(-10px) rotate(-3deg)}75%{transform:translateY(-30px) rotate(2deg)}}
+
+/* ═══ Modal ═══ */
 .modal-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,.45);
     display:flex;align-items:center;justify-content:center;
@@ -187,8 +260,8 @@ footer span{color:var(--accent);font-weight:500}
     max-width:640px;width:90vw;max-height:80vh;
     overflow-y:auto;padding:40px 36px 32px;
     position:relative;
-    transform:translateY(20px) scale(.96);
-    transition:transform .3s cubic-bezier(.16,1,.3,1);
+    transform:translateY(30px) scale(.94);
+    transition:transform .35s cubic-bezier(.16,1,.3,1);
     box-shadow:0 20px 60px rgba(0,0,0,.15);
 }
 .modal-overlay.active .modal-box{transform:translateY(0) scale(1)}
@@ -200,7 +273,7 @@ footer span{color:var(--accent);font-weight:500}
     justify-content:center;color:var(--text3);
     transition:all .2s ease;
 }
-.modal-close:hover{background:var(--bg);color:var(--text);border-color:var(--border2)}
+.modal-close:hover{background:var(--bg);color:var(--text);border-color:var(--border2);transform:rotate(90deg)}
 .modal-tag{
     display:inline-block;padding:3px 12px;border-radius:6px;
     font-size:11px;font-weight:600;background:rgba(0,85,232,.06);
@@ -223,26 +296,40 @@ footer span{color:var(--accent);font-weight:500}
     .modal-box{padding:28px 22px 24px;max-width:95vw}
     .modal-box h2{font-size:21px}
 }
+
+/* ═══ Pulse ring on clickable elements ═══ */
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,85,232,.2)}70%{box-shadow:0 0 0 10px rgba(0,85,232,0)}100%{box-shadow:0 0 0 0 rgba(0,85,232,0)}}
+.card:active,.stage-card:active{animation:pulse .6s ease-out}
 </style>
 </head>
 <body>
 
+<!-- ═══ Particle canvas ═══ -->
+<canvas id="particles-canvas"></canvas>
+
 <div class="wrap">
 
+<!-- ═══ Hero ═══ -->
 <header class="hero">
+    <div class="hero-glow g1"></div>
+    <div class="hero-glow g2"></div>
+    <div class="float-emoji e1">🎬</div>
+    <div class="float-emoji e2">✂️</div>
+    <div class="float-emoji e3">🎥</div>
     <div class="label">🎬 DAILY TOPIC SYSTEM</div>
     <h1>拍摄<em>+</em>剪辑<br>选题系统</h1>
     <p class="sub">每天一个选题 · 从拍到剪全流程 · 200 期完整规划</p>
     <div class="hero-stats">
-        <div class="hero-stat"><div class="num">200</div><div class="lbl">总选题</div></div>
-        <div class="hero-stat"><div class="num">200</div><div class="lbl">待发布</div></div>
-        <div class="hero-stat"><div class="num">200</div><div class="lbl">日历期数</div></div>
-        <div class="hero-stat"><div class="num">11</div><div class="lbl">大分类</div></div>
+        <div class="hero-stat"><div class="num" data-count="200">0</div><div class="lbl">总选题</div></div>
+        <div class="hero-stat"><div class="num" data-count="200">0</div><div class="lbl">待发布</div></div>
+        <div class="hero-stat"><div class="num" data-count="200">0</div><div class="lbl">日历期数</div></div>
+        <div class="hero-stat"><div class="num" data-count="11">0</div><div class="lbl">大分类</div></div>
     </div>
 </header>
 
 <div class="divider"></div>
 
+<!-- ═══ 今日选题 ═══ -->
 <section class="sec">
     <div class="sec-hd"><div class="kicker">Today's Picks</div><h2>🔥 今日推荐选题</h2><p class="sub">2026-06-28 · 点击任意卡片查看完整制作指南</p></div>
     <div class="card-grid">
@@ -286,6 +373,7 @@ footer span{color:var(--accent);font-weight:500}
 
 <div class="divider"></div>
 
+<!-- ═══ 内容日历 ═══ -->
 <section class="sec">
     <div class="sec-hd"><div class="kicker">Content Calendar</div><h2>🗓️ 200期内容日历</h2><p class="sub">三阶段渐进 · 从小白到进阶 · 覆盖11大分类 · 点击各阶段查看详情</p></div>
     <div class="stage-grid">
@@ -322,44 +410,45 @@ footer span{color:var(--accent);font-weight:500}
 
 <div class="divider"></div>
 
+<!-- ═══ 数据统计 ═══ -->
 <section class="sec">
     <div class="sec-hd"><div class="kicker">Statistics</div><h2>📊 数据概览</h2></div>
     <div class="kpi-row">
-        <div class="kpi"><div class="val" style="color:var(--accent)">200</div><div class="lbl">总选题</div></div>
-        <div class="kpi"><div class="val" style="color:var(--green)">200</div><div class="lbl">待发布</div></div>
-        <div class="kpi"><div class="val" style="color:var(--purple)">0</div><div class="lbl">已发布</div></div>
-        <div class="kpi"><div class="val" style="color:var(--orange)">200</div><div class="lbl">日历期数</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--accent)" data-count="200">0</div><div class="lbl">总选题</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--green)" data-count="200">0</div><div class="lbl">待发布</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--purple)" data-count="0">0</div><div class="lbl">已发布</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--orange)" data-count="200">0</div><div class="lbl">日历期数</div></div>
     </div>
     <div class="stats-grid" style="margin-top:24px">
         <div class="stat-panel reveal" data-reveal><h3>📂 11大分类覆盖</h3><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">拍摄技巧</span><div class="bar-track"><div class="bar-fill" style="width:14.5%"></div></div><span class="bar-num">29</span>
+    <span class="bar-label">拍摄技巧</span><div class="bar-track"><div class="bar-fill" data-width="14.5"></div></div><span class="bar-num">29</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">调色教程</span><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><span class="bar-num">24</span>
+    <span class="bar-label">调色教程</span><div class="bar-track"><div class="bar-fill" data-width="12"></div></div><span class="bar-num">24</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">案例实战</span><div class="bar-track"><div class="bar-fill" style="width:11%"></div></div><span class="bar-num">22</span>
+    <span class="bar-label">案例实战</span><div class="bar-track"><div class="bar-fill" data-width="11"></div></div><span class="bar-num">22</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">蒙版&关键帧</span><div class="bar-track"><div class="bar-fill" style="width:10.5%"></div></div><span class="bar-num">21</span>
+    <span class="bar-label">蒙版&amp;关键帧</span><div class="bar-track"><div class="bar-fill" data-width="10.5"></div></div><span class="bar-num">21</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">转场特效</span><div class="bar-track"><div class="bar-fill" style="width:10%"></div></div><span class="bar-num">20</span>
+    <span class="bar-label">转场特效</span><div class="bar-track"><div class="bar-fill" data-width="10"></div></div><span class="bar-num">20</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">卡点节奏</span><div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div><span class="bar-num">15</span>
+    <span class="bar-label">卡点节奏</span><div class="bar-track"><div class="bar-fill" data-width="7.5"></div></div><span class="bar-num">15</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">文字动画</span><div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div><span class="bar-num">15</span>
+    <span class="bar-label">文字动画</span><div class="bar-track"><div class="bar-fill" data-width="7.5"></div></div><span class="bar-num">15</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">抠像&合成</span><div class="bar-track"><div class="bar-fill" style="width:7.5%"></div></div><span class="bar-num">15</span>
+    <span class="bar-label">抠像&amp;合成</span><div class="bar-track"><div class="bar-fill" data-width="7.5"></div></div><span class="bar-num">15</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">音频处理</span><div class="bar-track"><div class="bar-fill" style="width:7%"></div></div><span class="bar-num">14</span>
+    <span class="bar-label">音频处理</span><div class="bar-track"><div class="bar-fill" data-width="7"></div></div><span class="bar-num">14</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">热门跟拍</span><div class="bar-track"><div class="bar-fill" style="width:6.5%"></div></div><span class="bar-num">13</span>
+    <span class="bar-label">热门跟拍</span><div class="bar-track"><div class="bar-fill" data-width="6.5"></div></div><span class="bar-num">13</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">剪映基础操作</span><div class="bar-track"><div class="bar-fill" style="width:6%"></div></div><span class="bar-num">12</span>
+    <span class="bar-label">剪映基础操作</span><div class="bar-track"><div class="bar-fill" data-width="6"></div></div><span class="bar-num">12</span>
 </div></div>
         <div class="stat-panel reveal" data-reveal><h3>📈 内容类型分布</h3><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">爆款</span><div class="bar-track"><div class="bar-fill fill-red" style="width:22%"></div></div><span class="bar-num">44</span>
+    <span class="bar-label">爆款</span><div class="bar-track"><div class="bar-fill fill-red" data-width="22"></div></div><span class="bar-num">44</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">干货</span><div class="bar-track"><div class="bar-fill fill-blue" style="width:68.5%"></div></div><span class="bar-num">137</span>
+    <span class="bar-label">干货</span><div class="bar-track"><div class="bar-fill fill-blue" data-width="68.5"></div></div><span class="bar-num">137</span>
 </div><div class="bar-row reveal" data-reveal>
-    <span class="bar-label">深度</span><div class="bar-track"><div class="bar-fill fill-purple" style="width:9.5%"></div></div><span class="bar-num">19</span>
+    <span class="bar-label">深度</span><div class="bar-track"><div class="bar-fill fill-purple" data-width="9.5"></div></div><span class="bar-num">19</span>
 </div></div>
     </div>
 </section>
@@ -373,8 +462,177 @@ footer span{color:var(--accent);font-weight:500}
 </div>
 
 <script>
-// ═══ Topic data ═══
-const TOPICS = {
+(function() {
+    // ═══ Particle canvas ═══
+    var canvas = document.getElementById('particles-canvas');
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var w, h;
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = document.documentElement.scrollHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    for (var i = 0; i < 50; i++) {
+        particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.5 + .5,
+            vx: (Math.random() - .5) * .3,
+            vy: (Math.random() - .5) * .3,
+            alpha: Math.random() * .5 + .2
+        });
+    }
+
+    function drawParticles() {
+        ctx.clearRect(0, 0, w, h);
+        for (var i = 0; i < particles.length; i++) {
+            var p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0) p.x = w;
+            if (p.x > w) p.x = 0;
+            if (p.y < 0) p.y = h;
+            if (p.y > h) p.y = 0;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,85,232,' + p.alpha + ')';
+            ctx.fill();
+        }
+        // Draw connections between close particles
+        for (var i = 0; i < particles.length; i++) {
+            for (var j = i + 1; j < particles.length; j++) {
+                var dx = particles[i].x - particles[j].x;
+                var dy = particles[i].y - particles[j].y;
+                var dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = 'rgba(0,85,232,' + (1 - dist / 120) * .06 + ')';
+                    ctx.lineWidth = .5;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    // ═══ Mouse-follow glow on cards ═══
+    var cards = document.querySelectorAll('.card');
+    cards.forEach(function(card) {
+        card.addEventListener('mousemove', function(e) {
+            var rect = card.getBoundingClientRect();
+            var x = ((e.clientX - rect.left) / rect.width) * 100;
+            var y = ((e.clientY - rect.top) / rect.height) * 100;
+            card.style.setProperty('--mx', x + '%');
+            card.style.setProperty('--my', y + '%');
+        });
+    });
+
+    // ═══ Count-up animation ═══
+    function animateCount(el, target, duration) {
+        var start = 0;
+        var startTime = null;
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            var progress = Math.min((timestamp - startTime) / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+            el.textContent = Math.round(eased * target);
+            if (progress < 1) requestAnimationFrame(step);
+            else el.textContent = target;
+        }
+        requestAnimationFrame(step);
+    }
+
+    var countObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var nums = entry.target.querySelectorAll('[data-count]');
+                nums.forEach(function(num) {
+                    var target = parseInt(num.getAttribute('data-count'));
+                    if (!num._counted && target > 0) {
+                        num._counted = true;
+                        animateCount(num, target, 1500);
+                    }
+                });
+                // Animate progress bars
+                var bars = entry.target.querySelectorAll('[data-width]');
+                bars.forEach(function(bar) {
+                    if (!bar._animated) {
+                        bar._animated = true;
+                        setTimeout(function() {
+                            bar.style.width = bar.getAttribute('data-width') + '%';
+                        }, 200);
+                    }
+                });
+            }
+        });
+    }, { threshold: .15 });
+
+    // Observe sections containing data-count or data-width
+    document.querySelectorAll('.hero-stats, .kpi-row, .stat-panel').forEach(function(el) {
+        countObserver.observe(el);
+    });
+
+    // ═══ Reveal ═══
+    var rvl = document.querySelectorAll('.reveal');
+    var obs = new IntersectionObserver(function(es) {
+        es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: .08 });
+    rvl.forEach(function(el) { obs.observe(el); });
+    window.addEventListener('load', function() {
+        rvl.forEach(function(el) {
+            if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible');
+        });
+    });
+
+    // Trigger hero stats count on load
+    setTimeout(function() {
+        document.querySelectorAll('.hero-stat .num[data-count]').forEach(function(num) {
+            var target = parseInt(num.getAttribute('data-count'));
+            if (!num._counted && target > 0) { num._counted = true; animateCount(num, target, 1500); }
+        });
+        document.querySelectorAll('.kpi .val[data-count]').forEach(function(num) {
+            var target = parseInt(num.getAttribute('data-count'));
+            if (!num._counted && target > 0) { num._counted = true; animateCount(num, target, 1500); }
+        });
+    }, 400);
+
+    // Scroll-triggered bar animation
+    var barObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var bars = entry.target.querySelectorAll('[data-width]');
+                bars.forEach(function(bar, i) {
+                    if (!bar._animated) {
+                        bar._animated = true;
+                        setTimeout(function() {
+                            bar.style.width = bar.getAttribute('data-width') + '%';
+                        }, i * 60);
+                    }
+                });
+            }
+        });
+    }, { threshold: .1 });
+    document.querySelectorAll('.stat-panel').forEach(function(p) { barObserver.observe(p); });
+
+    // ═══ Canvas resize on scroll (for full page height) ═══
+    var resizeTimeout;
+    window.addEventListener('scroll', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            h = canvas.height = document.documentElement.scrollHeight;
+        }, 200);
+    });
+})();
+
+// ═══ Topic Data ═══
+var TOPICS = {
     'reverse-effect': {
         tag: '剪映基础操作',
         title: '倒放效果：让视频变魔术的秘密',
@@ -447,7 +705,7 @@ const TOPICS = {
     }
 };
 
-const PHASES = {
+var PHASES = {
     'phase1': {
         tag: '冷启动期 · 第 1–30 期',
         title: '剪映基础 + 拍摄入门',
@@ -490,9 +748,9 @@ const PHASES = {
 };
 
 function openTopic(key) {
-    const t = TOPICS[key]; if (!t) return;
-    const box = document.getElementById('modal-box');
-    const overlay = document.getElementById('modal-overlay');
+    var t = TOPICS[key]; if (!t) return;
+    var box = document.getElementById('modal-box');
+    var overlay = document.getElementById('modal-overlay');
     box.innerHTML =
         '<button class="modal-close" onclick="closeModal()">✕</button>' +
         '<div class="modal-tag">' + t.tag + '</div>' +
@@ -506,9 +764,9 @@ function openTopic(key) {
 }
 
 function openPhase(key) {
-    const p = PHASES[key]; if (!p) return;
-    const box = document.getElementById('modal-box');
-    const overlay = document.getElementById('modal-overlay');
+    var p = PHASES[key]; if (!p) return;
+    var box = document.getElementById('modal-box');
+    var overlay = document.getElementById('modal-overlay');
     box.innerHTML =
         '<button class="modal-close" onclick="closeModal()">✕</button>' +
         '<div class="modal-tag">' + p.tag + '</div>' +
@@ -527,18 +785,6 @@ function closeModal() {
 }
 
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
-
-// ═══ Scroll reveal ═══
-var rvl = document.querySelectorAll('.reveal');
-var obs = new IntersectionObserver(function(es) {
-    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, {threshold: .08});
-rvl.forEach(function(el) { obs.observe(el); });
-window.addEventListener('load', function() {
-    rvl.forEach(function(el) {
-        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible');
-    });
-});
 </script>
 </body>
 </html>
