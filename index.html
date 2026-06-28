@@ -5,317 +5,305 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>🎬 剪辑选题系统</title>
 <style>
-/* ══════════════════════════════════════════
-   DESIGN SYSTEM + MG ANIMATIONS
-   ══════════════════════════════════════════ */
+/* ════════════════ DESIGN SYSTEM + Q弹 MG ════════════════ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-    --bg:#f6f7fa;
-    --card:#fff;
-    --text:#111318;
-    --text2:#555a66;
-    --text3:#8a8e9a;
-    --border:#e6e7ee;
-    --border2:#dcdde6;
-    --accent:#0055e8;
-    --accent2:#003bb5;
-    --red:#d92d20;
-    --orange:#e04f16;
-    --green:#188038;
-    --purple:#7a1eb8;
-    --radius:14px;
-    --radius-sm:10px;
-    --shadow-sm:0 1px 2px rgba(0,0,0,.03);
-    --shadow:0 1px 3px rgba(0,0,0,.04),0 4px 20px rgba(0,0,0,.04);
-    --shadow-lg:0 8px 40px rgba(0,0,0,.06);
+    --bg:#f6f7fa;--card:#fff;
+    --text:#111318;--text2:#555a66;--text3:#8a8e9a;
+    --border:#e6e7ee;--border2:#dcdde6;
+    --accent:#0055e8;--accent2:#003bb5;
+    --red:#d92d20;--orange:#e04f16;--green:#188038;--purple:#7a1eb8;
+    --radius:16px;--radius-sm:10px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.04);
+    --shadow:0 2px 8px rgba(0,0,0,.05),0 8px 32px rgba(0,0,0,.05);
+    --shadow-lg:0 8px 30px rgba(0,0,0,.07),0 20px 60px rgba(0,0,0,.05);
+    --spring:cubic-bezier(0.34,1.56,0.64,1);
+    --bounce:cubic-bezier(0.68,-0.55,0.27,1.55);
+    --smooth:cubic-bezier(0.22,0.61,0.36,1);
     font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
     background:var(--bg);color:var(--text);
-    -webkit-font-smoothing:antialiased;line-height:1.55;
-    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;
 }
 h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;letter-spacing:-.025em}
 
-/* ═══ Canvas Particles ═══ */
-#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.6}
+/* ═══ Canvas ═══ */
+#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.45}
+
+/* ═══ Floating geometric shapes ═══ */
+.geo-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.geo{position:absolute;opacity:.06;animation:geoFloat 14s var(--spring) infinite}
+@keyframes geoFloat{
+    0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}
+    20%{transform:translate(25px,-40px) rotate(72deg) scale(1.3)}
+    40%{transform:translate(-15px,-80px) rotate(144deg) scale(.85)}
+    60%{transform:translate(-35px,-20px) rotate(216deg) scale(1.15)}
+    80%{transform:translate(20px,-60px) rotate(288deg) scale(.9)}
+}
+.geo.circle{border-radius:50%;border:2px solid var(--accent)}
+.geo.triangle{width:0!important;height:0!important;border:none!important;
+    border-left:solid transparent;border-right:solid transparent;
+    border-bottom:solid var(--accent);background:none!important}
+.geo.square{border-radius:4px;border:2px solid var(--purple)}
+.geo.dot{border-radius:50%;background:var(--accent)!important;border:none!important}
+.geo.ring{border-radius:50%;border:2px dashed var(--accent);background:none!important}
+
+/* ═══ Spring entrance = keyframe ═══ */
+@keyframes springIn{0%{opacity:0;transform:scale(.3) translateY(60px)}60%{opacity:1;transform:scale(1.08) translateY(-4px)}80%{transform:scale(.96) translateY(2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes springInLeft{0%{opacity:0;transform:translateX(-80px) scale(.8)}60%{opacity:1;transform:translateX(8px) scale(1.05)}80%{transform:translateX(-3px) scale(.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes springInRight{0%{opacity:0;transform:translateX(80px) scale(.8)}60%{opacity:1;transform:translateX(-8px) scale(1.05)}80%{transform:translateX(3px) scale(.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes springInUp{0%{opacity:0;transform:translateY(60px) scale(.8)}60%{opacity:1;transform:translateY(-8px) scale(1.04)}80%{transform:translateY(3px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes fadeSlideUp{0%{opacity:0;transform:translateY(40px)}100%{opacity:1;transform:translateY(0)}}
 
 .wrap{max-width:1240px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
 
-/* ═══ Hero ═══ */
-.hero{
-    position:relative;overflow:hidden;
-    padding:90px 0 64px;margin-bottom:0;
-    background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,85,232,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 50% at 80% 100%, rgba(0,85,232,0.04) 0%, transparent 50%),
-        linear-gradient(180deg, #f8f9fc 0%, var(--bg) 100%);
-}
-.hero::before{
-    content:'';position:absolute;inset:0;pointer-events:none;
-    background-image:
-        linear-gradient(rgba(0,85,232,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,85,232,0.04) 1px, transparent 1px);
-    background-size:48px 48px;
-    opacity:.5;
-    animation:gridShift 20s linear infinite;
-}
-@keyframes gridShift{0%{transform:translate(0,0)}100%{transform:translate(48px,24px)}}
+/* ═══ HERO ═══ */
+.hero{position:relative;overflow:visible;padding:100px 0 80px;margin-bottom:0;z-index:2}
+.hero-bg{position:absolute;inset:-100px -50px;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(0,85,232,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 35% 45% at 85% 100%,rgba(0,85,232,.03) 0%,transparent 50%),
+    linear-gradient(180deg,#f8f9fc 0%,var(--bg) 100%)}
+.hero-glow{position:absolute;width:600px;height:600px;border-radius:50%;filter:blur(150px);opacity:.08;pointer-events:none;z-index:0;
+    animation:glowFloat 10s var(--smooth) infinite}
+.hero-glow.g1{top:-300px;left:5%;background:radial-gradient(circle,#0055e8,transparent 70%);animation-delay:0s}
+.hero-glow.g2{top:10%;right:-200px;background:radial-gradient(circle,#7a1eb8,transparent 70%);animation-delay:-5s}
+@keyframes glowFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.2)}66%{transform:translate(-25px,15px) scale(.85)}}
 
-/* Hero glow orb */
-.hero-glow{
-    position:absolute;width:500px;height:500px;
-    border-radius:50%;filter:blur(120px);opacity:.12;
-    background:radial-gradient(circle, var(--accent), transparent 70%);
-    pointer-events:none;z-index:0;
-    animation:glowFloat 8s ease-in-out infinite;
-}
-.hero-glow.g1{top:-200px;left:10%;animation-delay:0s}
-.hero-glow.g2{top:20%;right:-150px;animation-delay:-4s;background:radial-gradient(circle, #7a1eb8, transparent 70%);opacity:.08}
-@keyframes glowFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.15)}66%{transform:translate(-20px,10px) scale(.9)}}
+/* Hero geometric toys */
+.hero-toy{position:absolute;pointer-events:none;z-index:0}
+.hero-toy.t1{top:15%;left:8%;width:60px;height:60px;border:3px solid var(--accent);border-radius:50%;opacity:.06;animation:toyBounce1 7s var(--spring) infinite}
+.hero-toy.t2{top:40%;right:10%;width:40px;height:40px;background:var(--accent);border-radius:8px;opacity:.04;animation:toyBounce2 9s var(--spring) infinite;transform:rotate(45deg)}
+.hero-toy.t3{bottom:20%;left:15%;width:50px;height:50px;border:3px dashed var(--purple);border-radius:50%;opacity:.05;animation:toySpin 11s linear infinite}
+.hero-toy.t4{top:25%;right:25%;width:30px;height:30px;border-radius:50%;background:var(--purple);opacity:.04;animation:toyBounce1 6s var(--spring) infinite;animation-delay:-3s}
+.hero-toy.t5{bottom:30%;right:15%;width:20px;height:80px;border:2px solid var(--accent);border-radius:10px;opacity:.04;animation:toyBounce2 8s var(--spring) infinite;animation-delay:-5s}
+@keyframes toyBounce1{0%,100%{transform:translateY(0) rotate(0deg)}30%{transform:translateY(-50px) rotate(60deg)}60%{transform:translateY(-20px) rotate(120deg)}80%{transform:translateY(-35px) rotate(180deg)}}
+@keyframes toyBounce2{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-60px) rotate(-45deg)}50%{transform:translateY(-15px) rotate(-90deg)}75%{transform:translateY(-45px) rotate(-135deg)}}
+@keyframes toySpin{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.4)}100%{transform:rotate(360deg) scale(1)}}
 
-.hero .label{position:relative;display:inline-block;padding:5px 18px;border-radius:20px;background:rgba(0,85,232,.07);color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.6px;margin-bottom:20px;z-index:1}
-.hero h1{position:relative;font-size:clamp(38px,5.5vw,72px);font-weight:700;line-height:1.08;margin-bottom:16px;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;z-index:1}
-.hero h1 em{font-style:normal;color:var(--accent);display:inline-block;
-    background:linear-gradient(135deg, #0055e8 0%, #7a1eb8 50%, #0055e8 100%);
-    background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;
-    animation:shimmer 3s linear infinite;
+.hero .label{position:relative;display:inline-block;padding:6px 20px;border-radius:24px;background:rgba(0,85,232,.06);color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.8px;margin-bottom:24px;z-index:1;
+    text-shadow:0 0 20px rgba(0,85,232,.15);
+    box-shadow:0 2px 12px rgba(0,85,232,.06),inset 0 1px 0 rgba(255,255,255,.5);
+    animation:springIn .7s var(--spring) .1s both}
+.hero h1{position:relative;font-size:clamp(42px,6vw,80px);font-weight:800;line-height:1.06;margin-bottom:20px;z-index:1;
+    text-shadow:0 2px 4px rgba(0,0,0,.04),0 8px 30px rgba(0,85,232,.06);
+    animation:springIn .8s var(--spring) .2s both}
+.hero h1 em{font-style:normal;
+    background:linear-gradient(135deg,#0055e8 0%,#7a1eb8 40%,#e04f16 70%,#0055e8 100%);
+    background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    display:inline-block;
+    animation:shimmer 4s linear infinite;
+    text-shadow:none;
+    filter:drop-shadow(0 4px 8px rgba(0,85,232,.2));
 }
-@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
-.hero .sub{position:relative;font-size:clamp(16px,2vw,20px);color:var(--text2);max-width:520px;font-weight:400;margin-bottom:36px;z-index:1}
-.hero-stats{position:relative;display:flex;gap:40px;flex-wrap:wrap;z-index:1}
-.hero-stat{text-align:left}
-.hero-stat .num{font-size:38px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;color:var(--accent);letter-spacing:-.04em;line-height:1;transition:transform .3s ease}
-.hero-stat:hover .num{transform:scale(1.1)}
-.hero-stat .lbl{font-size:11.5px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:300% center}}
+.hero .sub{position:relative;font-size:clamp(16px,2vw,20px);color:var(--text2);max-width:560px;font-weight:400;margin-bottom:44px;z-index:1;
+    text-shadow:0 1px 2px rgba(0,0,0,.03);
+    animation:fadeSlideUp .7s var(--smooth) .35s both}
+.hero-stats{position:relative;display:flex;gap:48px;flex-wrap:wrap;z-index:1}
+.hero-stat{text-align:left;animation:springInUp .7s var(--spring) both}
+.hero-stat:nth-child(1){animation-delay:.4s}.hero-stat:nth-child(2){animation-delay:.48s}.hero-stat:nth-child(3){animation-delay:.56s}.hero-stat:nth-child(4){animation-delay:.64s}
+.hero-stat .num{font-size:42px;font-weight:800;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;color:var(--accent);line-height:1;
+    text-shadow:0 2px 8px rgba(0,85,232,.12);
+    transition:transform .3s var(--spring)}
+.hero-stat:hover .num{transform:scale(1.15)}
+.hero-stat .lbl{font-size:11.5px;color:var(--text3);margin-top:8px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;
+    text-shadow:0 1px 2px rgba(0,0,0,.02)}
 
 /* ═══ Section ═══ */
-.sec{padding:56px 0;position:relative}
-.sec-hd{margin-bottom:30px}
-.sec-hd .kicker{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:8px}
-.sec-hd h2{font-size:clamp(25px,3.2vw,38px);font-weight:700;margin-bottom:4px}
-.sec-hd .sub{font-size:14px;color:var(--text3)}
+.sec{padding:60px 0;position:relative}
+.sec-hd{margin-bottom:36px}
+.sec-hd .kicker{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:10px;
+    text-shadow:0 0 20px rgba(0,85,232,.1);
+    display:inline-block;padding:4px 0}
+.sec-hd h2{font-size:clamp(26px,3.5vw,42px);font-weight:800;margin-bottom:6px;
+    text-shadow:0 2px 4px rgba(0,0,0,.03),0 10px 30px rgba(0,85,232,.04)}
+.sec-hd .sub{font-size:14px;color:var(--text3);
+    text-shadow:0 1px 1px rgba(0,0,0,.02)}
 .divider{width:100%;height:1px;background:var(--border);position:relative;overflow:hidden}
-.divider::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
-    background:linear-gradient(90deg, transparent, rgba(0,85,232,.15), transparent);
-    animation:dividerShine 4s ease-in-out infinite;
-}
-@keyframes dividerShine{0%{left:-60%}100%{left:160%}}
+.divider::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(0,85,232,.18),transparent);
+    animation:dividerShine 5s var(--smooth) infinite}
+@keyframes dividerShine{0%{left:-50%}100%{left:150%}}
+
+/* ═══ Section entrance ═══ */
+.sec-hd .kicker.visible{animation:springInLeft .6s var(--spring) both}
+.sec-hd h2.visible{animation:springInLeft .7s var(--spring) .05s both}
+.sec-hd .sub.visible{animation:fadeSlideUp .6s var(--smooth) .1s both}
 
 /* ═══ Cards ═══ */
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;perspective:1000px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .card{
-    position:relative;background:var(--card);border-radius:var(--radius);padding:28px 24px 38px;
-    border:1px solid var(--border);overflow:hidden;
-    cursor:pointer;
-    transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
-    background-image:
-        radial-gradient(circle at 100% 0%, rgba(0,85,232,.015) 0%, transparent 50%);
-    transform-style:preserve-3d;
+    position:relative;background:var(--card);border-radius:var(--radius);padding:30px 26px 40px;
+    border:1px solid var(--border);overflow:hidden;cursor:pointer;
+    transition:transform .4s var(--spring),box-shadow .4s var(--spring),border-color .3s ease;
+    box-shadow:0 1px 4px rgba(0,0,0,.03),0 4px 16px rgba(0,0,0,.03);
+    background-image:radial-gradient(circle at 100% 0%,rgba(0,85,232,.015) 0%,transparent 50%);
 }
-.card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(0,85,232,.1);border-color:var(--accent)}
-.card::after{
-    content:'→';position:absolute;bottom:10px;right:16px;
-    font-size:14px;color:var(--accent);opacity:0;
-    transition:opacity .2s ease,transform .2s ease;
-    transform:translateX(-4px);font-weight:700;
-}
+.card.reveal.visible{animation:springInUp .65s var(--spring) both}
+.card.reveal.visible:nth-child(1){animation-delay:.05s}.card.reveal.visible:nth-child(2){animation-delay:.12s}.card.reveal.visible:nth-child(3){animation-delay:.19s}.card.reveal.visible:nth-child(4){animation-delay:.26s}.card.reveal.visible:nth-child(5){animation-delay:.33s}
+.card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 12px 40px rgba(0,85,232,.1),0 4px 12px rgba(0,0,0,.06);border-color:var(--accent)}
+.card::after{content:'→';position:absolute;bottom:12px;right:18px;font-size:15px;color:var(--accent);opacity:0;transition:all .3s var(--spring);transform:translateX(-6px);font-weight:700}
 .card:hover::after{opacity:1;transform:translateX(0)}
-.card::before{
-    content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
-    background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(0,85,232,.04) 0%, transparent 50%);
-    pointer-events:none;opacity:0;transition:opacity .3s ease;z-index:0;
-}
+.card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,85,232,.05) 0%,transparent 50%);
+    pointer-events:none;opacity:0;transition:opacity .4s ease;z-index:0}
 .card:hover::before{opacity:1}
 .card>*{position:relative;z-index:1}
-.card-bar{position:absolute;top:0;left:0;right:0;height:3px;z-index:2}
-.card-bar.bar-red{background:var(--red)}
-.card-bar.bar-blue{background:var(--accent)}
-.card-bar.bar-purple{background:var(--purple)}
-.card-medal{font-size:26px;position:absolute;top:12px;right:16px;opacity:.12;transition:opacity .3s ease,transform .3s ease}
-.card:hover .card-medal{opacity:.25;transform:scale(1.2) rotate(-5deg)}
-.card-tag{display:inline-block;padding:2px 10px;border-radius:6px;font-size:10.5px;font-weight:600;background:rgba(0,85,232,.06);color:var(--accent);margin-bottom:10px}
-.card h3{font-size:14.5px;font-weight:600;line-height:1.35;margin-bottom:8px}
+.card-bar{position:absolute;top:0;left:0;right:0;height:4px;z-index:2;transition:height .2s var(--spring)}
+.card:hover .card-bar{height:5px}
+.card-bar.bar-red{background:var(--red)}.card-bar.bar-blue{background:var(--accent)}.card-bar.bar-purple{background:var(--purple)}
+.card-medal{font-size:28px;position:absolute;top:14px;right:18px;opacity:.1;transition:all .4s var(--spring)}
+.card:hover .card-medal{opacity:.3;transform:scale(1.3) rotate(-8deg);
+    filter:drop-shadow(0 4px 8px rgba(0,85,232,.2));}
+.card-tag{display:inline-block;padding:3px 12px;border-radius:7px;font-size:10.5px;font-weight:700;background:rgba(0,85,232,.06);color:var(--accent);margin-bottom:12px;letter-spacing:.3px;
+    box-shadow:0 1px 3px rgba(0,85,232,.04);}
+.card h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:10px;
+    text-shadow:0 1px 2px rgba(0,0,0,.03);}
 .card-meta{font-size:11.5px;color:var(--text2);margin-bottom:8px}
 .card-desc{font-size:12.5px;color:var(--text3);line-height:1.5}
 
 /* ═══ Stage cards ═══ */
-.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 @media(max-width:768px){.stage-grid{grid-template-columns:1fr}}
 .stage-card{
-    display:flex;gap:20px;align-items:flex-start;
-    background:var(--card);border-radius:var(--radius);padding:28px 38px 28px 26px;
-    border:1px solid var(--border);cursor:pointer;
-    transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;
-    background-image:linear-gradient(135deg, rgba(0,85,232,.02) 0%, transparent 50%);
-    position:relative;overflow:hidden;
+    display:flex;gap:22px;align-items:flex-start;
+    background:var(--card);border-radius:var(--radius);padding:30px 42px 30px 28px;
+    border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;
+    transition:transform .4s var(--spring),box-shadow .4s var(--spring),border-color .3s ease;
+    box-shadow:0 1px 4px rgba(0,0,0,.03),0 6px 20px rgba(0,0,0,.03);
+    background-image:linear-gradient(135deg,rgba(0,85,232,.015) 0%,transparent 50%);
 }
-.stage-card:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,85,232,.08);border-color:var(--accent)}
-.stage-card::after{
-    content:'→';position:absolute;top:50%;right:16px;
-    transform:translateY(-50%) translateX(-4px);
-    font-size:18px;color:var(--accent);opacity:0;
-    transition:opacity .2s ease,transform .2s ease;
-    font-weight:700;
-}
+.stage-card.reveal.visible{animation:springInUp .7s var(--spring) both}
+.stage-card.reveal.visible:nth-child(1){animation-delay:.08s}.stage-card.reveal.visible:nth-child(2){animation-delay:.18s}.stage-card.reveal.visible:nth-child(3){animation-delay:.28s}
+.stage-card:hover{transform:translateY(-6px) scale(1.015);box-shadow:0 14px 44px rgba(0,85,232,.1),0 4px 12px rgba(0,0,0,.06);border-color:var(--accent)}
+.stage-card::after{content:'→';position:absolute;top:50%;right:18px;transform:translateY(-50%) translateX(-6px);font-size:20px;color:var(--accent);opacity:0;transition:all .3s var(--spring);font-weight:700}
 .stage-card:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
-.stage-num{
-    font-size:40px;font-weight:800;color:var(--accent);opacity:.06;
-    font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;
-    letter-spacing:-.04em;line-height:1;flex-shrink:0;width:48px;text-align:center;
-    transition:opacity .3s ease,transform .3s ease;
-}
-.stage-card:hover .stage-num{opacity:.15;transform:scale(1.15)}
-.stage-content h4{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:10px}
-.stage-content h4 span{font-size:12px;font-weight:500;color:var(--accent);letter-spacing:.2px}
-.stage-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px}
-.stage-desc{font-size:13px;color:var(--text3);line-height:1.5}
+.stage-num{font-size:44px;font-weight:900;color:var(--accent);opacity:.05;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;line-height:1;flex-shrink:0;width:52px;text-align:center;transition:all .4s var(--spring);
+    text-shadow:0 0 40px rgba(0,85,232,.3);}
+.stage-card:hover .stage-num{opacity:.14;transform:scale(1.2)}
+.stage-content h4{font-size:19px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:12px;
+    text-shadow:0 1px 3px rgba(0,0,0,.03);}
+.stage-content h4 span{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.3px;
+    box-shadow:0 1px 4px rgba(0,85,232,.06);padding:2px 10px;border-radius:6px;background:rgba(0,85,232,.04)}
+.stage-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px}
+.stage-desc{font-size:13px;color:var(--text3);line-height:1.6}
 
 /* ═══ Info cards ═══ */
-.info-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
 @media(max-width:768px){.info-row{grid-template-columns:1fr}}
 .info-card{
-    background:var(--card);border-radius:var(--radius);padding:22px 26px;
-    border:1px solid var(--border);
-    background-image:linear-gradient(135deg, rgba(0,85,232,.015) 0%, transparent 50%);
-    font-size:13.5px;color:var(--text2);line-height:1.6;
-    transition:transform .25s ease,box-shadow .25s ease;
+    background:var(--card);border-radius:var(--radius);padding:24px 28px;
+    border:1px solid var(--border);font-size:13.5px;color:var(--text2);line-height:1.7;
+    background-image:linear-gradient(135deg,rgba(0,85,232,.012) 0%,transparent 50%);
+    transition:transform .35s var(--spring),box-shadow .35s var(--spring);
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 16px rgba(0,0,0,.03);
 }
-.info-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.info-card strong{color:var(--text);font-weight:600}
+.info-card:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 8px 28px rgba(0,0,0,.06)}
+.info-card strong{color:var(--text);font-weight:700;
+    text-shadow:0 1px 1px rgba(0,0,0,.02)}
 
 /* ═══ Stats ═══ */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 @media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
 .stat-panel{
-    background:var(--card);border-radius:var(--radius);padding:28px;
-    border:1px solid var(--border);
-    background-image:radial-gradient(circle at 100% 0%, rgba(0,85,232,.02) 0%, transparent 50%);
-    transition:transform .25s ease,box-shadow .25s ease;
+    background:var(--card);border-radius:var(--radius);padding:30px;
+    border:1px solid var(--border);transition:transform .35s var(--spring),box-shadow .35s var(--spring);
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 6px 20px rgba(0,0,0,.04);
+    background-image:radial-gradient(circle at 100% 0%,rgba(0,85,232,.015) 0%,transparent 50%);
 }
-.stat-panel:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.stat-panel h3{font-size:16px;font-weight:700;margin-bottom:22px}
-.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.bar-label{font-size:11.5px;color:var(--text2);min-width:90px;text-align:right;font-weight:500}
-.bar-track{flex:1;height:6px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;position:relative}
+.stat-panel:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 10px 36px rgba(0,0,0,.06)}
+.stat-panel h3{font-size:17px;font-weight:800;margin-bottom:24px;
+    text-shadow:0 1px 3px rgba(0,0,0,.03)}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{font-size:11.5px;color:var(--text2);min-width:92px;text-align:right;font-weight:600}
+.bar-track{flex:1;height:7px;background:rgba(0,0,0,.03);border-radius:4px;overflow:hidden;position:relative;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.04)}
 .bar-track::after{content:'';position:absolute;top:0;left:0;height:100%;width:0;
-    background:linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent);
-    animation:barShine 2s ease-in-out infinite;
-}
-@keyframes barShine{0%{width:0;left:0}50%{width:30%}100%{width:0;left:100%}}
-.bar-fill{height:100%;border-radius:3px;background:var(--accent);width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
-.bar-fill.fill-red{background:var(--red)}
-.bar-fill.fill-blue{background:var(--accent)}
-.bar-fill.fill-purple{background:var(--purple)}
-.bar-num{font-size:11.5px;color:var(--text3);min-width:36px;font-weight:500;text-align:left}
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);
+    animation:barShine 2.5s ease-in-out infinite}
+@keyframes barShine{0%{width:0;left:0}50%{width:20%;left:30%}100%{width:0;left:100%}}
+.bar-fill{height:100%;border-radius:4px;background:var(--accent);width:0;
+    transition:width 1.4s var(--spring);
+    box-shadow:0 0 8px rgba(0,85,232,.2)}
+.bar-fill.fill-red{background:var(--red);box-shadow:0 0 8px rgba(217,45,32,.2)}
+.bar-fill.fill-blue{background:var(--accent);box-shadow:0 0 8px rgba(0,85,232,.2)}
+.bar-fill.fill-purple{background:var(--purple);box-shadow:0 0 8px rgba(122,30,184,.2)}
+.bar-num{font-size:12px;color:var(--text3);min-width:30px;font-weight:600;text-align:left}
 
 /* ═══ KPI ═══ */
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
 @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
 .kpi{
-    background:var(--card);border-radius:var(--radius);padding:24px;
-    border:1px solid var(--border);text-align:center;
-    transition:transform .25s ease,box-shadow .25s ease;
-    position:relative;overflow:hidden;
+    background:var(--card);border-radius:var(--radius);padding:28px 20px;
+    border:1px solid var(--border);text-align:center;position:relative;overflow:hidden;
+    transition:transform .35s var(--spring),box-shadow .35s var(--spring);
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 16px rgba(0,0,0,.03);
 }
-.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.kpi .val{font-size:42px;font-weight:700;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;letter-spacing:-.04em;position:relative;z-index:1}
-.kpi .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;font-weight:600;position:relative;z-index:1}
-.kpi-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:80px;height:80px;border-radius:50%;border:2px solid rgba(0,85,232,.06);
-    pointer-events:none;transition:transform .4s ease;
-}
-.kpi:hover .kpi-ring{transform:translate(-50%,-50%) scale(1.3);border-color:rgba(0,85,232,.12)}
+.kpi:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 10px 34px rgba(0,0,0,.06)}
+.kpi .val{font-size:48px;font-weight:900;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;position:relative;z-index:1;
+    text-shadow:0 2px 10px rgba(0,85,232,.1);}
+.kpi .lbl{font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:6px;font-weight:700;position:relative;z-index:1}
+.kpi-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;border:2px solid rgba(0,85,232,.05);pointer-events:none;transition:all .5s var(--spring)}
+.kpi:hover .kpi-ring{transform:translate(-50%,-50%) scale(1.4);border-color:rgba(0,85,232,.12);border-width:3px}
 
-footer{padding:32px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}
-footer span{color:var(--accent);font-weight:500}
+/* ═══ Footer ═══ */
+footer{padding:36px 0;text-align:center;font-size:13px;color:var(--text3);position:relative;z-index:1}
+footer span{color:var(--accent);font-weight:700}
 
 /* ═══ Reveal ═══ */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .7s var(--smooth),transform .7s var(--spring)}
 .reveal.visible{opacity:1;transform:translateY(0)}
-.reveal:nth-child(1){transition-delay:0s}
-.reveal:nth-child(2){transition-delay:.05s}
-.reveal:nth-child(3){transition-delay:.1s}
-.reveal:nth-child(4){transition-delay:.15s}
-.reveal:nth-child(5){transition-delay:.2s}
-
-/* ═══ Floating emojis (decoration) ═══ */
-.float-emoji{position:absolute;pointer-events:none;opacity:.07;font-size:60px;z-index:0;animation:floatEmoji 12s ease-in-out infinite}
-.float-emoji.e1{top:20%;left:5%;font-size:50px;animation-delay:0s}
-.float-emoji.e2{top:50%;right:8%;font-size:70px;animation-delay:-4s}
-.float-emoji.e3{top:75%;left:3%;font-size:45px;animation-delay:-8s}
-@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-20px) rotate(5deg)}50%{transform:translateY(-10px) rotate(-3deg)}75%{transform:translateY(-30px) rotate(2deg)}}
 
 /* ═══ Modal ═══ */
-.modal-overlay{
-    position:fixed;inset:0;background:rgba(0,0,0,.45);
-    display:flex;align-items:center;justify-content:center;
-    z-index:1000;opacity:0;pointer-events:none;
-    transition:opacity .25s ease;
-    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .modal-overlay.active{opacity:1;pointer-events:auto}
-.modal-box{
-    background:var(--card);border-radius:var(--radius);
-    max-width:640px;width:90vw;max-height:80vh;
-    overflow-y:auto;padding:40px 36px 32px;
-    position:relative;
-    transform:translateY(30px) scale(.94);
-    transition:transform .35s cubic-bezier(.16,1,.3,1);
-    box-shadow:0 20px 60px rgba(0,0,0,.15);
-}
+.modal-box{background:var(--card);border-radius:var(--radius);max-width:660px;width:92vw;max-height:82vh;overflow-y:auto;padding:44px 40px 36px;position:relative;transform:translateY(40px) scale(.92);transition:transform .45s var(--spring);box-shadow:0 24px 80px rgba(0,0,0,.18)}
 .modal-overlay.active .modal-box{transform:translateY(0) scale(1)}
-.modal-close{
-    position:absolute;top:14px;right:18px;
-    width:32px;height:32px;border-radius:50%;
-    border:1px solid var(--border);background:var(--card);
-    cursor:pointer;font-size:18px;display:flex;align-items:center;
-    justify-content:center;color:var(--text3);
-    transition:all .2s ease;
-}
-.modal-close:hover{background:var(--bg);color:var(--text);border-color:var(--border2);transform:rotate(90deg)}
-.modal-tag{
-    display:inline-block;padding:3px 12px;border-radius:6px;
-    font-size:11px;font-weight:600;background:rgba(0,85,232,.06);
-    color:var(--accent);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px;
-}
-.modal-box h2{font-size:26px;font-weight:700;margin-bottom:12px;line-height:1.25}
-.modal-difficulty{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:20px}
-.modal-box .detail-section{margin-bottom:22px}
-.modal-box .detail-section h4{
-    font-size:12px;text-transform:uppercase;letter-spacing:.8px;
-    color:var(--accent);margin-bottom:8px;font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC",sans-serif;
-}
-.modal-box .detail-section p,.modal-box .detail-section ul,.modal-box .detail-section ol{
-    font-size:14px;color:var(--text2);line-height:1.7;
-}
-.modal-box .detail-section ul,.modal-box .detail-section ol{padding-left:18px}
-.modal-box .detail-section li{margin-bottom:6px;font-size:14px;color:var(--text2);line-height:1.65}
+.modal-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .3s var(--spring);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.modal-close:hover{background:var(--bg);color:var(--text);border-color:var(--border2);transform:rotate(90deg) scale(1.1)}
+.modal-tag{display:inline-block;padding:4px 14px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(0,85,232,.06);color:var(--accent);margin-bottom:18px;text-transform:uppercase;letter-spacing:.6px;
+    box-shadow:0 1px 4px rgba(0,85,232,.05)}
+.modal-box h2{font-size:28px;font-weight:800;margin-bottom:14px;line-height:1.2;
+    text-shadow:0 2px 5px rgba(0,0,0,.04)}
+.modal-difficulty{font-size:13px;color:var(--accent);font-weight:700;margin-bottom:24px}
+.modal-box .detail-section{margin-bottom:24px}
+.modal-box .detail-section h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;font-weight:700}
+.modal-box .detail-section p,.modal-box .detail-section ul,.modal-box .detail-section ol{font-size:14px;color:var(--text2);line-height:1.8}
+.modal-box .detail-section ul,.modal-box .detail-section ol{padding-left:20px}
+.modal-box .detail-section li{margin-bottom:8px;font-size:14px;color:var(--text2);line-height:1.7}
 
-@media(max-width:768px){
-    .modal-box{padding:28px 22px 24px;max-width:95vw}
-    .modal-box h2{font-size:21px}
-}
+@media(max-width:768px){.modal-box{padding:28px 24px 26px;max-width:96vw}.modal-box h2{font-size:22px}}
 
-/* ═══ Pulse ring on clickable elements ═══ */
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,85,232,.2)}70%{box-shadow:0 0 0 10px rgba(0,85,232,0)}100%{box-shadow:0 0 0 0 rgba(0,85,232,0)}}
-.card:active,.stage-card:active{animation:pulse .6s ease-out}
+/* ═══ Click pulse ═══ */
+@keyframes clickPulse{0%{box-shadow:0 0 0 0 rgba(0,85,232,.25)}70%{box-shadow:0 0 0 14px rgba(0,85,232,0)}100%{box-shadow:0 0 0 0 rgba(0,85,232,0)}}
+.card:active,.stage-card:active{animation:clickPulse .5s ease-out}
 </style>
 </head>
 <body>
 
-<!-- ═══ Particle canvas ═══ -->
 <canvas id="particles-canvas"></canvas>
+
+<!-- ═══ Floating geometric toys ═══ -->
+<div class="geo-shapes">
+    <div class="geo circle" style="top:8%;left:5%;width:80px;height:80px;animation-delay:0s"></div>
+    <div class="geo triangle" style="top:30%;right:10%;width:0;height:0;border-left:35px solid transparent;border-right:35px solid transparent;border-bottom:60px solid;animation-delay:-3s"></div>
+    <div class="geo square" style="top:55%;left:3%;width:45px;height:45px;animation-delay:-7s"></div>
+    <div class="geo dot" style="top:70%;right:8%;width:18px;height:18px;animation-delay:-5s"></div>
+    <div class="geo ring" style="top:20%;left:50%;width:65px;height:65px;animation-delay:-9s"></div>
+    <div class="geo circle" style="top:85%;left:15%;width:50px;height:50px;animation-delay:-2s;opacity:.04"></div>
+    <div class="geo triangle" style="top:60%;left:60%;width:0;height:0;border-left:25px solid transparent;border-right:25px solid transparent;border-bottom:40px solid;animation-delay:-11s"></div>
+    <div class="geo dot" style="top:12%;right:30%;width:12px;height:12px;animation-delay:-6s"></div>
+    <div class="geo square" style="top:40%;right:5%;width:35px;height:35px;animation-delay:-4s;border-color:var(--purple)"></div>
+    <div class="geo ring" style="top:78%;left:45%;width:55px;height:55px;animation-delay:-8s;opacity:.04"></div>
+</div>
 
 <div class="wrap">
 
 <!-- ═══ Hero ═══ -->
 <header class="hero">
-    <div class="hero-glow g1"></div>
-    <div class="hero-glow g2"></div>
-    <div class="float-emoji e1">🎬</div>
-    <div class="float-emoji e2">✂️</div>
-    <div class="float-emoji e3">🎥</div>
+    <div class="hero-bg"></div>
+    <div class="hero-glow g1"></div><div class="hero-glow g2"></div>
+    <div class="hero-toy t1"></div><div class="hero-toy t2"></div><div class="hero-toy t3"></div><div class="hero-toy t4"></div><div class="hero-toy t5"></div>
     <div class="label">🎬 DAILY TOPIC SYSTEM</div>
     <h1>拍摄<em>+</em>剪辑<br>选题系统</h1>
     <p class="sub">每天一个选题 · 从拍到剪全流程 · 200 期完整规划</p>
@@ -331,7 +319,7 @@ footer span{color:var(--accent);font-weight:500}
 
 <!-- ═══ 今日选题 ═══ -->
 <section class="sec">
-    <div class="sec-hd"><div class="kicker">Today's Picks</div><h2>🔥 今日推荐选题</h2><p class="sub">2026-06-28 · 点击任意卡片查看完整制作指南</p></div>
+    <div class="sec-hd"><div class="kicker reveal" data-reveal>Today's Picks</div><h2 class="reveal" data-reveal>🔥 今日推荐选题</h2><p class="sub reveal" data-reveal>2026-06-28 · 点击任意卡片查看完整制作指南</p></div>
     <div class="card-grid">
 <div class="card reveal" data-reveal onclick="openTopic('reverse-effect')">
     <div class="card-bar bar-red"></div><span class="card-medal">🥇</span>
@@ -375,7 +363,7 @@ footer span{color:var(--accent);font-weight:500}
 
 <!-- ═══ 内容日历 ═══ -->
 <section class="sec">
-    <div class="sec-hd"><div class="kicker">Content Calendar</div><h2>🗓️ 200期内容日历</h2><p class="sub">三阶段渐进 · 从小白到进阶 · 覆盖11大分类 · 点击各阶段查看详情</p></div>
+    <div class="sec-hd"><div class="kicker reveal" data-reveal>Content Calendar</div><h2 class="reveal" data-reveal>🗓️ 200期内容日历</h2><p class="sub reveal" data-reveal>三阶段渐进 · 从小白到进阶 · 覆盖11大分类 · 点击各阶段查看详情</p></div>
     <div class="stage-grid">
 <div class="stage-card reveal" data-reveal onclick="openPhase('phase1')">
     <div class="stage-num">01</div>
@@ -412,14 +400,14 @@ footer span{color:var(--accent);font-weight:500}
 
 <!-- ═══ 数据统计 ═══ -->
 <section class="sec">
-    <div class="sec-hd"><div class="kicker">Statistics</div><h2>📊 数据概览</h2></div>
+    <div class="sec-hd"><div class="kicker reveal" data-reveal>Statistics</div><h2 class="reveal" data-reveal>📊 数据概览</h2></div>
     <div class="kpi-row">
         <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--accent)" data-count="200">0</div><div class="lbl">总选题</div></div>
         <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--green)" data-count="200">0</div><div class="lbl">待发布</div></div>
         <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--purple)" data-count="0">0</div><div class="lbl">已发布</div></div>
         <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--orange)" data-count="200">0</div><div class="lbl">日历期数</div></div>
     </div>
-    <div class="stats-grid" style="margin-top:24px">
+    <div class="stats-grid" style="margin-top:28px">
         <div class="stat-panel reveal" data-reveal><h3>📂 11大分类覆盖</h3><div class="bar-row reveal" data-reveal>
     <span class="bar-label">拍摄技巧</span><div class="bar-track"><div class="bar-fill" data-width="14.5"></div></div><span class="bar-num">29</span>
 </div><div class="bar-row reveal" data-reveal>
@@ -453,7 +441,7 @@ footer span{color:var(--accent);font-weight:500}
     </div>
 </section>
 
-<footer><p>数据截止 2026-06-28 · 每日 <span>8:57</span> 自动刷新 · 点击任意卡片查看完整制作指南</p></footer>
+<footer><p>数据截止 2026-06-28 · 每日 <span>8:57</span> 自动刷新 · 点击卡片可查看完整制作指南</p></footer>
 </div>
 
 <!-- ═══ Modal ═══ -->
@@ -462,329 +450,71 @@ footer span{color:var(--accent);font-weight:500}
 </div>
 
 <script>
-(function() {
-    // ═══ Particle canvas ═══
-    var canvas = document.getElementById('particles-canvas');
-    var ctx = canvas.getContext('2d');
-    var particles = [];
-    var w, h;
+(function(){
+// ═══ Particles ═══
+var c=document.getElementById('particles-canvas'),ctx=c.getContext('2d'),pts=[],W,H;
+function rs(){W=c.width=window.innerWidth;H=c.height=document.documentElement.scrollHeight}
+rs();window.addEventListener('resize',rs);
+for(var i=0;i<50;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.5,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,a:Math.random()*.45+.15});
+function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<pts.length;i++){var p=pts[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,85,232,'+p.a+')';ctx.fill()}
+    for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle='rgba(0,85,232,'+(1-d/120)*.05+')';ctx.lineWidth=.5;ctx.stroke()}}
+    requestAnimationFrame(draw);
+}draw();
 
-    function resize() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = document.documentElement.scrollHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
+// ═══ Mouse glow on cards ═══
+document.querySelectorAll('.card').forEach(function(card){card.addEventListener('mousemove',function(e){var r=card.getBoundingClientRect();card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%')})});
 
-    for (var i = 0; i < 50; i++) {
-        particles.push({
-            x: Math.random() * w,
-            y: Math.random() * h,
-            r: Math.random() * 1.5 + .5,
-            vx: (Math.random() - .5) * .3,
-            vy: (Math.random() - .5) * .3,
-            alpha: Math.random() * .5 + .2
-        });
-    }
+// ═══ Count-up with elastic ═══
+function countUp(el,target,dur){
+    var s=+el.textContent||0,st=null;
+    function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,4);el.textContent=Math.round(s+(target-s)*e);if(p<1)requestAnimationFrame(step);else el.textContent=target}
+    requestAnimationFrame(step);
+}
 
-    function drawParticles() {
-        ctx.clearRect(0, 0, w, h);
-        for (var i = 0; i < particles.length; i++) {
-            var p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            if (p.x < 0) p.x = w;
-            if (p.x > w) p.x = 0;
-            if (p.y < 0) p.y = h;
-            if (p.y > h) p.y = 0;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0,85,232,' + p.alpha + ')';
-            ctx.fill();
-        }
-        // Draw connections between close particles
-        for (var i = 0; i < particles.length; i++) {
-            for (var j = i + 1; j < particles.length; j++) {
-                var dx = particles[i].x - particles[j].x;
-                var dy = particles[i].y - particles[j].y;
-                var dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 120) {
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = 'rgba(0,85,232,' + (1 - dist / 120) * .06 + ')';
-                    ctx.lineWidth = .5;
-                    ctx.stroke();
-                }
-            }
-        }
-        requestAnimationFrame(drawParticles);
-    }
-    drawParticles();
+// ═══ Reveal observer ═══
+var rvl=document.querySelectorAll('.reveal');
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+rvl.forEach(function(el){obs.observe(el)});
+window.addEventListener('load',function(){rvl.forEach(function(el){if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('visible')})});
 
-    // ═══ Mouse-follow glow on cards ═══
-    var cards = document.querySelectorAll('.card');
-    cards.forEach(function(card) {
-        card.addEventListener('mousemove', function(e) {
-            var rect = card.getBoundingClientRect();
-            var x = ((e.clientX - rect.left) / rect.width) * 100;
-            var y = ((e.clientY - rect.top) / rect.height) * 100;
-            card.style.setProperty('--mx', x + '%');
-            card.style.setProperty('--my', y + '%');
-        });
+// ═══ Trigger count anims ═══
+setTimeout(function(){
+    document.querySelectorAll('[data-count]').forEach(function(el){
+        var t=parseInt(el.getAttribute('data-count'));
+        if(t>0&&!el._done){el._done=true;countUp(el,t,1800)}
     });
+},500);
 
-    // ═══ Count-up animation ═══
-    function animateCount(el, target, duration) {
-        var start = 0;
-        var startTime = null;
-        function step(timestamp) {
-            if (!startTime) startTime = timestamp;
-            var progress = Math.min((timestamp - startTime) / duration, 1);
-            var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-            el.textContent = Math.round(eased * target);
-            if (progress < 1) requestAnimationFrame(step);
-            else el.textContent = target;
-        }
-        requestAnimationFrame(step);
-    }
+// ═══ Bar anims on scroll ═══
+var barObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var bars=e.target.querySelectorAll('[data-width]');bars.forEach(function(b,i){if(!b._done){b._done=true;setTimeout(function(){b.style.width=b.getAttribute('data-width')+'%'},i*50)}})}})},{threshold:.15});
+document.querySelectorAll('.stat-panel').forEach(function(p){barObs.observe(p)});
 
-    var countObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                var nums = entry.target.querySelectorAll('[data-count]');
-                nums.forEach(function(num) {
-                    var target = parseInt(num.getAttribute('data-count'));
-                    if (!num._counted && target > 0) {
-                        num._counted = true;
-                        animateCount(num, target, 1500);
-                    }
-                });
-                // Animate progress bars
-                var bars = entry.target.querySelectorAll('[data-width]');
-                bars.forEach(function(bar) {
-                    if (!bar._animated) {
-                        bar._animated = true;
-                        setTimeout(function() {
-                            bar.style.width = bar.getAttribute('data-width') + '%';
-                        }, 200);
-                    }
-                });
-            }
-        });
-    }, { threshold: .15 });
+// ═══ Resize canvas on scroll ═══
+var rt;window.addEventListener('scroll',function(){clearTimeout(rt);rt=setTimeout(function(){H=c.height=document.documentElement.scrollHeight},300)});
 
-    // Observe sections containing data-count or data-width
-    document.querySelectorAll('.hero-stats, .kpi-row, .stat-panel').forEach(function(el) {
-        countObserver.observe(el);
-    });
-
-    // ═══ Reveal ═══
-    var rvl = document.querySelectorAll('.reveal');
-    var obs = new IntersectionObserver(function(es) {
-        es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: .08 });
-    rvl.forEach(function(el) { obs.observe(el); });
-    window.addEventListener('load', function() {
-        rvl.forEach(function(el) {
-            if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible');
-        });
-    });
-
-    // Trigger hero stats count on load
-    setTimeout(function() {
-        document.querySelectorAll('.hero-stat .num[data-count]').forEach(function(num) {
-            var target = parseInt(num.getAttribute('data-count'));
-            if (!num._counted && target > 0) { num._counted = true; animateCount(num, target, 1500); }
-        });
-        document.querySelectorAll('.kpi .val[data-count]').forEach(function(num) {
-            var target = parseInt(num.getAttribute('data-count'));
-            if (!num._counted && target > 0) { num._counted = true; animateCount(num, target, 1500); }
-        });
-    }, 400);
-
-    // Scroll-triggered bar animation
-    var barObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                var bars = entry.target.querySelectorAll('[data-width]');
-                bars.forEach(function(bar, i) {
-                    if (!bar._animated) {
-                        bar._animated = true;
-                        setTimeout(function() {
-                            bar.style.width = bar.getAttribute('data-width') + '%';
-                        }, i * 60);
-                    }
-                });
-            }
-        });
-    }, { threshold: .1 });
-    document.querySelectorAll('.stat-panel').forEach(function(p) { barObserver.observe(p); });
-
-    // ═══ Canvas resize on scroll (for full page height) ═══
-    var resizeTimeout;
-    window.addEventListener('scroll', function() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function() {
-            h = canvas.height = document.documentElement.scrollHeight;
-        }, 200);
-    });
+// ═══ Re-trigger visible on load ═══
+window.addEventListener('load',function(){setTimeout(function(){rvl.forEach(function(el){if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('visible')})},100)});
 })();
 
 // ═══ Topic Data ═══
-var TOPICS = {
-    'reverse-effect': {
-        tag: '剪映基础操作',
-        title: '倒放效果：让视频变魔术的秘密',
-        difficulty: '⭐ 入门 · 约 20 秒 · 涨粉潜力：高',
-        overview: '倒放（Reverse）是短视频平台涨粉最快的特效之一。把日常动作反过来播放，会产生强烈的视觉冲击和"魔术感"——水从杯子倒流回瓶子、撕碎的纸张复原、人从地面飞回屋顶……观众会忍不住反复播放。',
-        steps: [
-            '打开剪映，导入一段 5–15 秒的视频素材（推荐动作清晰、方向性强的）',
-            '在时间线上点中素材 → 底部找到"倒放"按钮',
-            '点击后视频自动反转，背景音乐也会跟着反转（可关掉原声单独加 BGM）',
-            '微调：原视频末尾对着成片开头，确保动作衔接流畅',
-            '导出 1080p 60fps，加标题"见证奇迹的时刻"或类似悬念文字'
-        ],
-        tips: '最佳素材：倒水、跳跃、扔东西、撕纸、化妆、写字。这些动作倒放后的"反物理感"最强，播放量通常在 10 万以上。'
-    },
-    'symmetry-composition': {
-        tag: '拍摄技巧',
-        title: '对称构图：强迫症看了极度舒适',
-        difficulty: '⭐ 入门 · 约 20 秒 · 涨粉潜力：高',
-        overview: '对称构图是视觉舒适度的天花板。人的大脑天生喜欢对称——建筑、倒影、走廊、隧道……对称画面天然适合短视频的竖屏格式，配合舒缓 BGM 和慢镜头，播放完成率极高。',
-        steps: [
-            '打开手机相机，切换到 1x 或 2x 镜头（广角会畸变，破坏对称）',
-            '打开网格线（设置 → 相机 → 网格），确保中心线对齐',
-            '寻找对称场景：地铁长廊、对称建筑、水面倒影、旋转楼梯、对称路灯',
-            '保持手机绝对水平，慢慢推进或横移——切忌手抖',
-            '导入剪映，加冷色调滤镜降低饱和度，放慢 0.5x，配环境音'
-        ],
-        tips: '最佳时间：清晨或黄昏，光线柔和、影子对称。雨后的水面倒影是最天然的对称素材，拍摄时蹲到最低位置让水天线在画面正中。'
-    },
-    'jianying-interface': {
-        tag: '剪映基础操作',
-        title: '剪映界面速览：5分钟认识所有功能区',
-        difficulty: '⭐ 入门 · 约 3 分钟 · 涨粉潜力：中',
-        overview: '给纯新手的第一条视频。很多人手机装了剪映但没打开过——因为感觉"看起来很复杂"。这条视频的目标就是用 3 分钟让零基础用户心里有底，降低使用门槛。',
-        steps: [
-            '屏幕录制剪映打开的一瞬间（"点击开始创作"的镜头）',
-            '用画中画 + 红圈标注 4 个核心区域：素材区、预览区、时间线、工具栏',
-            '每讲一个区域停留 15 秒，不要快进——新手需要消化',
-            '演示一个最简单的操作：导入照片 → 加文字 → 导出 → 让观众感受到"我也能做"',
-            '结尾：鼓励观众打开剪映试一下，评论区交作业'
-        ],
-        tips: '核心不是教技能，而是"消除恐惧"。语速慢一点，语气像朋友在教朋友，不要用太多术语。'
-    },
-    'import-footage': {
-        tag: '剪映基础操作',
-        title: '导入素材的3种方式：第3种最方便',
-        difficulty: '⭐ 入门 · 约 2 分钟 · 涨粉潜力：中',
-        overview: '很多新手的第一道坎就是"怎么把视频放进剪映"。其实剪映有 3 种导入方式，第三种一键操作最高效，但 90% 的人不知道。',
-        steps: [
-            '方式一：剪映 → 开始创作 → 从相册选取 → 适合一次导入多个素材',
-            '方式二：相册里点"分享" → "用剪映打开" → 适合只处理一个视频',
-            '方式三（重点）：相册长按视频 → 拖动到剪映图标 → 一键导入——最快',
-            '对比三种方式的速度差异，突出第三种的高效',
-            '顺便演示：导入后如何调整素材顺序和删除多余片段'
-        ],
-        tips: '适合做成"冷知识"风格——前 3 秒先展示第三种方式的效果，制造"还有这操作？"的好奇感，再倒回去讲前两种。'
-    },
-    'breakdown-viral': {
-        tag: '热门跟拍 · 爆款拆解',
-        title: '某条500万播放的视频怎么剪的？逐帧拆解',
-        difficulty: '⭐⭐⭐ 进阶 · 约 4 分钟 · 涨粉潜力：高',
-        overview: '爆款拆解是短视频领域经久不衰的流量密码。观众天然好奇"这条视频为什么火"——你不需要原创内容，你只需要拆解别人已经验证过的好内容。',
-        steps: [
-            '选一条最近 3 天内播放量 >100 万的短视频（剪辑向、转场向优先）',
-            '0.5x 慢放逐帧分析：开场钩子、音乐切入时机、转场类型、高潮节奏',
-            '标注时间轴：00:00 钩子 / 00:02 铺垫 / 00:08 高潮 / 00:15 结尾 CTA',
-            '在剪映里复刻一个 10 秒片段，对比原版和你的版本',
-            '结尾总结：这条视频火的核心原因是 ____（一句话）'
-        ],
-        tips: '一定要用画中画 + 标注 + 慢镜头，让观众"看到"剪辑师的思维过程。不要只讲"这个转场好"，要讲"为什么好"——情绪节奏、视觉引导、音乐卡点配合。'
-    }
+var TOPICS={
+'reverse-effect':{tag:'剪映基础操作',title:'倒放效果：让视频变魔术的秘密',difficulty:'⭐ 入门 · 约 20 秒 · 涨粉潜力：高',overview:'倒放（Reverse）是短视频平台涨粉最快的特效之一。把日常动作反过来播放，会产生强烈的视觉冲击和"魔术感"——水从杯子倒流回瓶子、撕碎的纸张复原、人从地面飞回屋顶……观众会忍不住反复播放。',steps:['打开剪映，导入一段 5–15 秒的视频素材（推荐动作清晰、方向性强的）','在时间线上点中素材 → 底部找到"倒放"按钮','点击后视频自动反转，背景音乐也会跟着反转（可关掉原声单独加 BGM）','微调：原视频末尾对着成片开头，确保动作衔接流畅','导出 1080p 60fps，加标题"见证奇迹的时刻"或类似悬念文字'],tips:'最佳素材：倒水、跳跃、扔东西、撕纸、化妆、写字。这些动作倒放后的"反物理感"最强，播放量通常在 10 万以上。'},
+'symmetry-composition':{tag:'拍摄技巧',title:'对称构图：强迫症看了极度舒适',difficulty:'⭐ 入门 · 约 20 秒 · 涨粉潜力：高',overview:'对称构图是视觉舒适度的天花板。人的大脑天生喜欢对称——建筑、倒影、走廊、隧道……对称画面天然适合短视频的竖屏格式，配合舒缓 BGM 和慢镜头，播放完成率极高。',steps:['打开手机相机，切换到 1x 或 2x 镜头（广角会畸变，破坏对称）','打开网格线（设置 → 相机 → 网格），确保中心线对齐','寻找对称场景：地铁长廊、对称建筑、水面倒影、旋转楼梯、对称路灯','保持手机绝对水平，慢慢推进或横移——切忌手抖','导入剪映，加冷色调滤镜降低饱和度，放慢 0.5x，配环境音'],tips:'最佳时间：清晨或黄昏，光线柔和、影子对称。雨后的水面倒影是最天然的对称素材，拍摄时蹲到最低位置让水天线在画面正中。'},
+'jianying-interface':{tag:'剪映基础操作',title:'剪映界面速览：5分钟认识所有功能区',difficulty:'⭐ 入门 · 约 3 分钟 · 涨粉潜力：中',overview:'给纯新手的第一条视频。很多人手机装了剪映但没打开过——因为感觉"看起来很复杂"。这条视频的目标就是用 3 分钟让零基础用户心里有底，降低使用门槛。',steps:['屏幕录制剪映打开的一瞬间（"点击开始创作"的镜头）','用画中画 + 红圈标注 4 个核心区域：素材区、预览区、时间线、工具栏','每讲一个区域停留 15 秒，不要快进——新手需要消化','演示一个最简单的操作：导入照片 → 加文字 → 导出 → 让观众感受到"我也能做"','结尾：鼓励观众打开剪映试一下，评论区交作业'],tips:'核心不是教技能，而是"消除恐惧"。语速慢一点，语气像朋友在教朋友，不要用太多术语。'},
+'import-footage':{tag:'剪映基础操作',title:'导入素材的3种方式：第3种最方便',difficulty:'⭐ 入门 · 约 2 分钟 · 涨粉潜力：中',overview:'很多新手的第一道坎就是"怎么把视频放进剪映"。其实剪映有 3 种导入方式，第三种一键操作最高效，但 90% 的人不知道。',steps:['方式一：剪映 → 开始创作 → 从相册选取 → 适合一次导入多个素材','方式二：相册里点"分享" → "用剪映打开" → 适合只处理一个视频','方式三（重点）：相册长按视频 → 拖动到剪映图标 → 一键导入——最快','对比三种方式的速度差异，突出第三种的高效','顺便演示：导入后如何调整素材顺序和删除多余片段'],tips:'适合做成"冷知识"风格——前 3 秒先展示第三种方式的效果，制造"还有这操作？"的好奇感，再倒回去讲前两种。'},
+'breakdown-viral':{tag:'热门跟拍 · 爆款拆解',title:'某条500万播放的视频怎么剪的？逐帧拆解',difficulty:'⭐⭐⭐ 进阶 · 约 4 分钟 · 涨粉潜力：高',overview:'爆款拆解是短视频领域经久不衰的流量密码。观众天然好奇"这条视频为什么火"——你不需要原创内容，你只需要拆解别人已经验证过的好内容。',steps:['选一条最近 3 天内播放量 >100 万的短视频（剪辑向、转场向优先）','0.5x 慢放逐帧分析：开场钩子、音乐切入时机、转场类型、高潮节奏','标注时间轴：00:00 钩子 / 00:02 铺垫 / 00:08 高潮 / 00:15 结尾 CTA','在剪映里复刻一个 10 秒片段，对比原版和你的版本','结尾总结：这条视频火的核心原因是 ____（一句话）'],tips:'一定要用画中画 + 标注 + 慢镜头，让观众"看到"剪辑师的思维过程。不要只讲"这个转场好"，要讲"为什么好"——情绪节奏、视觉引导、音乐卡点配合。'}
 };
-
-var PHASES = {
-    'phase1': {
-        tag: '冷启动期 · 第 1–30 期',
-        title: '剪映基础 + 拍摄入门',
-        difficulty: '面向零基础 · 快速上手',
-        overview: '第一个月的目标是让账号快速渡过冷启动期。内容聚焦在"新手友好"——每个视频都应该让观众产生"这个我也能做"的感觉。选题以基础操作和入门拍摄为主，配合少量热门跟拍制造爆款。',
-        steps: [
-            '12 期剪映基础操作：界面、导入导出、剪辑分割、变速、文字、滤镜、转场、贴纸、画中画、蒙版入门、关键帧入门、倒放',
-            '6 期拍摄技巧：持机姿势、构图法则、光线基础、运镜（推拉摇移跟）、手机设置、收音入门',
-            '3 期热门跟拍：当周最火的 1–2 个挑战或模版，跟拍即可',
-            '9 期其他方向：音频处理、卡点、文字动画等——各做 1 期试水，看数据反馈'
-        ],
-        tips: '每期控制在 20 秒以内。前 10 期固定发布时间（如每天 12:00），保持更新频率比内容质量更重要。第 15 期后复盘数据，找到 2–3 个高播放方向加大投入。'
-    },
-    'phase2': {
-        tag: '增长期 · 第 31–100 期',
-        title: '转场 · 卡点 · 调色 · 蒙版',
-        difficulty: '系统技能进阶 · 建立专业度',
-        overview: '第二到第三个月是建立专业壁垒的关键期。内容从"这也太简单了"升级到"这个有点东西"——观众开始把你的账号当作学习资源而不是消遣，为后续商业化打基础。',
-        steps: [
-            '12 期调色教程：色温色调、曲线、HSL、LUT 导入、风格化调色（日系/港风/复古/电影感）',
-            '10 期转场特效：缩放、旋转、遮罩、闪光、模糊转场、匹配剪辑',
-            '8 期卡点节奏：鼓点对齐、节奏型卡点、变速卡点、画面抖动配合',
-            '40 期其他：蒙版进阶、关键帧动画、抠像合成、文字动画、高级滤镜叠加'
-        ],
-        tips: '可适当拉长到 30–60 秒，增加"教程感"。每期加"作业提示"（如"试试用今天的技巧剪一段 5 秒视频"），评论区互动率会大幅提升。'
-    },
-    'phase3': {
-        tag: '成熟期 · 第 101–200 期',
-        title: '案例实战 + 抠像合成',
-        difficulty: '深度壁垒 · 打造 IP 护城河',
-        overview: '第四个月开始，内容是壁垒。别人可以复制你的教程，但复制不了你做过 100 期后积累的手感和判断力。转向案例实战——每期完成一个完整的剪辑作品，展示从选素材到出片的完整流程。',
-        steps: [
-            '20 期案例实战：VLOG、美食视频、旅行短片、产品展示、音乐 MV——每期一个完整案例',
-            '15 期蒙版进阶：路径动画、形变蒙版、文字蒙版、双重曝光、局部调色',
-            '15 期拍摄升级：灯光布置、多机位、稳定器使用、帧率创意（升格/降格）',
-            '50 期综合：AI 工具辅助、绿幕抠像、跟踪合成、声音设计、批量制作技巧'
-        ],
-        tips: '可考虑出"系列视频"（如"30 天 VLOG 挑战"），每系列 5–7 期，连载形式增加粉丝粘性。同时开始准备付费内容——把最擅长的技能打包成系统课程。'
-    }
+var PHASES={
+'phase1':{tag:'冷启动期 · 第 1–30 期',title:'剪映基础 + 拍摄入门',difficulty:'面向零基础 · 快速上手',overview:'第一个月的目标是让账号快速渡过冷启动期。内容聚焦在"新手友好"——每个视频都应该让观众产生"这个我也能做"的感觉。选题以基础操作和入门拍摄为主，配合少量热门跟拍制造爆款。',steps:['12 期剪映基础操作：界面、导入导出、剪辑分割、变速、文字、滤镜、转场、贴纸、画中画、蒙版入门、关键帧入门、倒放','6 期拍摄技巧：持机姿势、构图法则、光线基础、运镜（推拉摇移跟）、手机设置、收音入门','3 期热门跟拍：当周最火的 1–2 个挑战或模版，跟拍即可','9 期其他方向：音频处理、卡点、文字动画等——各做 1 期试水，看数据反馈'],tips:'每期控制在 20 秒以内。前 10 期固定发布时间（如每天 12:00），保持更新频率比内容质量更重要。第 15 期后复盘数据，找到 2–3 个高播放方向加大投入。'},
+'phase2':{tag:'增长期 · 第 31–100 期',title:'转场 · 卡点 · 调色 · 蒙版',difficulty:'系统技能进阶 · 建立专业度',overview:'第二到第三个月是建立专业壁垒的关键期。内容从"这也太简单了"升级到"这个有点东西"——观众开始把你的账号当作学习资源而不是消遣，为后续商业化打基础。',steps:['12 期调色教程：色温色调、曲线、HSL、LUT 导入、风格化调色（日系/港风/复古/电影感）','10 期转场特效：缩放、旋转、遮罩、闪光、模糊转场、匹配剪辑','8 期卡点节奏：鼓点对齐、节奏型卡点、变速卡点、画面抖动配合','40 期其他：蒙版进阶、关键帧动画、抠像合成、文字动画、高级滤镜叠加'],tips:'可适当拉长到 30–60 秒，增加"教程感"。每期加"作业提示"（如"试试用今天的技巧剪一段 5 秒视频"），评论区互动率会大幅提升。'},
+'phase3':{tag:'成熟期 · 第 101–200 期',title:'案例实战 + 抠像合成',difficulty:'深度壁垒 · 打造 IP 护城河',overview:'第四个月开始，内容是壁垒。别人可以复制你的教程，但复制不了你做过 100 期后积累的手感和判断力。转向案例实战——每期完成一个完整的剪辑作品，展示从选素材到出片的完整流程。',steps:['20 期案例实战：VLOG、美食视频、旅行短片、产品展示、音乐 MV——每期一个完整案例','15 期蒙版进阶：路径动画、形变蒙版、文字蒙版、双重曝光、局部调色','15 期拍摄升级：灯光布置、多机位、稳定器使用、帧率创意（升格/降格）','50 期综合：AI 工具辅助、绿幕抠像、跟踪合成、声音设计、批量制作技巧'],tips:'可考虑出"系列视频"（如"30 天 VLOG 挑战"），每系列 5–7 期，连载形式增加粉丝粘性。同时开始准备付费内容——把最擅长的技能打包成系统课程。'}
 };
-
-function openTopic(key) {
-    var t = TOPICS[key]; if (!t) return;
-    var box = document.getElementById('modal-box');
-    var overlay = document.getElementById('modal-overlay');
-    box.innerHTML =
-        '<button class="modal-close" onclick="closeModal()">✕</button>' +
-        '<div class="modal-tag">' + t.tag + '</div>' +
-        '<h2>' + t.title + '</h2>' +
-        '<div class="modal-difficulty">' + t.difficulty + '</div>' +
-        '<div class="detail-section"><h4>📖 内容概述</h4><p>' + t.overview + '</p></div>' +
-        '<div class="detail-section"><h4>🛠️ 制作步骤</h4><ol>' + t.steps.map(function(s){return '<li>'+s+'</li>'}).join('') + '</ol></div>' +
-        '<div class="detail-section"><h4>💡 创作建议</h4><p>' + t.tips + '</p></div>';
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function openPhase(key) {
-    var p = PHASES[key]; if (!p) return;
-    var box = document.getElementById('modal-box');
-    var overlay = document.getElementById('modal-overlay');
-    box.innerHTML =
-        '<button class="modal-close" onclick="closeModal()">✕</button>' +
-        '<div class="modal-tag">' + p.tag + '</div>' +
-        '<h2>' + p.title + '</h2>' +
-        '<div class="modal-difficulty">' + p.difficulty + '</div>' +
-        '<div class="detail-section"><h4>📖 阶段概述</h4><p>' + p.overview + '</p></div>' +
-        '<div class="detail-section"><h4>📋 内容规划</h4><ul>' + p.steps.map(function(s){return '<li>'+s+'</li>'}).join('') + '</ul></div>' +
-        '<div class="detail-section"><h4>💡 运营建议</h4><p>' + p.tips + '</p></div>';
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-    document.getElementById('modal-overlay').classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+function openTopic(k){var t=TOPICS[k];if(!t)return;var b=document.getElementById('modal-box'),o=document.getElementById('modal-overlay');b.innerHTML='<button class="modal-close" onclick="closeModal()">✕</button><div class="modal-tag">'+t.tag+'</div><h2>'+t.title+'</h2><div class="modal-difficulty">'+t.difficulty+'</div><div class="detail-section"><h4>📖 内容概述</h4><p>'+t.overview+'</p></div><div class="detail-section"><h4>🛠️ 制作步骤</h4><ol>'+t.steps.map(function(s){return'<li>'+s+'</li>'}).join('')+'</ol></div><div class="detail-section"><h4>💡 创作建议</h4><p>'+t.tips+'</p></div>';o.classList.add('active');document.body.style.overflow='hidden'}
+function openPhase(k){var p=PHASES[k];if(!p)return;var b=document.getElementById('modal-box'),o=document.getElementById('modal-overlay');b.innerHTML='<button class="modal-close" onclick="closeModal()">✕</button><div class="modal-tag">'+p.tag+'</div><h2>'+p.title+'</h2><div class="modal-difficulty">'+p.difficulty+'</div><div class="detail-section"><h4>📖 阶段概述</h4><p>'+p.overview+'</p></div><div class="detail-section"><h4>📋 内容规划</h4><ul>'+p.steps.map(function(s){return'<li>'+s+'</li>'}).join('')+'</ul></div><div class="detail-section"><h4>💡 运营建议</h4><p>'+p.tips+'</p></div>';o.classList.add('active');document.body.style.overflow='hidden'}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('active');document.body.style.overflow=''}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
 </script>
 </body>
 </html>
