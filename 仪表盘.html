@@ -137,7 +137,20 @@ footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent
 .card:active{animation:clickPulse .4s ease-out}
 
 .steps-list{padding:0;list-style:none;margin:10px 0}
-.steps-list li{padding:10px 14px;margin-bottom:6px;background:rgba(0,85,232,.02);border-radius:10px;font-size:14px;color:var(--text);line-height:1.6;border:1px solid rgba(0,85,232,.05)}
+.steps-list{padding:0;list-style:none;margin:10px 0}
+.step-item{margin-bottom:6px;background:rgba(0,85,232,.015);border-radius:10px;border:1px solid rgba(0,85,232,.04);overflow:hidden;transition:all .3s var(--spring)}
+.step-item.open{background:rgba(0,85,232,.03);border-color:rgba(0,85,232,.1)}
+.step-header{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);font-weight:600;user-select:none;transition:all .2s}
+.step-header:hover{color:var(--accent)}
+.step-header .step-icon{font-size:18px;flex-shrink:0;transition:transform .3s var(--spring)}
+.step-item.open .step-header .step-icon{transform:rotate(90deg)}
+.step-header .step-num{width:24px;height:24px;border-radius:50%;background:rgba(0,85,232,.06);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.step-header .step-title{flex:1}
+.step-detail{max-height:0;overflow:hidden;transition:max-height .4s var(--spring);padding:0 16px 0 50px}
+.step-item.open .step-detail{max-height:500px;padding:0 16px 14px 50px}
+.step-detail p,.step-detail li{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:4px;font-weight:400}
+.step-detail ul{padding-left:16px;list-style:disc}
+.step-detail .tip-box{background:rgba(0,85,232,.03);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:12px;color:var(--accent);border-left:3px solid var(--accent)}
 .script-intro{background:rgba(0,85,232,.03);border-radius:10px;padding:14px 16px;font-size:15px;color:var(--text);margin-bottom:8px;line-height:1.7;border:1px solid rgba(0,85,232,.06)}
 .script-ending{font-size:14px;color:var(--text2);margin-top:8px;line-height:1.6}
 .bgm-tag{padding:12px 16px;border-radius:10px;background:rgba(224,79,22,.04);color:var(--orange);font-size:13px;margin:8px 0;border:1px solid rgba(224,79,22,.08)}
@@ -343,7 +356,22 @@ function openCard(card){
     if(ctype==="爆款"){hook="「"+core+"」——你是不是也刷到过这种效果？";steps=["打开剪映导入素材","关键操作："+core+"的核心步骤","微调参数到最佳效果","Before→After对比展示"];ending="学会了点个赞收藏！";bgm="节奏卡点BGM";}
     else if(ctype==="深度"){hook="完整拆解「"+titleEsc+"」的全过程。";steps=["前期构思与策划","拍摄现场还原与要点","剪辑全流程拆解","成片展示+复盘"];ending="觉得有用点关注！";bgm="叙事感配乐";}
     else{hook="为什么别人的视频那么高级？";steps=["常见错误：90%人做错了","正确方法："+titleEsc+"的核心要点","具体操作演示","效果对比+避坑提醒"];ending="收藏起来慢慢练！";bgm="轻量Lo-Fi BGM";}
-    var sh="<ol class=steps-list>";for(var i=0;i<steps.length;i++)sh+="<li>"+steps[i]+"</li>";sh+="</ol>";
+    var subDetails=generateSubDetails(t,ctype);
+    var sh="<div class=steps-list>";
+    for(var i=0;i<steps.length;i++){
+        sh+="<div class=step-item onclick=\"var s=this;if(s.classList.contains('open')){s.classList.remove('open')}else{s.classList.add('open')}\">";
+        sh+="<div class=step-header><span class=step-icon>▶</span><span class=step-num>"+(i+1)+"</span><span class=step-title>"+steps[i]+"</span></div>";
+        if(subDetails[i]){
+            sh+="<div class=step-detail>";
+            for(var j=0;j<subDetails[i].length;j++){
+                if(subDetails[i][j].startsWith("💡"))sh+="<div class=tip-box>"+subDetails[i][j]+"</div>";
+                else sh+="<p>"+subDetails[i][j]+"</p>";
+            }
+            sh+="</div>";
+        }
+        sh+="</div>";
+    }
+    sh+="</div>";
     var mt="";if(mats){var ps=mats.replace(/，/g,",").replace(/、/g,",").split(",");for(var i=0;i<ps.length;i++){var m=ps[i].trim();if(m)mt+="<span style=display:inline-block;padding:5px 12px;border-radius:7px;background:rgba(0,85,232,.04);color:var(--accent);font-size:12px;font-weight:600;margin:2px>"+esc(m)+"</span>";}}mt=mt||"无特殊要求";
     D.getElementById("modal-box").innerHTML="<button class=modal-close onclick=closeModal()>✕</button><div class=modal-tag>"+cat+" · "+ctype+"</div><h2>"+titleEsc+"</h2><div class=modal-difficulty>"+DM[diff]+" · "+dur+" · 涨粉"+viral+" · 制作"+prod+"</div>"+(desc?"<div class=ds><h4>内容说明</h4><p>"+desc+"</p></div>":"")+bh+"<div class=ds><h4>✍️ 脚本文案</h4><div class=script-intro><b>💬 </b>"+hook+"</div>"+sh+"<p style=font-size:14px;color:var(--text2);margin-top:8px>"+ending+"</p><div class=bgm-tag>🎵 BGM: "+bgm+"</div><button class=copy-btn onclick=\"navigator.clipboard.writeText('"+hook+"\n\n'+steps.join('\n')+'\n\n'+ending+'\n\n🎵 BGM: '+bgm);var b=this;b.textContent='✅ 已复制！';setTimeout(function(){b.textContent='📋 复制文案'},2000)\">📋 复制文案</button></div><div class=ds><h4>📦 所需素材</h4><div class=mats-wrap>"+mt+"</div></div>";
     D.getElementById("modal-overlay").classList.add("active");D.body.style.overflow="hidden";
@@ -351,6 +379,37 @@ function openCard(card){
 function openByTitle(title){if(!title)return;var cards=D.querySelectorAll(".card");for(var i=0;i<cards.length;i++){if(cards[i].dataset.title===title){openCard(cards[i]);return;}}}
 function closeModal(){D.getElementById("modal-overlay").classList.remove("active");D.body.style.overflow="";}
 D.getElementById("modal-overlay").addEventListener("click",function(e){if(e.target===this)closeModal();});
+
+/* Generate detailed sub-steps from topic metadata */
+function generateSubDetails(t,ctype){
+    var cat=t.category||"",title=t.title||"",desc=t.description||"",mats=t.materials_needed||"",dur=t.estimated_duration||"",viral=t.viral_potential||"";
+    /* Universal steps that get rich sub-content based on category & type */
+    if(ctype==="爆款"){
+        return [
+            ["选择一段 "+dur+" 以内的素材","素材要求："+mats+"
+💡 选择动作清晰、方向性强的画面效果最好","光线充足的场景比暗光场景传播率高3倍"],
+            ["核心操作技巧","打开剪映 → 导入素材 → 在时间线选中片段","根据分类「"+cat+"」使用对应的工具和特效","💡 参数先调到默认值，再根据预览效果微调"],
+            ["微调参数到最佳效果","预览3遍以上确认节奏流畅","对比原素材和成品：效果是否明显？节奏是否紧凑？","💡 可以让朋友先看一遍，看他们第一反应是什么"],
+            ["导出 + 发布","分辨率1080p，帧率60fps","标题写「"+title.split("：")[0] if "：" in title else title+"」","💡 发布时段推荐：工作日12:00/18:00，周末10:00/20:00"]
+        ];
+    }else if(ctype==="深度"){
+        return [
+            ["确定主题 + 选题调研","在抖音搜索「"+cat+"」，看最近7天播放量最高的5条视频","总结它们的共同点：时长、节奏、开头方式","💡 用飞书/Notion新建一页当本期的策划文档"],
+            ["拍摄准备 + 现场执行","脚本分镜表：至少列出开场/核心/高潮/结尾4个关键帧","素材清单："+(mats||"根据主题准备对应素材")+"
+💡 多拍30%的备用素材，给后期剪辑留余地"],
+            ["剪辑全流程","粗剪→精剪→调色→音效→字幕→导出","💡 每轮预览后休息5分钟再看，能发现新问题","第一版剪完后，删掉20%的内容——往往更紧凑"],
+            ["发布 + 数据复盘","发布24小时后查看完播率、互动率","💡 完播率<30%说明开头不够钩人，>50%说明节奏对了"]
+        ];
+    }else{
+        return [
+            ["踩坑预警：90%的人会犯的错","常见错误1：一上来就堆教程，观众3秒划走","常见错误2：没有对比画面，观众看不出区别","💡 正确做法：先展示效果→再教方法→最后给参数"],
+            ["正确操作步骤","工具："+(cat.indexOf("剪映")>=0?"剪映APP":(cat.indexOf("拍摄")>=0?"手机相机+剪映":"剪映+素材"))+"
+💡 每个操作录屏3次，选最流畅的一次"],
+            ["具体参数 + 演示","如果涉及调色：饱和度、色温、对比度的具体数值","如果涉及转场：转场时长、方向、缓动曲线","💡 在视频里以大字报形式展示参数，观众截图率高"],
+            ["效果对比 + 导出设置","Before vs After：分屏展示效果差异","导出：1080p · 60fps · H.264","💡 封面选对比画面中最震撼的那一帧"]
+        ];
+    }
+}
 
 /* AI */
 function runAI(){
