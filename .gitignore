@@ -3,3 +3,6 @@ images/card-texture.png
 .vercel
 .surge
 node_modules
+__pycache__/
+*.pyc
+.venv/
