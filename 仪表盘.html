@@ -158,7 +158,6 @@ footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent
 <button data-panel="calendar">内容日历</button>
 <button data-panel="library">选题库</button>
 <button data-panel="stats">数据</button>
-<button data-panel="inspire">灵感</button>
 </div><div class="time">2026-06-29 15:01</div></div></nav>
 <div class="wrap"><main>
 <section class="active" id="sec-today">
@@ -194,7 +193,8 @@ footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent
 <div class="tbl-wrap"><table><thead><tr><th>#</th><th>标题</th><th>分类</th><th>难度</th><th>类型</th><th>时长</th><th>阶段</th></tr></thead><tbody id="cal-tbody"></tbody></table></div>
 </section>
 <section id="sec-library">
-<div class="sec-hd" style="padding-top:90px"><div class="kicker">Full Library</div><h2>全部选题</h2><p class="sub">200 条·14 分类</p></div>
+<div class="sec-hd" style="padding-top:90px"><div class="kicker">Full Library + AI</div><h2>📚 选题库</h2><p class="sub">200 条·14 分类 · AI智能搜索</p></div>
+<div style="text-align:center;padding:0 0 18px"><input type="text" id="inspire-search" placeholder="🤖 输入想法让AI找选题：很酷的转场 Vlog怎么拍" style="padding:10px 16px;width:380px;max-width:70vw;border-radius:10px;border:1px solid var(--border);font-size:14px;font-family:inherit;outline:none"><button onclick="runAI()" style="margin-left:8px;padding:10px 24px;border-radius:10px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">AI选题</button></div>
 <div class="filters">
 <select id="f-cat"><option value="all">全部分类</option></select>
 <select id="f-type"><option value="all">全部类型</option><option value="爆款">爆款</option><option value="干货">干货</option><option value="深度">深度</option></select>
@@ -202,6 +202,9 @@ footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent
 <input type="text" id="f-search" placeholder="搜索标题">
 <span class="count" id="lib-num">200 条</span></div>
 <div class="card-grid" id="lib-grid"></div>
+<div class="divider" style="margin:24px 0"></div>
+<div class="sec-hd"><h2>📸 拍摄技巧速查</h2></div>
+<div id="quick-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px"></div>
 </section>
 <section id="sec-stats">
 <div class="sec-hd" style="padding-top:90px"><div class="kicker">Statistics</div><h2>数据概览</h2></div>
@@ -215,13 +218,6 @@ footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent
 <div class="stat-panel"><h3>分类覆盖</h3><div id="cat-bars"></div></div>
 <div class="stat-panel"><h3>内容类型</h3><div id="type-bars"></div></div>
 </div>
-</section>
-<section id="sec-inspire">
-<div class="sec-hd" style="padding-top:90px"><div class="kicker">Creative Lab</div><h2>创意灵感</h2></div>
-<div style="text-align:center;padding:16px 0"><input type="text" id="inspire-search" placeholder="输入想法找选题：很酷的转场 Vlog怎么拍" style="padding:10px 16px;width:400px;max-width:75vw;border-radius:10px;border:1px solid var(--border);font-size:14px;font-family:inherit;outline:none"><button onclick="runAI()" style="margin-left:8px;padding:10px 24px;border-radius:10px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">AI选题</button></div>
-<div class="info-row" id="rand-combo" style="margin-bottom:20px"></div>
-<div class="sec-hd"><h2>拍摄速查</h2></div>
-<div id="quick-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
 </section>
 </main></div>
 <footer><p>数据截止 2026-06-29 · 每日 <span>8:57</span> 自动刷新 · <a href="#" onclick="runAI()">AI助手</a></p></footer>
@@ -379,7 +375,7 @@ var pns=D.querySelectorAll(".stat-panel");for(var i=0;i<pns.length;i++)bo.observ
 /* TAG CLOUD */
 var items=[];for(var k in cc)items.push({cat:k,count:cc[k]});items.sort(function(a,b){return b.count-a.count;});
 var tcs=[D.getElementById("tag-cloud")];
-for(var j=0;j<tcs.length;j++)if(tcs[j]){var h="";for(var i=0;i<items.length;i++){var sz=i<3?"s3":(i<7?"s2":"s1");h+="<span class=\"tc-item "+sz+"\" onclick=\"switchTab('library');D.getElementById('f-cat').value='"+esc(items[i].cat)+"';filterLib()\">"+items[i].cat+" ("+items[i].count+")</span>";}tcs[j].innerHTML=h;}
+for(var j=0;j<tcs.length;j++)if(tcs[j]){var h="";for(var i=0;i<items.length;i++){var sz=i<3?"s3":(i<7?"s2":"s1");h+="<span class=\"tc-item "+sz+"\" onclick=\"var b=document.querySelector('.tabs button[data-panel=library]');if(b)b.click();document.getElementById('f-cat').value='"+esc(items[i].cat)+"';filterLib();window.scrollTo({top:document.getElementById('sec-library').offsetTop-80,behavior:'smooth'})\">"+items[i].cat+" ("+items[i].count+")</span>";}tcs[j].innerHTML=h;}
 
 /* QUICK CARDS */
 var refs=[{e:"📱",t:"手机拍摄6大运镜",d:"推拉摇移跟甩——每个运镜的适用场景"},{e:"🎨",t:"电影感调色公式",d:"青橙·复古港风·日系清新——万用LUT"},{e:"🔊",t:"BGM黄金法则",d:"节奏匹配+情绪共振+留白呼吸=爆款配乐"},{e:"✂️",t:"剪辑节奏控制",d:"快=短镜头+卡点·慢=长镜头+环境音"},{e:"💡",t:"爆款开头5秒公式",d:"好奇缺口+视觉冲击+承诺价值"},{e:"🎬",t:"Vlog叙事结构",d:"钩子→铺垫→高潮→CTA——4段式"}];
