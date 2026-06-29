@@ -127,6 +127,15 @@ nav .time{font-size:11px;color:var(--text3)}
 .modal-overlay.active .modal-box{transform:translateY(0) scale(1)}
 .modal-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text3)}
 .modal-close:hover{background:var(--bg);color:var(--text);transform:rotate(90deg)}
+.modal-tag{display:inline-block;padding:4px 14px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(0,85,232,.05);color:var(--accent);margin-bottom:16px}
+.modal-box h2{font-size:28px;font-weight:800;margin-bottom:12px}
+.modal-difficulty{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:22px}
+.modal-box .ds{margin-bottom:24px}.modal-box .ds h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;font-weight:700}
+.modal-box .ds p,.modal-box .ds li{font-size:14px;color:var(--text2);line-height:1.8}
+footer{padding:36px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}
+footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent);font-weight:700}
+.card:active{animation:clickPulse .4s ease-out}
+
 .steps-list{padding:0;list-style:none;margin:10px 0}
 .steps-list li{padding:10px 14px;margin-bottom:6px;background:rgba(0,85,232,.02);border-radius:10px;font-size:14px;color:var(--text);line-height:1.6;border:1px solid rgba(0,85,232,.05)}
 .script-intro{background:rgba(0,85,232,.03);border-radius:10px;padding:14px 16px;font-size:15px;color:var(--text);margin-bottom:8px;line-height:1.7;border:1px solid rgba(0,85,232,.06)}
@@ -142,14 +151,7 @@ nav .time{font-size:11px;color:var(--text3)}
 .blogger-arrow{font-size:14px;color:var(--text3);transition:all .2s}.blogger-link:hover .blogger-arrow{color:var(--accent);transform:translateX(2px)}
 .mat-tag{display:inline-block;padding:6px 14px;border-radius:8px;background:rgba(0,85,232,.04);color:var(--accent);font-size:12px;font-weight:600;margin:3px}
 .mats-wrap{display:flex;flex-wrap:wrap;gap:4px}
-.modal-tag{display:inline-block;padding:4px 14px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(0,85,232,.05);color:var(--accent);margin-bottom:16px}
-.modal-box h2{font-size:28px;font-weight:800;margin-bottom:12px}
-.modal-difficulty{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:22px}
-.modal-box .ds{margin-bottom:24px}.modal-box .ds h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;font-weight:700}
-.modal-box .ds p,.modal-box .ds li{font-size:14px;color:var(--text2);line-height:1.8}
-footer{padding:36px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}
-footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent);font-weight:700}
-.card:active{animation:clickPulse .4s ease-out}
+
 </style></head>
 <body>
 <canvas id="particles-canvas"></canvas>
@@ -336,35 +338,19 @@ function openCard(card){
     var desc=esc(t.description||""),mats=t.materials_needed||"",titleEsc=esc(t.title||"");
     var refs=BLOGGERS[cat]||[{n:"抖音搜索",d:"搜索标题找参考",u:"https://www.douyin.com/search/"+encodeURIComponent(title)}];
     var bh="<div class=ds><h4>🔗 灵感来源 & 对标博主</h4>";
-    for(var i=0;i<refs.length;i++){var r=refs[i];bh+="<a class="blogger-link" href="+(r.u||"#")+" target=_blank><span class=blogger-avatar>"+(r.n.charAt(0))+"</span><span class=blogger-info><b>"+esc(r.n)+"</b><small>"+esc(r.d)+"</small></span><span class=blogger-arrow>↗</span></a>";}bh+="</div>";
+    for(var i=0;i<refs.length;i++){var r=refs[i];bh+="<a class=blogger-link href="+(r.u||"#")+" target=_blank><span class=blogger-avatar>"+(r.n.charAt(0))+"</span><span class=blogger-info><b>"+esc(r.n)+"</b><small>"+esc(r.d)+"</small></span><span class=blogger-arrow>↗</span></a>";}bh+="</div>";
     var core=titleEsc.split("：")[1]||titleEsc,hook,steps,ending,bgm;
-    if(ctype==="爆款"){hook="「"+core+"」—— 你是不是也刷到过这种效果？今天30秒教会你。";steps=["📱 打开剪映，导入素材","⚡ 关键操作："+core+"的核心步骤","🎯 微调参数到最佳效果","✨ 对比展示：Before → After"];ending="学会了点个赞收藏，下期见！";bgm="节奏卡点BGM（Phut Hon / 病变 Remix）";}
-    else if(ctype==="深度"){hook="今天不教单个技巧，带你完整拆解「"+titleEsc+"」的全过程。";steps=["📋 前期构思与策划思路","🎥 拍摄现场还原与要点","✂️ 剪辑全流程逐步拆解","📊 成片展示 + 关键技巧复盘"];ending="觉得有用点个关注，持续更新深度拆解。";bgm="叙事感配乐（Epidemic Sound 风格）";}
-    else{hook="为什么别人的视频那么高级？问题就出在这一步 ——";steps=["🔍 常见错误：90%的人都做错了","🛠️ 正确方法："+titleEsc+"的核心要点","📐 具体操作演示","✅ 效果对比 + 避坑提醒"];ending="收藏起来慢慢练，关注我每天一个剪辑技巧。";bgm="轻量氛围BGM（Lo-Fi / Jazz Hop）";}
+    if(ctype==="爆款"){hook="「"+core+"」——你是不是也刷到过这种效果？";steps=["打开剪映导入素材","关键操作："+core+"的核心步骤","微调参数到最佳效果","Before→After对比展示"];ending="学会了点个赞收藏！";bgm="节奏卡点BGM";}
+    else if(ctype==="深度"){hook="完整拆解「"+titleEsc+"」的全过程。";steps=["前期构思与策划","拍摄现场还原与要点","剪辑全流程拆解","成片展示+复盘"];ending="觉得有用点关注！";bgm="叙事感配乐";}
+    else{hook="为什么别人的视频那么高级？";steps=["常见错误：90%人做错了","正确方法："+titleEsc+"的核心要点","具体操作演示","效果对比+避坑提醒"];ending="收藏起来慢慢练！";bgm="轻量Lo-Fi BGM";}
     var sh="<ol class=steps-list>";for(var i=0;i<steps.length;i++)sh+="<li>"+steps[i]+"</li>";sh+="</ol>";
-    var mt="";if(mats){var ps=mats.replace(/，/g,",").replace(/、/g,",").split(",");for(var i=0;i<ps.length;i++){var m=ps[i].trim();if(m)mt+="<span class=mat-tag>"+esc(m)+"</span>";}}mt=mt||"<span style=font-size:13px;color:var(--text3)>无特殊要求</span>";
-    var fullScript=hook+"\n\n";for(var i=0;i<steps.length;i++){fullScript+=steps[i].replace(/📱 |⚡ |🎯 |✨ |📋 |🎥 |✂️ |📊 |🔍 |🛠️ |📐 |✅ /g,"")+"\n";}fullScript+="\n"+ending+"\n\n🎵 BGM："+bgm;
-    var scriptEscaped=fullScript.replace(/'/g,"\'").replace(/"/g,"&quot;");
-    D.getElementById("modal-box").innerHTML=
-        "<button class=modal-close onclick=closeModal()>✕</button>"+
-        "<div class=modal-tag>"+cat+" · "+ctype+"</div>"+
-        "<h2>"+titleEsc+"</h2>"+
-        "<div class=modal-difficulty>"+DM[diff]+" · "+dur+" · 涨粉"+viral+" · 制作"+prod+"</div>"+
-        (desc?"<div class=ds><h4>💡 内容说明</h4><p>"+desc+"</p></div>":"")+
-        bh+
-        "<div class=ds><h4>✍️ 脚本文案</h4>"+
-        "<div class=script-intro><b>💬 开场钩子：</b>"+hook+"</div>"+
-        sh+
-        "<div class=script-ending><b>🎤 结尾CTA：</b>"+ending+"</div>"+
-        "<div class=bgm-tag>🎵 推荐BGM："+bgm+"</div>"+
-        "<button class=copy-btn onclick="navigator.clipboard.writeText('"+scriptEscaped+"');var b=this;b.textContent='✅ 文案已复制！';setTimeout(function(){b.textContent='📋 复制完整文案'},2000)">📋 复制完整文案</button>"+
-        "</div>"+
-        "<div class=ds><h4>📦 所需素材</h4><div class=mats-wrap>"+mt+"</div></div>";
+    var mt="";if(mats){var ps=mats.replace(/，/g,",").replace(/、/g,",").split(",");for(var i=0;i<ps.length;i++){var m=ps[i].trim();if(m)mt+="<span style=display:inline-block;padding:5px 12px;border-radius:7px;background:rgba(0,85,232,.04);color:var(--accent);font-size:12px;font-weight:600;margin:2px>"+esc(m)+"</span>";}}mt=mt||"无特殊要求";
+    D.getElementById("modal-box").innerHTML="<button class=modal-close onclick=closeModal()>✕</button><div class=modal-tag>"+cat+" · "+ctype+"</div><h2>"+titleEsc+"</h2><div class=modal-difficulty>"+DM[diff]+" · "+dur+" · 涨粉"+viral+" · 制作"+prod+"</div>"+(desc?"<div class=ds><h4>内容说明</h4><p>"+desc+"</p></div>":"")+bh+"<div class=ds><h4>✍️ 脚本文案</h4><div class=script-intro><b>💬 </b>"+hook+"</div>"+sh+"<p style=font-size:14px;color:var(--text2);margin-top:8px>"+ending+"</p><div class=bgm-tag>🎵 BGM: "+bgm+"</div><button class=copy-btn onclick=\"navigator.clipboard.writeText('"+hook+"\n\n'+steps.join('\n')+'\n\n'+ending+'\n\n🎵 BGM: '+bgm);var b=this;b.textContent='✅ 已复制！';setTimeout(function(){b.textContent='📋 复制文案'},2000)\">📋 复制文案</button></div><div class=ds><h4>📦 所需素材</h4><div class=mats-wrap>"+mt+"</div></div>";
     D.getElementById("modal-overlay").classList.add("active");D.body.style.overflow="hidden";
 }
 function openByTitle(title){if(!title)return;var cards=D.querySelectorAll(".card");for(var i=0;i<cards.length;i++){if(cards[i].dataset.title===title){openCard(cards[i]);return;}}}
 function closeModal(){D.getElementById("modal-overlay").classList.remove("active");D.body.style.overflow="";}
-D.getElementById("modal-overlay").addEventListener("click",function(e){if(e.target===this||e.target.classList.contains("modal-overlay"))closeModal();});
+D.getElementById("modal-overlay").addEventListener("click",function(e){if(e.target===this)closeModal();});
 
 /* AI */
 function runAI(){
