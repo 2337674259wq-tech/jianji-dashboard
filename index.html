@@ -4,22 +4,13 @@
 <title>🎬 剪辑选题系统</title>
 <style>*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-    --bg:#f6f7fa;--card:#fff;--text:#111318;--text2:#555a66;--text3:#8a8e9a;
-    --border:#e5e7ed;--accent:#0055e8;--red:#d92d20;--orange:#e04f16;--green:#188038;--purple:#7a1eb8;
-    --radius:14px;--spring:cubic-bezier(0.34,1.56,0.64,1);--smooth:cubic-bezier(0.22,0.61,0.36,1);
-    font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
-    background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;
-}
-h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif}
-#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.6}
+body{--bg:#f6f7fa;--card:#fff;--text:#111318;--text2:#555a66;--text3:#8a8e9a;--border:#e5e7ed;--accent:#0055e8;--red:#d92d20;--orange:#e04f16;--green:#188038;--purple:#7a1eb8;--radius:14px;--spring:cubic-bezier(0.34,1.56,0.64,1);--smooth:cubic-bezier(0.22,0.61,0.36,1);font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
+h1,h2,h3{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif}
+#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55}
 .geo-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .geo{position:absolute;animation:geoFloat 12s var(--spring) infinite}
 @keyframes geoFloat{0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}25%{transform:translate(40px,-60px) rotate(90deg) scale(1.3)}50%{transform:translate(-20px,-100px) rotate(180deg) scale(.75)}75%{transform:translate(-40px,-30px) rotate(270deg) scale(1.15)}}
-.geo.circle{border-radius:50%;border:3px solid var(--accent)}
-.geo.square{border-radius:8px;border:3px solid var(--purple)}
-.geo.dot{border-radius:50%;background:var(--accent)!important;border:none!important}
-.geo.ring{border-radius:50%;border:3px dashed var(--accent);background:none!important}
+.geo.circle{border-radius:50%;border:3px solid var(--accent)}.geo.square{border-radius:8px;border:3px solid var(--purple)}.geo.dot{border-radius:50%;background:var(--accent)!important;border:none!important}.geo.ring{border-radius:50%;border:3px dashed var(--accent);background:none!important}
 @keyframes fadeSlideUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
 @keyframes shimmer{0%{background-position:0% center}100%{background-position:300% center}}
 section{display:none;animation:fadeSlideUp .35s var(--smooth);padding:0 0 50px}
@@ -31,10 +22,8 @@ nav .logo{font-size:18px;font-weight:800;color:var(--text);display:flex;align-it
 nav .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 16px rgba(0,85,232,.35)}
 nav .tabs{display:flex;gap:4px;background:rgba(0,0,0,.025);border-radius:10px;padding:3px}
 nav .tabs button{border:none;background:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .25s var(--spring);font-family:inherit}
-nav .tabs button:hover{color:var(--text)}
-nav .tabs button.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.06)}
-nav .time{font-size:11px;color:var(--text3)}
-@media(max-width:768px){nav .time{display:none}nav .tabs button{padding:6px 11px;font-size:11px}}
+nav .tabs button:hover{color:var(--text)}nav .tabs button.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+nav .time{font-size:11px;color:var(--text3)}@media(max-width:768px){nav .time{display:none}nav .tabs button{padding:6px 11px;font-size:11px}}
 .hero{position:relative;padding:80px 0 48px}
 .hero .label{display:inline-block;padding:6px 20px;border-radius:24px;background:rgba(0,85,232,.05);color:var(--accent);font-size:12px;font-weight:700;letter-spacing:1px;margin-bottom:22px}
 .hero h1{font-size:clamp(38px,6vw,64px);font-weight:900;line-height:1.08;margin-bottom:14px}
@@ -44,81 +33,86 @@ nav .time{font-size:11px;color:var(--text3)}
 .hero-stat .num{font-size:36px;font-weight:900;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;transition:transform .3s var(--spring)}
 .hero-stat:hover .num{transform:scale(1.15)}
 .hero-stat .lbl{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;font-weight:700}
-.sec-hd{margin-bottom:24px}
-.sec-hd .kicker{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:8px}
-.sec-hd h2{font-size:clamp(22px,3vw,34px);font-weight:800;margin-bottom:4px}
-.sec-hd .sub{font-size:13px;color:var(--text3)}
+.sec-hd{margin-bottom:24px}.sec-hd .kicker{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:8px}
+.sec-hd h2{font-size:clamp(22px,3vw,34px);font-weight:800;margin-bottom:4px}.sec-hd .sub{font-size:13px;color:var(--text3)}
 .divider{width:100%;height:1px;background:var(--border);margin:20px 0}
-
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.card{position:relative;background:var(--card);border-radius:var(--radius);padding:28px 24px 36px;border:1px solid var(--border);cursor:pointer;transition:transform .35s var(--spring),box-shadow .35s var(--spring),border-color .25s ease;box-shadow:0 1px 3px rgba(0,0,0,.02),0 3px 14px rgba(0,0,0,.03);overflow:hidden}
+.card{position:relative;background:var(--card);border-radius:var(--radius);padding:28px 24px 36px;border:1px solid var(--border);cursor:pointer;transition:transform .35s var(--spring),box-shadow .35s var(--spring);box-shadow:0 1px 3px rgba(0,0,0,.02),0 3px 14px rgba(0,0,0,.03);overflow:hidden}
 .card:hover{transform:translateY(-6px);box-shadow:0 10px 32px rgba(0,85,232,.08);border-color:var(--accent)}
 .card::after{content:'→';position:absolute;bottom:10px;right:16px;font-size:15px;color:var(--accent);opacity:0;transition:all .3s var(--spring);transform:translateX(-6px);font-weight:700}
 .card:hover::after{opacity:1;transform:translateX(0)}
-.card-bar{position:absolute;top:0;left:0;right:0;height:3px}
-.card-bar.r{background:var(--red)}.card-bar.b{background:var(--accent)}.card-bar.pu{background:var(--purple)}
-.card .tag{display:inline-block;padding:2px 10px;border-radius:6px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-bottom:8px}
-.card .tag.r{background:rgba(217,45,32,.06);color:var(--red)}.card .tag.b{background:rgba(0,85,232,.06);color:var(--accent)}.card .tag.pu{background:rgba(122,30,184,.06);color:var(--purple)}
-.card h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px}
-.card .meta{font-size:11.5px;color:var(--text2)}.card.hidden{display:none}
-
-.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:768px){.stage-grid{grid-template-columns:1fr}}
+.card-bar{position:absolute;top:0;left:0;right:0;height:3px}.card-bar.r{background:var(--red)}.card-bar.b{background:var(--accent)}.card-bar.pu{background:var(--purple)}
+.card .tag{display:inline-block;padding:2px 10px;border-radius:6px;font-size:10.5px;font-weight:700;margin-bottom:8px}.card .tag.r{background:rgba(217,45,32,.06);color:var(--red)}.card .tag.b{background:rgba(0,85,232,.06);color:var(--accent)}.card .tag.pu{background:rgba(122,30,184,.06);color:var(--purple)}
+.card h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px}.card .meta{font-size:11.5px;color:var(--text2)}.card.hidden{display:none}
+.card .desc{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.4}
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}@media(max-width:768px){.stage-grid{grid-template-columns:1fr}}
 .stage-card{display:flex;gap:20px;align-items:flex-start;background:var(--card);border-radius:var(--radius);padding:28px 36px 28px 24px;border:1px solid var(--border);cursor:pointer;transition:transform .35s var(--spring),box-shadow .35s var(--spring);box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 14px rgba(0,0,0,.03)}
 .stage-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,85,232,.06);border-color:var(--accent)}
 .stage-num{font-size:44px;font-weight:900;color:var(--accent);opacity:.04;line-height:1;flex-shrink:0;width:44px;text-align:center}
-.stage-content h4{font-size:18px;font-weight:800;margin-bottom:4px}
-.stage-content h4 span{font-size:12px;font-weight:600;color:var(--accent);padding:2px 8px;border-radius:5px;background:rgba(0,85,232,.04)}
+.stage-content h4{font-size:18px;font-weight:800;margin-bottom:4px}.stage-content h4 span{font-size:12px;font-weight:600;color:var(--accent);padding:2px 8px;border-radius:5px;background:rgba(0,85,232,.04)}
 .stage-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px}.stage-desc{font-size:12.5px;color:var(--text3)}
-
-.info-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-@media(max-width:768px){.info-row{grid-template-columns:1fr}}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}@media(max-width:768px){.info-row{grid-template-columns:1fr}}
 .info-card{background:var(--card);border-radius:var(--radius);padding:20px 24px;border:1px solid var(--border);font-size:13.5px;color:var(--text2);line-height:1.7}
-
-footer{padding:32px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}
-footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent);font-weight:700}
-
-/* MODAL */
+.tbl-wrap{border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;background:var(--card);max-height:55vh;overflow-y:auto}
+.tbl-wrap table{width:100%;border-collapse:collapse;font-size:13px}
+.tbl-wrap th{text-align:left;padding:12px 16px;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.tbl-wrap td{padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.03)}.tbl-wrap tr:hover td{background:rgba(0,85,232,.02)}
+.tbl-wrap .ep{font-weight:700;color:var(--accent)}.cal-row.hidden{display:none}.cal-row{cursor:pointer}
+.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:600}.pill.green{background:rgba(24,128,56,.08);color:var(--green)}.pill.blue{background:rgba(0,85,232,.08);color:var(--accent)}.pill.purple{background:rgba(122,30,184,.08);color:var(--purple)}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filters select,.filters input{padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none}
+.filters input{min-width:150px}.filters .count{font-size:11px;color:var(--text3);margin-left:auto}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
+.stat-panel{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid var(--border)}
+.stat-panel h3{font-size:15px;font-weight:800;margin-bottom:16px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}.bar-label{font-size:11px;color:var(--text2);min-width:80px;text-align:right;font-weight:600}
+.bar-track{flex:1;height:7px;background:rgba(0,0,0,.03);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.5s var(--spring);background:linear-gradient(90deg,var(--accent),#7a1eb8)}.bar-fill.r{background:var(--red)}.bar-fill.b{background:var(--accent)}.bar-fill.pu{background:var(--purple)}
+.bar-num{font-size:11px;color:var(--text3);min-width:26px;font-weight:600}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border-radius:var(--radius);padding:26px 18px;border:1px solid var(--border);text-align:center;transition:transform .3s var(--spring)}
+.kpi:hover{transform:translateY(-3px)}.kpi .val{font-size:44px;font-weight:900}.kpi .lbl{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+footer{padding:32px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}footer a{color:var(--accent);text-decoration:none}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s ease;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center}
 .modal-overlay.active{opacity:1;pointer-events:auto}
-.modal-box{background:var(--card);border-radius:var(--radius);max-width:680px;width:92vw;max-height:85vh;overflow-y:auto;padding:36px 32px 28px;position:relative;transform:translateY(16px);transition:transform .35s var(--spring);box-shadow:0 16px 60px rgba(0,0,0,.12)}
+.modal-box{background:var(--card);border-radius:var(--radius);max-width:680px;width:92vw;max-height:85vh;overflow-y:auto;padding:36px 32px 28px;position:relative;transform:translateY(12px);transition:transform .35s var(--spring);box-shadow:0 16px 60px rgba(0,0,0,.12)}
 .modal-overlay.active .modal-box{transform:translateY(0)}
 .modal-close{position:absolute;top:12px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text3);background:var(--card)}
 .modal-close:hover{background:var(--bg);color:var(--text);transform:rotate(90deg)}
-.modal-tag{display:inline-block;padding:3px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(0,85,232,.05);color:var(--accent);margin-bottom:12px;letter-spacing:.4px}
+.modal-tag{display:inline-block;padding:3px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(0,85,232,.05);color:var(--accent);margin-bottom:12px}
 .modal-box h2{font-size:24px;font-weight:800;margin-bottom:8px;line-height:1.2}
 .modal-meta{font-size:12px;color:var(--text3);margin-bottom:6px}
-.modal-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
-.modal-tags span{padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;background:rgba(0,85,232,.04);color:var(--accent)}
-.modal-box .ds{margin-bottom:20px}
-.modal-box .ds h4{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:8px;font-weight:700}
-.modal-box .ds .framework-block{background:rgba(0,85,232,.02);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line;border:1px solid rgba(0,85,232,.05)}
-.modal-box .ds .script-block{background:rgba(0,0,0,.01);border-radius:10px;padding:16px 18px;font-size:13px;color:var(--text2);line-height:1.85;white-space:pre-line;border:1px solid rgba(0,0,0,.04);max-height:300px;overflow-y:auto}
-.modal-blogger{font-size:11px;color:var(--text3);margin-top:8px;font-style:italic;text-align:right}
-.modal-copy-btn{display:inline-block;padding:6px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;margin-top:12px;transition:all .2s}
-.modal-copy-btn:hover{background:var(--accent);color:#fff}
-@media(max-width:768px){.modal-box{padding:24px 18px 20px;max-width:96vw}.modal-box h2{font-size:20px}}
+.modal-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}.modal-tags span{padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;background:rgba(0,85,232,.04);color:var(--accent)}
+.modal-box .ds{margin-bottom:20px}.modal-box .ds h4{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:8px;font-weight:700}
+.modal-box .ds .fb{background:rgba(0,85,232,.02);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line;border:1px solid rgba(0,85,232,.05)}
+.modal-box .ds .sb{background:rgba(0,0,0,.01);border-radius:10px;padding:16px 18px;font-size:13px;color:var(--text2);line-height:1.85;white-space:pre-line;border:1px solid rgba(0,0,0,.04);max-height:300px;overflow-y:auto}
+.modal-blogger{font-size:11px;color:var(--text3);margin-top:8px;font-style:italic;text-align:right;opacity:.8}
+.cp-btn{display:inline-block;padding:6px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;margin-top:12px;transition:all .2s}
+.cp-btn:hover{background:var(--accent);color:#fff}@media(max-width:768px){.modal-box{padding:24px 18px 20px;max-width:96vw}.modal-box h2{font-size:20px}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:2px}
 </style></head>
 <body>
 <canvas id="particles-canvas"></canvas>
 <div class="geo-shapes">
-<div class="geo circle" style="top:6%;left:4%;width:100px;height:100px;opacity:.09"></div>
-<div class="geo dot" style="top:22%;right:8%;width:30px;height:30px;opacity:.1;animation-delay:-3s"></div>
-<div class="geo ring" style="top:45%;left:3%;width:80px;height:80px;opacity:.08;animation-delay:-5s"></div>
-<div class="geo square" style="top:65%;right:6%;width:55px;height:55px;opacity:.09;animation-delay:-7s"></div>
-<div class="geo dot" style="top:15%;left:50%;width:20px;height:20px;opacity:.08;animation-delay:-2s"></div>
-<div class="geo circle" style="top:78%;left:10%;width:70px;height:70px;opacity:.07;animation-delay:-4s"></div>
-<div class="geo ring" style="top:35%;right:4%;width:65px;height:65px;opacity:.07;animation-delay:-8s"></div>
-<div class="geo square" style="top:55%;left:55%;width:40px;height:40px;opacity:.06;animation-delay:-9s;border-color:var(--orange)"></div>
-<div class="geo dot" style="top:85%;right:20%;width:18px;height:18px;opacity:.07;animation-delay:-6s"></div>
+<div class="geo circle" style="top:6%;left:4%;width:100px;height:100px;opacity:.08"></div>
+<div class="geo dot" style="top:22%;right:8%;width:28px;height:28px;opacity:.09;animation-delay:-3s"></div>
+<div class="geo ring" style="top:45%;left:3%;width:80px;height:80px;opacity:.07;animation-delay:-5s"></div>
+<div class="geo square" style="top:65%;right:6%;width:50px;height:50px;opacity:.08;animation-delay:-7s"></div>
+<div class="geo dot" style="top:15%;left:50%;width:18px;height:18px;opacity:.07;animation-delay:-2s"></div>
+<div class="geo circle" style="top:78%;left:10%;width:65px;height:65px;opacity:.06;animation-delay:-4s"></div>
+<div class="geo ring" style="top:35%;right:4%;width:60px;height:60px;opacity:.06;animation-delay:-8s"></div>
+<div class="geo square" style="top:55%;left:55%;width:38px;height:38px;opacity:.05;animation-delay:-9s;border-color:var(--orange)"></div>
+<div class="geo dot" style="top:88%;right:18%;width:16px;height:16px;opacity:.06;animation-delay:-6s"></div>
 </div>
 
 <nav><div class="nav-inner"><div class="logo"><span class="dot"></span>剪辑选题系统</div>
 <div class="tabs">
 <button class="active" data-panel="today">今日选题</button>
+<button data-panel="calendar">日历</button>
+<button data-panel="library">选题库</button>
+<button data-panel="stats">数据</button>
 <button data-panel="inspire">灵感</button>
-</div><div class="time">2026-06-29</div></div></nav>
+</div><div class="time">2026-06-29 15:27</div></div></nav>
 
 <div class="wrap"><main>
 
@@ -130,114 +124,169 @@ footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent
 <div class="hero-stats">
 <div class="hero-stat"><div class="num" style="color:var(--accent)">6</div><div class="lbl">精选选题</div></div>
 <div class="hero-stat"><div class="num" style="color:var(--green)">6</div><div class="lbl">覆盖分类</div></div>
-<div class="hero-stat"><div class="num" style="color:var(--purple)" id="hero-today-count">6</div><div class="lbl">今日推荐</div></div>
+<div class="hero-stat"><div class="num" style="color:var(--purple)">6</div><div class="lbl">制作方案</div></div>
 </div></div>
 <div class="divider"></div>
-<div class="sec-hd" style="margin-top:20px"><div class="kicker">Today's Picks</div><h2>🔥 今日精选选题</h2><p class="sub">2026-06-29 · 点击任意卡片查看完整制作方案（标题·标签·框架·文案·博主溯源）</p></div>
+<div class="sec-hd" style="margin-top:20px"><div class="kicker">Today's Picks</div><h2>🔥 今日精选选题</h2><p class="sub">2026-06-29 · 点击卡片查看完整制作方案（标题+标签+框架+文案）</p></div>
 <div class="card-grid" id="today-grid"></div>
 </section>
 
-<section id="sec-inspire">
-<div class="sec-hd" style="padding-top:90px"><div class="kicker">Creator Resources</div><h2>💡 灵感库</h2></div>
+<section id="sec-calendar">
+<div class="sec-hd" style="padding-top:90px"><div class="kicker">Content Calendar</div><h2>🗓️ 选题日历</h2></div>
 <div class="stage-grid">
-<div class="stage-card" onclick="window.openTopic('t01')"><div class="stage-num">01</div><div class="stage-content"><h4>剪映入门<span>零基础</span></h4><p class="stage-title">倒放效果+蒙版转场</p><p class="stage-desc">从零开始的2个必学技巧</p></div></div>
-<div class="stage-card" onclick="window.openTopic('t04')"><div class="stage-num">02</div><div class="stage-content"><h4>调色进阶<span>提升质感</span></h4><p class="stage-title">电影感调色+BGM卡点</p><p class="stage-desc">让你的画面脱离手机味</p></div></div>
-<div class="stage-card" onclick="window.openTopic('t06')"><div class="stage-num">03</div><div class="stage-content"><h4>爆款思维<span>深度拆解</span></h4><p class="stage-title">逐帧分析500万播放视频</p><p class="stage-desc">掌握可复用的爆款公式</p></div></div>
+<div class="stage-card" data-stage="冷启动期"><div class="stage-num">01</div><div class="stage-content"><h4>冷启动<span>第1-2期</span></h4><p class="stage-title">剪映基础+拍摄入门</p><p class="stage-desc">零基础快速上手</p></div></div>
+<div class="stage-card" data-stage="增长期"><div class="stage-num">02</div><div class="stage-content"><h4>增长期<span>第3-4期</span></h4><p class="stage-title">转场·调色·卡点</p><p class="stage-desc">技能进阶建立专业度</p></div></div>
+<div class="stage-card" data-stage="成熟期"><div class="stage-num">03</div><div class="stage-content"><h4>成熟期<span>第5-6期</span></h4><p class="stage-title">爆款拆解·案例实战</p><p class="stage-desc">深度壁垒·IP护城河</p></div></div>
 </div>
+<div class="info-row"><div class="info-card"><strong>📐 内容节奏</strong><br>每个选题都是完整制作包：视频标题+标签+框架+口播文案</div><div class="info-card"><strong>⚡ 使用方式</strong><br>点击任意选题→查看完整方案→复制文案→照着拍</div></div>
+<div class="divider"></div>
+<div class="filters">
+<select id="f-stage"><option value="all">全部阶段</option><option value="冷启动期">冷启动期</option><option value="增长期">增长期</option><option value="成熟期">成熟期</option></select>
+<select id="f-cal-cat"><option value="all">全部分类</option></select>
+<span class="count" id="cal-num">6 期</span></div>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>标题</th><th>分类</th><th>难度</th><th>时长</th><th>阶段</th></tr></thead><tbody id="cal-tbody"></tbody></table></div>
+</section>
+
+<section id="sec-library">
+<div class="sec-hd" style="padding-top:90px"><div class="kicker">Full Library</div><h2>📚 全部选题</h2><p class="sub">共 6 条 · 6 分类 · 每条含完整制作方案</p></div>
+<div class="filters">
+<select id="f-cat"><option value="all">全部分类</option></select>
+<select id="f-type"><option value="all">全部难度</option><option value="1">⭐入门</option><option value="2">⭐⭐基础</option><option value="3">⭐⭐⭐进阶</option></select>
+<span class="count" id="lib-num">6 条</span></div>
+<div class="card-grid" id="lib-grid"></div>
+</section>
+
+<section id="sec-stats">
+<div class="sec-hd" style="padding-top:90px"><div class="kicker">Statistics</div><h2>📊 数据概览</h2></div>
+<div class="kpi-row">
+<div class="kpi"><div class="val" style="color:var(--accent)">6</div><div class="lbl">总选题</div></div>
+<div class="kpi"><div class="val" style="color:var(--green)">6</div><div class="lbl">待发布</div></div>
+<div class="kpi"><div class="val" style="color:var(--purple)">2</div><div class="lbl">已制作</div></div>
+<div class="kpi"><div class="val" style="color:var(--orange)">6</div><div class="lbl">日历规划</div></div>
+</div>
+<div class="stats-grid" style="margin-top:24px">
+<div class="stat-panel"><h3>📂 分类覆盖</h3><div id="cat-bars"></div></div>
+<div class="stat-panel"><h3>📈 内容类型</h3><div id="type-bars"></div></div>
+</div>
+</section>
+
+<section id="sec-inspire">
+<div class="sec-hd" style="padding-top:90px"><div class="kicker">Creator Resources</div><h2>💡 灵感 & 对标</h2></div>
 <div class="info-row">
-<div class="info-card"><strong>📐 内容策略</strong><br>每条选题都包含完整的视频框架和口播文案，直接照着拍就能用。灵感来源标注了对应博主，方便深入学习。</div>
-<div class="info-card"><strong>🔗 对标博主</strong><br>@云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版） · @陆一舟剪辑（剪映全套入门体系） · @四维像素（爆款视频逐帧制作方法拆解） · @南门录像厅（拉片式逐帧分析镜头衔接） · @百万剪辑狮（爆款节奏和镜头衔接底层规律） · @几何生长（AE动效转场设计思路，剪映平替版）</div>
+<div class="info-card"><strong>@陆一舟剪辑（剪映全套入门体系）</strong><br>对应选题：倒放效果：让普通视频秒变魔术大片<br><span style="font-size:11px;color:var(--text3)">点击选题卡片查看完整制作方案</span></div><div class="info-card"><strong>@南门录像厅（拉片式逐帧分析镜头衔接）</strong><br>对应选题：对称构图：强迫症看了极度舒适<br><span style="font-size:11px;color:var(--text3)">点击选题卡片查看完整制作方案</span></div><div class="info-card"><strong>@几何生长（AE动效转场设计，剪映平替版）</strong><br>对应选题：遮罩转场：用蒙版做丝滑无缝衔接<br><span style="font-size:11px;color:var(--text3)">点击选题卡片查看完整制作方案</span></div><div class="info-card"><strong>@云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版）</strong><br>对应选题：电影感调色：3步让画面高级10倍<br><span style="font-size:11px;color:var(--text3)">点击选题卡片查看完整制作方案</span></div><div class="info-card"><strong>@百万剪辑狮（爆款节奏和镜头衔接底层规律）</strong><br>对应选题：BGM卡点剪辑：让画面跟着音乐跳舞<br><span style="font-size:11px;color:var(--text3)">点击选题卡片查看完整制作方案</span></div><div class="info-card"><strong>@四维像素（爆款视频逐帧制作方法拆解）</strong><br>对应选题：爆款逐帧拆解：500万播放视频的秘密<br><span style="font-size:11px;color:var(--text3)">点击选题卡片查看完整制作方案</span></div>
 </div>
 </section>
 
 </main></div>
-<footer><p>数据截止 2026-06-29 · 每个选题含完整制作方案 · 点击卡片查看 · @云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版） · @陆一舟剪辑（剪映全套入门体系） · @四维像素（爆款视频逐帧制作方法拆解） · @南门录像厅（拉片式逐帧分析镜头衔接） · @百万剪辑狮（爆款节奏和镜头衔接底层规律） · @几何生长（AE动效转场设计思路，剪映平替版）</p></footer>
+<footer><p>数据截止 2026-06-29 · 每个选题含完整制作方案 · 点击卡片查看 · 灵感来源：@陆一舟剪辑（剪映全套入门体系） · @南门录像厅（拉片式逐帧分析镜头衔接） · @几何生长（AE动效转场设计，剪映平替版） · @云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版） · @百万剪辑狮（爆款节奏和镜头衔接底层规律） · @四维像素（爆款视频逐帧制作方法拆解）</p></footer>
 
 <div class="modal-overlay" id="modal-overlay"><div class="modal-box" id="modal-box"></div></div>
 
 <script>
-var TOPICS = [{"id": "t01", "title": "倒放效果：让普通视频秒变魔术大片", "category": "剪映基础操作", "difficulty": 1, "duration": "30秒", "tags": "剪映教程 倒放 魔术效果 新手必看 短视频技巧", "platform": "抖音 / 快手 / 小红书", "framework": "开场钩子(3s)：展示倒放前后的对比画面，制造震惊感\n核心教学(20s)：选择素材→点击倒放按钮→调整速度→加BGM\n对比展示(5s)：Before vs After，让观众直观看到效果\n结尾CTA(2s)：引导点赞收藏+评论区交作业", "script": "【开场】「你有没有刷到过那种水往高处流、纸张自动复原的视频？其实一个按钮就搞定了。」\n\n【步骤1】打开剪映，导入一段方向性强的素材——比如倒水、跳跃、扔东西，5到15秒就够了。\n\n【步骤2】点击素材，在底部工具栏找到「倒放」按钮，点下去——视频瞬间反转。记得关掉原声，单独配一段节奏BGM。\n\n【步骤3】微调一下开头结尾，让动作衔接更流畅。导出1080p。标题写「见证奇迹的时刻」，封面选倒放后最反直觉的那一帧。\n\n【结尾】「学会了没？点个赞收藏起来，下期教你用蒙版做无缝转场。」", "blogger": "灵感来源：@陆一舟剪辑（剪映全套入门体系）"}, {"id": "t02", "title": "对称构图：强迫症看了极度舒适", "category": "拍摄技巧", "difficulty": 1, "duration": "20秒", "tags": "手机摄影 对称构图 拍摄技巧 治愈系 强迫症福音", "platform": "抖音 / 小红书", "framework": "开场钩子(3s)：直接展示一段极致对称的画面，配文「这画面舒服吗？」\n核心教学(12s)：打开网格线→找对称场景→手机保持水平→缓慢推进\n成果展示(3s)：3段不同场景的对称画面连续播放\n结尾CTA(2s)：引导评论区发自己的对称作品", "script": "【开场】「为什么有些视频看着就特别舒服？答案就四个字——对称构图。」\n\n【步骤1】打开手机相机设置→开启网格线。用1x或2x镜头，别用广角——广角会畸变，破坏对称感。\n\n【步骤2】找场景：地铁长廊、对称建筑、水面倒影、旋转楼梯。记住要站在正中间，手机绝对水平。慢慢往前推或横移，手稳是第一位的。\n\n【步骤3】导入剪映，加冷色调滤镜降一点饱和度，放慢0.5倍速，配一段环境音。雨后的水面倒影是最天然的对称素材，蹲到最低让水天线在画面正中。\n\n【结尾】「拍到好看的对称画面记得@我交作业，关注我每天一个拍摄技巧。」", "blogger": "灵感来源：@南门录像厅（拉片式逐帧分析镜头衔接）"}, {"id": "t03", "title": "遮罩转场：用蒙版做丝滑无缝衔接", "category": "转场特效", "difficulty": 2, "duration": "40秒", "tags": "剪映高级教程 遮罩转场 蒙版 丝滑转场 剪辑技巧", "platform": "抖音 / B站", "framework": "开场钩子(3s)：播放一段遮罩转场的成品，让观众看到效果\n核心教学(30s)：导入AB两段素材→A在上B在下→给A添加矩形蒙版→在蒙版打关键帧→让蒙版从左到右移动\n对比展示(5s)：无转场 vs 有遮罩转场\n结尾CTA(2s)：引导点赞关注", "script": "【开场】「你刷到过那种画面从中间往两边推开或者从左到右擦过去的转场吗？今天教你用蒙版实现。」\n\n【步骤1】导入两段素材A和B。A放上层，B放下层。点中A素材，在工具栏找到「蒙版」→选「矩形」。\n\n【步骤2】把蒙版拖到画面左边。在蒙版位置打第一个关键帧。然后把时间线往后移0.3秒，把蒙版拖到画面右边，自动生成第二个关键帧。\n\n【步骤3】预览一下——A素材从左到右被「推开」，露出下面的B素材。可以加一点羽化让边缘更自然。\n\n【结尾】「这就是最基础的遮罩转场。还想学哪种转场？评论区告诉我。」", "blogger": "灵感来源：@几何生长（AE动效转场设计思路，剪映平替版）"}, {"id": "t04", "title": "电影感调色：3步让你的画面高级10倍", "category": "调色教程", "difficulty": 2, "duration": "45秒", "tags": "调色教程 电影感 青橙色调 剪映调色 视频质感", "platform": "抖音 / B站 / 小红书", "framework": "开场钩子(3s)：放一段手机直出 vs 调色后的对比\n核心教学(35s)：降低饱和度→色温偏冷→加暗角→套青橙LUT\n参数展示(5s)：所有参数以大字报形式展示\n结尾CTA(2s)：引导收藏", "script": "【开场】「为什么别人的视频有种电影的高级感？不是机器贵，是调对了三个参数。」\n\n【步骤1】打开剪映「调节」。先把饱和度降到-15，对比度加到+10，让画面不那么「手机味」。\n\n【步骤2】色温减到-8，色调加+3。这就是「青橙色调」的基础——阴影偏青、肤色偏橙。\n\n【步骤3】加一点暗角（-20），锐度+15。然后去「滤镜」→「电影」分类，选一个强度15%左右的LUT叠加。\n\n【结尾】「参数截图保存到相册，下次直接套用。关注我，下期教港风复古调色。」", "blogger": "灵感来源：@云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版）"}, {"id": "t05", "title": "BGM卡点剪辑：让画面跟着音乐跳舞", "category": "卡点节奏", "difficulty": 2, "duration": "35秒", "tags": "卡点剪辑 BGM卡点 节奏剪辑 踩点 剪映教程", "platform": "抖音 / 快手", "framework": "开场钩子(3s)：展示一段踩点精准的卡点视频\n核心教学(25s)：选BGM→标记鼓点→每个鼓点切一刀→配合放大动画\n对比展示(5s)：随机剪辑 vs 卡点剪辑的节奏差异\n结尾CTA(2s)：引导关注", "script": "【开场】「刷到过这种每一帧都踩在音乐鼓点上的视频吗？不是天赋，是方法。」\n\n【步骤1】选一首鼓点明显的BGM——推荐Phut Hon或者病变Remix。导入后点「踩点」→「自动踩点」，剪映会自动标记所有鼓点位置。\n\n【步骤2】把你要用的画面按鼓点切开。每个黄点就是一个切换点。画面切换配合缩放动画——鼓点落下时画面放大到105%，鼓点间恢复100%。\n\n【步骤3】关键秘诀：最重的那一下鼓点，画面一定要配合最炸的那一帧。如果鼓点密集，画面切换要快；鼓点稀疏，画面可以长一点留呼吸感。\n\n【结尾】「练3遍你就能找到感觉。收藏起来慢慢练，关注我每天一个剪辑技巧。」", "blogger": "灵感来源：@百万剪辑狮（爆款节奏和镜头衔接底层规律）"}, {"id": "t06", "title": "爆款视频逐帧拆解：500万播放的秘密", "category": "热门跟拍", "difficulty": 3, "duration": "4分钟", "tags": "爆款拆解 逐帧分析 流量密码 剪辑思维 视频分析", "platform": "抖音 / B站", "framework": "开场钩子(5s)：播放被拆解视频的最炸3秒\n逐帧拆解(3min)：0.5x慢放→标注时间轴→分析每一段的剪辑逻辑\n关键技巧提炼(30s)：总结3个可复用的爆款公式\n结尾CTA(10s)：引导关注+评论想看拆哪条", "script": "【开场】「这条视频500万播放——我今天把它每一秒的剪辑逻辑拆给你看。」\n\n【00:00-00:02】开场就是「好奇缺口」——画面出现一个你完全看不懂的东西，配文「这怎么做到的？」——2秒内制造悬念，停下滑动的手指。\n\n【00:02-00:08】铺垫段。用正常速度展示完整过程，让观众理解背景。注意这里BGM还没完全起来，给后面高潮留空间。\n\n【00:08-00:15】高潮段。BGM鼓点炸开，画面切换到结果展示，配合缩放转场+画面抖动。这7秒是「爽感峰值」。\n\n【00:15-00:20】结尾CTA。画面回到正常，博主出镜或加文字「你学会了吗？」——这是标准收尾公式。\n\n【结尾】「总结3个爆款公式：好奇缺口开头+节奏爬坡+爽感峰值收尾。还想拆哪条视频？评论区发链接。」", "blogger": "灵感来源：@四维像素（爆款视频逐帧制作方法拆解）"}];
-var PICKS = [{"id": "t01", "title": "倒放效果：让普通视频秒变魔术大片", "category": "剪映基础操作", "difficulty": 1, "duration": "30秒", "tags": "剪映教程 倒放 魔术效果 新手必看 短视频技巧", "platform": "抖音 / 快手 / 小红书", "framework": "开场钩子(3s)：展示倒放前后的对比画面，制造震惊感\n核心教学(20s)：选择素材→点击倒放按钮→调整速度→加BGM\n对比展示(5s)：Before vs After，让观众直观看到效果\n结尾CTA(2s)：引导点赞收藏+评论区交作业", "script": "【开场】「你有没有刷到过那种水往高处流、纸张自动复原的视频？其实一个按钮就搞定了。」\n\n【步骤1】打开剪映，导入一段方向性强的素材——比如倒水、跳跃、扔东西，5到15秒就够了。\n\n【步骤2】点击素材，在底部工具栏找到「倒放」按钮，点下去——视频瞬间反转。记得关掉原声，单独配一段节奏BGM。\n\n【步骤3】微调一下开头结尾，让动作衔接更流畅。导出1080p。标题写「见证奇迹的时刻」，封面选倒放后最反直觉的那一帧。\n\n【结尾】「学会了没？点个赞收藏起来，下期教你用蒙版做无缝转场。」", "blogger": "灵感来源：@陆一舟剪辑（剪映全套入门体系）"}, {"id": "t02", "title": "对称构图：强迫症看了极度舒适", "category": "拍摄技巧", "difficulty": 1, "duration": "20秒", "tags": "手机摄影 对称构图 拍摄技巧 治愈系 强迫症福音", "platform": "抖音 / 小红书", "framework": "开场钩子(3s)：直接展示一段极致对称的画面，配文「这画面舒服吗？」\n核心教学(12s)：打开网格线→找对称场景→手机保持水平→缓慢推进\n成果展示(3s)：3段不同场景的对称画面连续播放\n结尾CTA(2s)：引导评论区发自己的对称作品", "script": "【开场】「为什么有些视频看着就特别舒服？答案就四个字——对称构图。」\n\n【步骤1】打开手机相机设置→开启网格线。用1x或2x镜头，别用广角——广角会畸变，破坏对称感。\n\n【步骤2】找场景：地铁长廊、对称建筑、水面倒影、旋转楼梯。记住要站在正中间，手机绝对水平。慢慢往前推或横移，手稳是第一位的。\n\n【步骤3】导入剪映，加冷色调滤镜降一点饱和度，放慢0.5倍速，配一段环境音。雨后的水面倒影是最天然的对称素材，蹲到最低让水天线在画面正中。\n\n【结尾】「拍到好看的对称画面记得@我交作业，关注我每天一个拍摄技巧。」", "blogger": "灵感来源：@南门录像厅（拉片式逐帧分析镜头衔接）"}, {"id": "t03", "title": "遮罩转场：用蒙版做丝滑无缝衔接", "category": "转场特效", "difficulty": 2, "duration": "40秒", "tags": "剪映高级教程 遮罩转场 蒙版 丝滑转场 剪辑技巧", "platform": "抖音 / B站", "framework": "开场钩子(3s)：播放一段遮罩转场的成品，让观众看到效果\n核心教学(30s)：导入AB两段素材→A在上B在下→给A添加矩形蒙版→在蒙版打关键帧→让蒙版从左到右移动\n对比展示(5s)：无转场 vs 有遮罩转场\n结尾CTA(2s)：引导点赞关注", "script": "【开场】「你刷到过那种画面从中间往两边推开或者从左到右擦过去的转场吗？今天教你用蒙版实现。」\n\n【步骤1】导入两段素材A和B。A放上层，B放下层。点中A素材，在工具栏找到「蒙版」→选「矩形」。\n\n【步骤2】把蒙版拖到画面左边。在蒙版位置打第一个关键帧。然后把时间线往后移0.3秒，把蒙版拖到画面右边，自动生成第二个关键帧。\n\n【步骤3】预览一下——A素材从左到右被「推开」，露出下面的B素材。可以加一点羽化让边缘更自然。\n\n【结尾】「这就是最基础的遮罩转场。还想学哪种转场？评论区告诉我。」", "blogger": "灵感来源：@几何生长（AE动效转场设计思路，剪映平替版）"}, {"id": "t04", "title": "电影感调色：3步让你的画面高级10倍", "category": "调色教程", "difficulty": 2, "duration": "45秒", "tags": "调色教程 电影感 青橙色调 剪映调色 视频质感", "platform": "抖音 / B站 / 小红书", "framework": "开场钩子(3s)：放一段手机直出 vs 调色后的对比\n核心教学(35s)：降低饱和度→色温偏冷→加暗角→套青橙LUT\n参数展示(5s)：所有参数以大字报形式展示\n结尾CTA(2s)：引导收藏", "script": "【开场】「为什么别人的视频有种电影的高级感？不是机器贵，是调对了三个参数。」\n\n【步骤1】打开剪映「调节」。先把饱和度降到-15，对比度加到+10，让画面不那么「手机味」。\n\n【步骤2】色温减到-8，色调加+3。这就是「青橙色调」的基础——阴影偏青、肤色偏橙。\n\n【步骤3】加一点暗角（-20），锐度+15。然后去「滤镜」→「电影」分类，选一个强度15%左右的LUT叠加。\n\n【结尾】「参数截图保存到相册，下次直接套用。关注我，下期教港风复古调色。」", "blogger": "灵感来源：@云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版）"}, {"id": "t05", "title": "BGM卡点剪辑：让画面跟着音乐跳舞", "category": "卡点节奏", "difficulty": 2, "duration": "35秒", "tags": "卡点剪辑 BGM卡点 节奏剪辑 踩点 剪映教程", "platform": "抖音 / 快手", "framework": "开场钩子(3s)：展示一段踩点精准的卡点视频\n核心教学(25s)：选BGM→标记鼓点→每个鼓点切一刀→配合放大动画\n对比展示(5s)：随机剪辑 vs 卡点剪辑的节奏差异\n结尾CTA(2s)：引导关注", "script": "【开场】「刷到过这种每一帧都踩在音乐鼓点上的视频吗？不是天赋，是方法。」\n\n【步骤1】选一首鼓点明显的BGM——推荐Phut Hon或者病变Remix。导入后点「踩点」→「自动踩点」，剪映会自动标记所有鼓点位置。\n\n【步骤2】把你要用的画面按鼓点切开。每个黄点就是一个切换点。画面切换配合缩放动画——鼓点落下时画面放大到105%，鼓点间恢复100%。\n\n【步骤3】关键秘诀：最重的那一下鼓点，画面一定要配合最炸的那一帧。如果鼓点密集，画面切换要快；鼓点稀疏，画面可以长一点留呼吸感。\n\n【结尾】「练3遍你就能找到感觉。收藏起来慢慢练，关注我每天一个剪辑技巧。」", "blogger": "灵感来源：@百万剪辑狮（爆款节奏和镜头衔接底层规律）"}, {"id": "t06", "title": "爆款视频逐帧拆解：500万播放的秘密", "category": "热门跟拍", "difficulty": 3, "duration": "4分钟", "tags": "爆款拆解 逐帧分析 流量密码 剪辑思维 视频分析", "platform": "抖音 / B站", "framework": "开场钩子(5s)：播放被拆解视频的最炸3秒\n逐帧拆解(3min)：0.5x慢放→标注时间轴→分析每一段的剪辑逻辑\n关键技巧提炼(30s)：总结3个可复用的爆款公式\n结尾CTA(10s)：引导关注+评论想看拆哪条", "script": "【开场】「这条视频500万播放——我今天把它每一秒的剪辑逻辑拆给你看。」\n\n【00:00-00:02】开场就是「好奇缺口」——画面出现一个你完全看不懂的东西，配文「这怎么做到的？」——2秒内制造悬念，停下滑动的手指。\n\n【00:02-00:08】铺垫段。用正常速度展示完整过程，让观众理解背景。注意这里BGM还没完全起来，给后面高潮留空间。\n\n【00:08-00:15】高潮段。BGM鼓点炸开，画面切换到结果展示，配合缩放转场+画面抖动。这7秒是「爽感峰值」。\n\n【00:15-00:20】结尾CTA。画面回到正常，博主出镜或加文字「你学会了吗？」——这是标准收尾公式。\n\n【结尾】「总结3个爆款公式：好奇缺口开头+节奏爬坡+爽感峰值收尾。还想拆哪条视频？评论区发链接。」", "blogger": "灵感来源：@四维像素（爆款视频逐帧制作方法拆解）"}];
-var MEDALS = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣"];
-
-var D = document;
-var DM = {1:"⭐入门",2:"⭐⭐基础",3:"⭐⭐⭐进阶"};
-var TC = {"剪映基础操作":"r","拍摄技巧":"r","转场特效":"b","调色教程":"b","卡点节奏":"b","热门跟拍":"pu"};
+var TOPICS = [{"id": "t01", "title": "倒放效果：让普通视频秒变魔术大片", "category": "剪映基础操作", "difficulty": 1, "duration": "30秒", "tags": "剪映教程 倒放 魔术效果 新手必看", "platform": "抖音/快手/小红书", "intro": "一个按钮就能实现的视觉魔术，涨粉最快的特效之一", "framework": "开场钩子(3s)：展示倒放前后的对比画面制造震惊感\n核心教学(20s)：选素材→点倒放→关原声→配BGM\n对比展示(5s)：Before vs After直观展示效果\n结尾CTA(2s)：引导点赞收藏+评论区交作业", "script": "【开场】你有没有刷到过那种水往高处流、纸张自动复原的视频？其实一个按钮就搞定了。\n\n【步骤1】打开剪映，导入一段方向性强的素材——倒水、跳跃、扔东西，5到15秒。\n\n【步骤2】点中素材→底部工具栏找到「倒放」按钮→点下去。关掉原声，单独配一段节奏BGM。\n\n【步骤3】微调开头结尾确保动作衔接流畅。导出1080p。标题写「见证奇迹的时刻」。\n\n【结尾】学会了没？点个赞收藏，下期教蒙版无缝转场。", "blogger": "灵感来源：@陆一舟剪辑（剪映全套入门体系）"}, {"id": "t02", "title": "对称构图：强迫症看了极度舒适", "category": "拍摄技巧", "difficulty": 1, "duration": "20秒", "tags": "手机摄影 对称构图 治愈系 拍摄技巧", "platform": "抖音/小红书", "intro": "视觉舒适度的天花板，播放完成率极高的内容类型", "framework": "开场钩子(3s)：一段极致对称画面，配文「这画面舒服吗？」\n核心教学(12s)：开网格线→找场景→手机水平→缓慢推进\n成果展示(3s)：3段不同对称画面连播\n结尾CTA(2s)：引导评论区发自己的对称作品", "script": "【开场】为什么有些视频看着就特别舒服？答案四个字——对称构图。\n\n【步骤1】手机设置→打开网格线。用1x或2x镜头，别用广角。\n\n【步骤2】找场景：地铁长廊、对称建筑、水面倒影、旋转楼梯。站在正中间，手机绝对水平，慢慢往前推。\n\n【步骤3】导入剪映，冷色调滤镜降低饱和度，放慢0.5倍速，配环境音。雨后水面倒影是最天然的对称素材。\n\n【结尾】拍到好看对称画面@我交作业，关注我每天一个拍摄技巧。", "blogger": "灵感来源：@南门录像厅（拉片式逐帧分析镜头衔接）"}, {"id": "t03", "title": "遮罩转场：用蒙版做丝滑无缝衔接", "category": "转场特效", "difficulty": 2, "duration": "40秒", "tags": "遮罩转场 蒙版 丝滑转场 剪映高级", "platform": "抖音/B站", "intro": "最常用的专业级转场手法，剪映也能轻松实现", "framework": "开场钩子(3s)：播放遮罩转场成品效果\n核心教学(30s)：AB素材→A加蒙版→打关键帧→蒙版移动\n对比展示(5s)：无转场 vs 遮罩转场\n结尾CTA(2s)：引导评论区留言想学的转场类型", "script": "【开场】刷到过画面从左到右擦过去那种转场吗？今天用蒙版实现。\n\n【步骤1】导入AB两段素材，A放上层B放下层。点中A→工具栏「蒙版」→选「矩形」。\n\n【步骤2】蒙版拖到画面左边→打第一个关键帧。时间线后移0.3秒→蒙版拖到右边→第二个关键帧自动生成。\n\n【步骤3】预览——A素材从左到右被推开露出B。加点羽化让边缘更自然。\n\n【结尾】这就是最基础的遮罩转场。还想学哪种？评论区告诉我。", "blogger": "灵感来源：@几何生长（AE动效转场设计，剪映平替版）"}, {"id": "t04", "title": "电影感调色：3步让画面高级10倍", "category": "调色教程", "difficulty": 2, "duration": "45秒", "tags": "调色教程 电影感 青橙色调 视频质感", "platform": "抖音/B站/小红书", "intro": "不需要达芬奇，剪映也能调出电影级画面质感", "framework": "开场钩子(3s)：手机直出 vs 调色后的强烈对比\n核心教学(35s)：降饱和度→色温偏冷→暗角→套LUT\n参数展示(5s)：大字报形式展示所有参数\n结尾CTA(2s)：引导截图保存+关注", "script": "【开场】为什么别人的视频有种电影高级感？不是机器贵，是调对了参数。\n\n【步骤1】剪映「调节」→饱和度-15，对比度+10，让画面不那么手机味。\n\n【步骤2】色温-8，色调+3。这就是青橙色调——阴影偏青、肤色偏橙。\n\n【步骤3】暗角-20，锐度+15。去「滤镜」→「电影」分类，选一个强度15%的LUT。\n\n【结尾】参数截图保存，下次直接套用。关注我下期教港风复古调色。", "blogger": "灵感来源：@云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版）"}, {"id": "t05", "title": "BGM卡点剪辑：让画面跟着音乐跳舞", "category": "卡点节奏", "difficulty": 2, "duration": "35秒", "tags": "卡点剪辑 BGM 踩点 节奏 剪映", "platform": "抖音/快手", "intro": "每一个鼓点都是画面的切换时机，踩准了就有魔力", "framework": "开场钩子(3s)：展示踩点精准的卡点视频\n核心教学(25s)：选BGM→自动踩点→每鼓点切一刀→配合缩放\n对比展示(5s)：随机剪辑 vs 卡点剪辑\n结尾CTA(2s)：引导关注", "script": "【开场】刷到过每一帧都踩在鼓点上的视频吗？不是天赋是方法。\n\n【步骤1】选鼓点明显的BGM——推荐Phut Hon或病变Remix。导入后点「踩点」→「自动踩点」。\n\n【步骤2】按鼓点切开画面，每个黄点就是一个切换点。鼓点落下时画面放大到105%，鼓点间恢复100%。\n\n【步骤3】最重的那下鼓点配最炸的那一帧。鼓点密集画面快切，鼓点稀疏画面留呼吸感。\n\n【结尾】练3遍就能找到感觉。收藏起来，关注我每天一个技巧。", "blogger": "灵感来源：@百万剪辑狮（爆款节奏和镜头衔接底层规律）"}, {"id": "t06", "title": "爆款逐帧拆解：500万播放视频的秘密", "category": "热门跟拍", "difficulty": 3, "duration": "4分钟", "tags": "爆款拆解 逐帧分析 流量密码 剪辑思维", "platform": "抖音/B站", "intro": "不用原创，拆解别人验证过的好内容就是流量密码", "framework": "开场钩子(5s)：播放被拆解视频最炸3秒\n逐帧拆解(3min)：0.5x慢放→时间轴标注→分析每段逻辑\n技巧提炼(30s)：总结3个可复用的爆款公式\n结尾CTA(10s)：引导关注+评论想看拆哪条", "script": "【开场】这条视频500万播放——我今天把每一秒的剪辑逻辑拆给你看。\n\n【00:00-00:02】开场「好奇缺口」——画面出现看不懂的东西配文「这怎么做到的？」——2秒制造悬念。\n\n【00:02-00:08】铺垫段。正常速度展示完整过程，BGM还没完全起来给高潮留空间。\n\n【00:08-00:15】高潮段。BGM鼓点炸开，画面切换配合缩放+抖动。这7秒是爽感峰值。\n\n【00:15-00:20】结尾CTA。画面恢复正常，博主出镜或加文字「你学会了吗？」——标准收尾公式。\n\n【结尾】3个爆款公式：好奇缺口开头+节奏爬坡+爽感峰值收尾。还想拆哪条？评论区发链接。", "blogger": "灵感来源：@四维像素（爆款视频逐帧制作方法拆解）"}];
+var CALENDAR = [{"id": "t01", "title": "倒放效果：让普通视频秒变魔术大片", "category": "剪映基础操作", "difficulty": 1, "duration": "30秒", "tags": "剪映教程 倒放 魔术效果 新手必看", "platform": "抖音/快手/小红书", "intro": "一个按钮就能实现的视觉魔术，涨粉最快的特效之一", "framework": "开场钩子(3s)：展示倒放前后的对比画面制造震惊感\n核心教学(20s)：选素材→点倒放→关原声→配BGM\n对比展示(5s)：Before vs After直观展示效果\n结尾CTA(2s)：引导点赞收藏+评论区交作业", "script": "【开场】你有没有刷到过那种水往高处流、纸张自动复原的视频？其实一个按钮就搞定了。\n\n【步骤1】打开剪映，导入一段方向性强的素材——倒水、跳跃、扔东西，5到15秒。\n\n【步骤2】点中素材→底部工具栏找到「倒放」按钮→点下去。关掉原声，单独配一段节奏BGM。\n\n【步骤3】微调开头结尾确保动作衔接流畅。导出1080p。标题写「见证奇迹的时刻」。\n\n【结尾】学会了没？点个赞收藏，下期教蒙版无缝转场。", "blogger": "灵感来源：@陆一舟剪辑（剪映全套入门体系）", "episode": 1, "stage": "冷启动期"}, {"id": "t02", "title": "对称构图：强迫症看了极度舒适", "category": "拍摄技巧", "difficulty": 1, "duration": "20秒", "tags": "手机摄影 对称构图 治愈系 拍摄技巧", "platform": "抖音/小红书", "intro": "视觉舒适度的天花板，播放完成率极高的内容类型", "framework": "开场钩子(3s)：一段极致对称画面，配文「这画面舒服吗？」\n核心教学(12s)：开网格线→找场景→手机水平→缓慢推进\n成果展示(3s)：3段不同对称画面连播\n结尾CTA(2s)：引导评论区发自己的对称作品", "script": "【开场】为什么有些视频看着就特别舒服？答案四个字——对称构图。\n\n【步骤1】手机设置→打开网格线。用1x或2x镜头，别用广角。\n\n【步骤2】找场景：地铁长廊、对称建筑、水面倒影、旋转楼梯。站在正中间，手机绝对水平，慢慢往前推。\n\n【步骤3】导入剪映，冷色调滤镜降低饱和度，放慢0.5倍速，配环境音。雨后水面倒影是最天然的对称素材。\n\n【结尾】拍到好看对称画面@我交作业，关注我每天一个拍摄技巧。", "blogger": "灵感来源：@南门录像厅（拉片式逐帧分析镜头衔接）", "episode": 2, "stage": "冷启动期"}, {"id": "t03", "title": "遮罩转场：用蒙版做丝滑无缝衔接", "category": "转场特效", "difficulty": 2, "duration": "40秒", "tags": "遮罩转场 蒙版 丝滑转场 剪映高级", "platform": "抖音/B站", "intro": "最常用的专业级转场手法，剪映也能轻松实现", "framework": "开场钩子(3s)：播放遮罩转场成品效果\n核心教学(30s)：AB素材→A加蒙版→打关键帧→蒙版移动\n对比展示(5s)：无转场 vs 遮罩转场\n结尾CTA(2s)：引导评论区留言想学的转场类型", "script": "【开场】刷到过画面从左到右擦过去那种转场吗？今天用蒙版实现。\n\n【步骤1】导入AB两段素材，A放上层B放下层。点中A→工具栏「蒙版」→选「矩形」。\n\n【步骤2】蒙版拖到画面左边→打第一个关键帧。时间线后移0.3秒→蒙版拖到右边→第二个关键帧自动生成。\n\n【步骤3】预览——A素材从左到右被推开露出B。加点羽化让边缘更自然。\n\n【结尾】这就是最基础的遮罩转场。还想学哪种？评论区告诉我。", "blogger": "灵感来源：@几何生长（AE动效转场设计，剪映平替版）", "episode": 3, "stage": "增长期"}, {"id": "t04", "title": "电影感调色：3步让画面高级10倍", "category": "调色教程", "difficulty": 2, "duration": "45秒", "tags": "调色教程 电影感 青橙色调 视频质感", "platform": "抖音/B站/小红书", "intro": "不需要达芬奇，剪映也能调出电影级画面质感", "framework": "开场钩子(3s)：手机直出 vs 调色后的强烈对比\n核心教学(35s)：降饱和度→色温偏冷→暗角→套LUT\n参数展示(5s)：大字报形式展示所有参数\n结尾CTA(2s)：引导截图保存+关注", "script": "【开场】为什么别人的视频有种电影高级感？不是机器贵，是调对了参数。\n\n【步骤1】剪映「调节」→饱和度-15，对比度+10，让画面不那么手机味。\n\n【步骤2】色温-8，色调+3。这就是青橙色调——阴影偏青、肤色偏橙。\n\n【步骤3】暗角-20，锐度+15。去「滤镜」→「电影」分类，选一个强度15%的LUT。\n\n【结尾】参数截图保存，下次直接套用。关注我下期教港风复古调色。", "blogger": "灵感来源：@云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版）", "episode": 4, "stage": "增长期"}, {"id": "t05", "title": "BGM卡点剪辑：让画面跟着音乐跳舞", "category": "卡点节奏", "difficulty": 2, "duration": "35秒", "tags": "卡点剪辑 BGM 踩点 节奏 剪映", "platform": "抖音/快手", "intro": "每一个鼓点都是画面的切换时机，踩准了就有魔力", "framework": "开场钩子(3s)：展示踩点精准的卡点视频\n核心教学(25s)：选BGM→自动踩点→每鼓点切一刀→配合缩放\n对比展示(5s)：随机剪辑 vs 卡点剪辑\n结尾CTA(2s)：引导关注", "script": "【开场】刷到过每一帧都踩在鼓点上的视频吗？不是天赋是方法。\n\n【步骤1】选鼓点明显的BGM——推荐Phut Hon或病变Remix。导入后点「踩点」→「自动踩点」。\n\n【步骤2】按鼓点切开画面，每个黄点就是一个切换点。鼓点落下时画面放大到105%，鼓点间恢复100%。\n\n【步骤3】最重的那下鼓点配最炸的那一帧。鼓点密集画面快切，鼓点稀疏画面留呼吸感。\n\n【结尾】练3遍就能找到感觉。收藏起来，关注我每天一个技巧。", "blogger": "灵感来源：@百万剪辑狮（爆款节奏和镜头衔接底层规律）", "episode": 5, "stage": "成熟期"}, {"id": "t06", "title": "爆款逐帧拆解：500万播放视频的秘密", "category": "热门跟拍", "difficulty": 3, "duration": "4分钟", "tags": "爆款拆解 逐帧分析 流量密码 剪辑思维", "platform": "抖音/B站", "intro": "不用原创，拆解别人验证过的好内容就是流量密码", "framework": "开场钩子(5s)：播放被拆解视频最炸3秒\n逐帧拆解(3min)：0.5x慢放→时间轴标注→分析每段逻辑\n技巧提炼(30s)：总结3个可复用的爆款公式\n结尾CTA(10s)：引导关注+评论想看拆哪条", "script": "【开场】这条视频500万播放——我今天把每一秒的剪辑逻辑拆给你看。\n\n【00:00-00:02】开场「好奇缺口」——画面出现看不懂的东西配文「这怎么做到的？」——2秒制造悬念。\n\n【00:02-00:08】铺垫段。正常速度展示完整过程，BGM还没完全起来给高潮留空间。\n\n【00:08-00:15】高潮段。BGM鼓点炸开，画面切换配合缩放+抖动。这7秒是爽感峰值。\n\n【00:15-00:20】结尾CTA。画面恢复正常，博主出镜或加文字「你学会了吗？」——标准收尾公式。\n\n【结尾】3个爆款公式：好奇缺口开头+节奏爬坡+爽感峰值收尾。还想拆哪条？评论区发链接。", "blogger": "灵感来源：@四维像素（爆款视频逐帧制作方法拆解）", "episode": 6, "stage": "成熟期"}];
+var PICKS = [{"id": "t01", "title": "倒放效果：让普通视频秒变魔术大片", "category": "剪映基础操作", "difficulty": 1, "duration": "30秒", "tags": "剪映教程 倒放 魔术效果 新手必看", "platform": "抖音/快手/小红书", "intro": "一个按钮就能实现的视觉魔术，涨粉最快的特效之一", "framework": "开场钩子(3s)：展示倒放前后的对比画面制造震惊感\n核心教学(20s)：选素材→点倒放→关原声→配BGM\n对比展示(5s)：Before vs After直观展示效果\n结尾CTA(2s)：引导点赞收藏+评论区交作业", "script": "【开场】你有没有刷到过那种水往高处流、纸张自动复原的视频？其实一个按钮就搞定了。\n\n【步骤1】打开剪映，导入一段方向性强的素材——倒水、跳跃、扔东西，5到15秒。\n\n【步骤2】点中素材→底部工具栏找到「倒放」按钮→点下去。关掉原声，单独配一段节奏BGM。\n\n【步骤3】微调开头结尾确保动作衔接流畅。导出1080p。标题写「见证奇迹的时刻」。\n\n【结尾】学会了没？点个赞收藏，下期教蒙版无缝转场。", "blogger": "灵感来源：@陆一舟剪辑（剪映全套入门体系）"}, {"id": "t02", "title": "对称构图：强迫症看了极度舒适", "category": "拍摄技巧", "difficulty": 1, "duration": "20秒", "tags": "手机摄影 对称构图 治愈系 拍摄技巧", "platform": "抖音/小红书", "intro": "视觉舒适度的天花板，播放完成率极高的内容类型", "framework": "开场钩子(3s)：一段极致对称画面，配文「这画面舒服吗？」\n核心教学(12s)：开网格线→找场景→手机水平→缓慢推进\n成果展示(3s)：3段不同对称画面连播\n结尾CTA(2s)：引导评论区发自己的对称作品", "script": "【开场】为什么有些视频看着就特别舒服？答案四个字——对称构图。\n\n【步骤1】手机设置→打开网格线。用1x或2x镜头，别用广角。\n\n【步骤2】找场景：地铁长廊、对称建筑、水面倒影、旋转楼梯。站在正中间，手机绝对水平，慢慢往前推。\n\n【步骤3】导入剪映，冷色调滤镜降低饱和度，放慢0.5倍速，配环境音。雨后水面倒影是最天然的对称素材。\n\n【结尾】拍到好看对称画面@我交作业，关注我每天一个拍摄技巧。", "blogger": "灵感来源：@南门录像厅（拉片式逐帧分析镜头衔接）"}, {"id": "t03", "title": "遮罩转场：用蒙版做丝滑无缝衔接", "category": "转场特效", "difficulty": 2, "duration": "40秒", "tags": "遮罩转场 蒙版 丝滑转场 剪映高级", "platform": "抖音/B站", "intro": "最常用的专业级转场手法，剪映也能轻松实现", "framework": "开场钩子(3s)：播放遮罩转场成品效果\n核心教学(30s)：AB素材→A加蒙版→打关键帧→蒙版移动\n对比展示(5s)：无转场 vs 遮罩转场\n结尾CTA(2s)：引导评论区留言想学的转场类型", "script": "【开场】刷到过画面从左到右擦过去那种转场吗？今天用蒙版实现。\n\n【步骤1】导入AB两段素材，A放上层B放下层。点中A→工具栏「蒙版」→选「矩形」。\n\n【步骤2】蒙版拖到画面左边→打第一个关键帧。时间线后移0.3秒→蒙版拖到右边→第二个关键帧自动生成。\n\n【步骤3】预览——A素材从左到右被推开露出B。加点羽化让边缘更自然。\n\n【结尾】这就是最基础的遮罩转场。还想学哪种？评论区告诉我。", "blogger": "灵感来源：@几何生长（AE动效转场设计，剪映平替版）"}, {"id": "t04", "title": "电影感调色：3步让画面高级10倍", "category": "调色教程", "difficulty": 2, "duration": "45秒", "tags": "调色教程 电影感 青橙色调 视频质感", "platform": "抖音/B站/小红书", "intro": "不需要达芬奇，剪映也能调出电影级画面质感", "framework": "开场钩子(3s)：手机直出 vs 调色后的强烈对比\n核心教学(35s)：降饱和度→色温偏冷→暗角→套LUT\n参数展示(5s)：大字报形式展示所有参数\n结尾CTA(2s)：引导截图保存+关注", "script": "【开场】为什么别人的视频有种电影高级感？不是机器贵，是调对了参数。\n\n【步骤1】剪映「调节」→饱和度-15，对比度+10，让画面不那么手机味。\n\n【步骤2】色温-8，色调+3。这就是青橙色调——阴影偏青、肤色偏橙。\n\n【步骤3】暗角-20，锐度+15。去「滤镜」→「电影」分类，选一个强度15%的LUT。\n\n【结尾】参数截图保存，下次直接套用。关注我下期教港风复古调色。", "blogger": "灵感来源：@云桥饲羽（达芬奇无LUT调色逻辑，剪映简化版）"}, {"id": "t05", "title": "BGM卡点剪辑：让画面跟着音乐跳舞", "category": "卡点节奏", "difficulty": 2, "duration": "35秒", "tags": "卡点剪辑 BGM 踩点 节奏 剪映", "platform": "抖音/快手", "intro": "每一个鼓点都是画面的切换时机，踩准了就有魔力", "framework": "开场钩子(3s)：展示踩点精准的卡点视频\n核心教学(25s)：选BGM→自动踩点→每鼓点切一刀→配合缩放\n对比展示(5s)：随机剪辑 vs 卡点剪辑\n结尾CTA(2s)：引导关注", "script": "【开场】刷到过每一帧都踩在鼓点上的视频吗？不是天赋是方法。\n\n【步骤1】选鼓点明显的BGM——推荐Phut Hon或病变Remix。导入后点「踩点」→「自动踩点」。\n\n【步骤2】按鼓点切开画面，每个黄点就是一个切换点。鼓点落下时画面放大到105%，鼓点间恢复100%。\n\n【步骤3】最重的那下鼓点配最炸的那一帧。鼓点密集画面快切，鼓点稀疏画面留呼吸感。\n\n【结尾】练3遍就能找到感觉。收藏起来，关注我每天一个技巧。", "blogger": "灵感来源：@百万剪辑狮（爆款节奏和镜头衔接底层规律）"}, {"id": "t06", "title": "爆款逐帧拆解：500万播放视频的秘密", "category": "热门跟拍", "difficulty": 3, "duration": "4分钟", "tags": "爆款拆解 逐帧分析 流量密码 剪辑思维", "platform": "抖音/B站", "intro": "不用原创，拆解别人验证过的好内容就是流量密码", "framework": "开场钩子(5s)：播放被拆解视频最炸3秒\n逐帧拆解(3min)：0.5x慢放→时间轴标注→分析每段逻辑\n技巧提炼(30s)：总结3个可复用的爆款公式\n结尾CTA(10s)：引导关注+评论想看拆哪条", "script": "【开场】这条视频500万播放——我今天把每一秒的剪辑逻辑拆给你看。\n\n【00:00-00:02】开场「好奇缺口」——画面出现看不懂的东西配文「这怎么做到的？」——2秒制造悬念。\n\n【00:02-00:08】铺垫段。正常速度展示完整过程，BGM还没完全起来给高潮留空间。\n\n【00:08-00:15】高潮段。BGM鼓点炸开，画面切换配合缩放+抖动。这7秒是爽感峰值。\n\n【00:15-00:20】结尾CTA。画面恢复正常，博主出镜或加文字「你学会了吗？」——标准收尾公式。\n\n【结尾】3个爆款公式：好奇缺口开头+节奏爬坡+爽感峰值收尾。还想拆哪条？评论区发链接。", "blogger": "灵感来源：@四维像素（爆款视频逐帧制作方法拆解）"}];
+var CATS = ["剪映基础操作", "卡点节奏", "拍摄技巧", "热门跟拍", "调色教程", "转场特效"];
+var MEDALS=["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣"];
+var D=document,DM={1:"⭐入门",2:"⭐⭐基础",3:"⭐⭐⭐进阶"},TC={"剪映基础操作":"r","拍摄技巧":"r","转场特效":"b","调色教程":"b","卡点节奏":"b","热门跟拍":"pu"},SC={"冷启动期":"green","增长期":"blue","成熟期":"purple"};
 
 function es(s){return s?String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}
-
-function cardHTML(t, m){
-    var cat=t.category, diff=t.difficulty, dur=t.duration;
-    var tc=TC[cat]||"b";
-    return'<div class="card" data-id="'+t.id+'" onclick="window.openTopic(''+t.id+'')">'
+function cardHTML(t,m){
+    var c=t.category,d=t.difficulty,du=t.duration,tc=TC[c]||"b",intro=t.intro||"",dm=DM[d]||"";
+    return'<div class="card" data-id="'+t.id+'" data-cat="'+c+'" data-diff="'+d+'" onclick="window.openTopic(''+t.id+'')">'
         +'<div class="card-bar '+tc+'"></div>'
         +(m?'<span style="position:absolute;top:10px;right:14px;font-size:24px;opacity:.15">'+m+'</span>':'')
-        +'<span class="tag '+tc+'">'+es(cat)+'</span>'
-        +'<h3>'+es(t.title)+'</h3>'
-        +'<div class="meta">'+DM[diff]+' · '+dur+'</div>'
-        +'</div>';
+        +'<span class="tag '+tc+'">'+es(c)+'</span><h3>'+es(t.title)+'</h3>'
+        +'<div class="meta">'+dm+' · '+du+'</div>'
+        +(intro?'<div class="desc">'+es(intro)+'</div>':'')+'</div>';
 }
 
-// Render
+// Render all
 var tg=D.getElementById("today-grid");
-for(var i=0;i<PICKS.length;i++)tg.innerHTML+=cardHTML(PICKS[i], MEDALS[i]);
+for(var i=0;i<PICKS.length;i++)tg.innerHTML+=cardHTML(PICKS[i],MEDALS[i]);
+var ct=D.getElementById("cal-tbody");
+for(var i=0;i<CALENDAR.length;i++){
+    var e=CALENDAR[i],sc=SC[e.stage]||"blue";
+    ct.innerHTML+='<tr class="cal-row" data-cat="'+es(e.category)+'" data-stage="'+es(e.stage)+'" data-id="'+e.id+'" onclick="window.openTopic(''+e.id+'')"><td class="ep">#'+e.episode+'</td><td>'+es(e.title)+'</td><td>'+es(e.category)+'</td><td>'+DM[e.difficulty]+'</td><td>'+es(e.duration)+'</td><td><span class="pill '+sc+'">'+es(e.stage)+'</span></td></tr>';
+}
+var lg=D.getElementById("lib-grid");
+for(var i=0;i<TOPICS.length;i++)lg.innerHTML+=cardHTML(TOPICS[i],"");
+
+// Dropdowns
+var co="";for(var i=0;i<CATS.length;i++)co+='<option value="'+CATS[i]+'">'+CATS[i]+'</option>';
+D.getElementById("f-cal-cat").innerHTML+='<option value="all">全部分类</option>'+co;
+D.getElementById("f-cat").innerHTML+='<option value="all">全部分类</option>'+co;
 
 // Nav
 var navBtns=D.querySelectorAll(".tabs button");
-for(var i=0;i<navBtns.length;i++)navBtns[i].onclick=function(){
+function switchTab(p){
     for(var j=0;j<navBtns.length;j++)navBtns[j].classList.remove("active");
-    var secs=D.querySelectorAll("section");
-    for(var k=0;k<secs.length;k++)secs[k].classList.remove("active");
-    this.classList.add("active");
-    D.getElementById("sec-"+this.dataset.panel).classList.add("active");
+    var secs=D.querySelectorAll("section");for(var k=0;k<secs.length;k++)secs[k].classList.remove("active");
+    D.getElementById("sec-"+p).classList.add("active");
+    var b=D.querySelector('.tabs button[data-panel="'+p+'"]');if(b)b.classList.add("active");
+}
+for(var i=0;i<navBtns.length;i++)navBtns[i].onclick=function(){switchTab(this.dataset.panel)};
+
+// Stage card click
+var scs=D.querySelectorAll(".stage-card");
+for(var i=0;i<scs.length;i++)scs[i].onclick=function(){switchTab("calendar");D.getElementById("f-stage").value=this.dataset.stage;filterCal()};
+
+// Filters
+window.filterCal=function(){
+    var s=D.getElementById("f-stage").value,c=D.getElementById("f-cal-cat").value,q=(D.getElementById("f-cal-search")||{value:""}).value.toLowerCase(),ct=0;
+    var rows=D.querySelectorAll("#cal-tbody .cal-row");
+    for(var i=0;i<rows.length;i++){var r=rows[i],sh=true;if(s!=="all"&&r.dataset.stage!==s)sh=false;if(c!=="all"&&r.dataset.cat!==c)sh=false;r.classList.toggle("hidden",!sh);if(sh)ct++;}
+    D.getElementById("cal-num").textContent=ct+" 期";
+};
+window.filterLib=function(){
+    var c=D.getElementById("f-cat").value,t=D.getElementById("f-type").value,d=D.getElementById("f-diff")||{},ct=0;
+    var cards=D.querySelectorAll("#lib-grid .card");
+    for(var i=0;i<cards.length;i++){var cd=cards[i],sh=true;if(c!=="all"&&cd.dataset.cat!==c)sh=false;if(t!=="all"&&cd.dataset.diff!==t)sh=false;cd.classList.toggle("hidden",!sh);if(sh)ct++;}
+    D.getElementById("lib-num").textContent=ct+" 条";
 };
 
-// ═══ OPEN TOPIC ═══
-window.openTopic = function(id) {
-    var t=null;
-    for(var i=0;i<TOPICS.length;i++){if(TOPICS[i].id===id){t=TOPICS[i];break}}
+// Detail modal
+window.openTopic=function(id){
+    var t=null;for(var i=0;i<TOPICS.length;i++){if(TOPICS[i].id===id){t=TOPICS[i];break}}
     if(!t)return;
-    var tags=(t.tags||"").split(/\s+/).filter(Boolean);
-    var tagsHTML="";
-    for(var i=0;i<tags.length;i++)tagsHTML+="<span>"+es(tags[i])+"</span>";
-    var frameworkHTML=t.framework.replace(/
-/g,"<br>");
-    var scriptHTML=t.script.replace(/
-/g,"<br>");
-    var bloggerHTML=t.blogger.replace(/灵感来源：/,"");
-
+    var tags=(t.tags||"").split(/\s+/).filter(Boolean),th="";
+    for(var i=0;i<tags.length;i++)th+="<span>"+es(tags[i])+"</span>";
+    var fw=t.framework.replace(/\n/g,"<br>"),sp=t.script.replace(/\n/g,"<br>");
+    var bg=t.blogger.replace(/灵感来源：/,""),spEsc=t.script.replace(/'/g,"\'").replace(/\n/g,"\n");
     D.getElementById("modal-box").innerHTML=
         '<button class="modal-close" onclick="window.closeModal()">✕</button>'
         +'<div class="modal-tag">'+es(t.category)+' · '+DM[t.difficulty]+' · '+es(t.duration)+'</div>'
         +'<h2>'+es(t.title)+'</h2>'
-        +'<div class="modal-meta">发布平台：'+es(t.platform)+'</div>'
-        +'<div class="modal-tags">'+tagsHTML+'</div>'
-        +'<div class="ds"><h4>📐 视频框架</h4><div class="framework-block">'+frameworkHTML+'</div></div>'
-        +'<div class="ds"><h4>✍️ 口播文案</h4><div class="script-block">'+scriptHTML+'</div>'
-        +'<button class="modal-copy-btn" onclick="navigator.clipboard.writeText(''+t.script.replace(/'/g,"\'").replace(/
-/g,"\n")+'');alert('文案已复制到剪贴板')">📋 复制文案</button></div>'
-        +'<div class="modal-blogger">灵感来源：'+es(bloggerHTML)+'</div>';
-    D.getElementById("modal-overlay").classList.add("active");
-    D.body.style.overflow="hidden";
+        +'<div class="modal-meta">发布：'+es(t.platform)+'</div>'
+        +'<div class="modal-tags">'+th+'</div>'
+        +'<div class="ds"><h4>📐 视频框架</h4><div class="fb">'+fw+'</div></div>'
+        +'<div class="ds"><h4>✍️ 口播文案</h4><div class="sb">'+sp+'</div><button class="cp-btn" onclick="navigator.clipboard.writeText(''+spEsc+'');this.textContent=\'✅ 已复制\'">📋 复制文案</button></div>'
+        +'<div class="modal-blogger">灵感来源：'+es(bg)+'</div>';
+    D.getElementById("modal-overlay").classList.add("active");D.body.style.overflow="hidden";
 };
+D.getElementById("modal-overlay").addEventListener("click",function(e){if(e.target===this)closeModal()});
+window.closeModal=function(){D.getElementById("modal-overlay").classList.remove("active");D.body.style.overflow=""};
+D.addEventListener("keydown",function(e){if(e.key==="Escape")closeModal()});
 
-// Modal Overlay Click to Close
-D.getElementById("modal-overlay").addEventListener("click", function(e){
-    if(e.target === this) closeModal();
-});
+// Cal row click delegates to card
+D.addEventListener("click",function(e){var tr=e.target.closest(".cal-row");if(tr&&tr.dataset.id)window.openTopic(tr.dataset.id)});
 
-window.closeModal = function() {
-    D.getElementById("modal-overlay").classList.remove("active");
-    D.body.style.overflow="";
-};
+// Stat bars
+var cc={};for(var i=0;i<TOPICS.length;i++){var c=TOPICS[i].category;cc[c]=(cc[c]||0)+1}
+var cn=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a]}),cb=D.getElementById("cat-bars"),ch="";
+for(var i=0;i<cn.length;i++){var pct=cc[cn[i]]/TOPICS.length*100;ch+='<div class="bar-row"><span class="bar-label">'+cn[i]+'</span><div class="bar-track"><div class="bar-fill" data-w="'+pct.toFixed(1)+'"></div></div><span class="bar-num">'+cc[cn[i]]+'</span></div>'}cb.innerHTML=ch;
+var tc={};for(var i=0;i<TOPICS.length;i++){var ty=TOPICS[i].difficulty<=1?"入门":(TOPICS[i].difficulty<=2?"基础":"进阶");tc[ty]=(tc[ty]||0)+1}
+var tn=Object.keys(tc),tb=D.getElementById("type-bars"),th="";
+for(var i=0;i<tn.length;i++){var pct=tc[tn[i]]/TOPICS.length*100;th+='<div class="bar-row"><span class="bar-label">'+tn[i]+'</span><div class="bar-track"><div class="bar-fill" data-w="'+pct.toFixed(1)+'"></div></div><span class="bar-num">'+tc[tn[i]]+'</span></div>'}tb.innerHTML=th;
 
-D.addEventListener("keydown", function(e){if(e.key==="Escape")closeModal();});
+var bo=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++)if(es[i].isIntersecting){var bars=es[i].target.querySelectorAll("[data-w]");for(var j=0;j<bars.length;j++){(function(b,d){setTimeout(function(){b.style.width=b.getAttribute("data-w")+"%"},d)})(bars[j],j*45)}}},{threshold:.1});
+var pns=D.querySelectorAll(".stat-panel");for(var i=0;i<pns.length;i++)bo.observe(pns[i]);
 
-// ═══ Particles ═══
+// Particles
 (function(){
     var cv=D.getElementById("particles-canvas"),ctx=cv.getContext("2d"),W=window.innerWidth,H=D.documentElement.scrollHeight,pts=[];
     cv.width=W;cv.height=H;
-    for(var i=0;i<40;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*3+1,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,a:Math.random()*.45+.25});
+    for(var i=0;i<40;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*3+1,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,a:Math.random()*.4+.25});
     function rs(){W=cv.width=window.innerWidth;H=D.documentElement.scrollHeight}window.addEventListener("resize",rs);
     function draw(){
         ctx.clearRect(0,0,W,H);
