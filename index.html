@@ -8,7 +8,7 @@ html{scroll-behavior:smooth}
 body{
     --bg:#f6f7fa;--card:#fff;--text:#111318;--text2:#555a66;--text3:#8a8e9a;
     --border:#e5e7ed;--accent:#0055e8;--red:#d92d20;--orange:#e04f16;--green:#188038;--purple:#7a1eb8;
-    --radius:16px;--spring:cubic-bezier(0.34,1.56,0.64,1);--extreme:cubic-bezier(0.68,-0.80,0.27,1.80);--smooth:cubic-bezier(0.22,0.61,0.36,1);
+    --radius:16px;--spring:cubic-bezier(0.34,1.56,0.64,1);--extreme:cubic-bezier(0.34,1.56,0.64,1);--smooth:cubic-bezier(0.22,0.61,0.36,1);
     font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
     background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;
 }
@@ -396,7 +396,7 @@ var qc=D.getElementById("quick-cards"),qh="";for(var i=0;i<refs.length;i++)qh+="
 (function(){
     var cv=D.getElementById("particles-canvas"),ctx=cv.getContext("2d"),W=window.innerWidth,H=D.documentElement.scrollHeight,pts=[];
     cv.width=W;cv.height=H;
-    for(var i=0;i<55;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.5,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,a:Math.random()*.45+.1});
+    for(var i=0;i<35;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.5,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,a:Math.random()*.45+.1});
     function rs(){W=cv.width=window.innerWidth;H=D.documentElement.scrollHeight;}window.addEventListener("resize",rs);
     function draw(){ctx.clearRect(0,0,W,H);for(var i=0;i<pts.length;i++){var p=pts[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle="rgba(0,85,232,"+p.a+")";ctx.fill();}for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<110){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle="rgba(0,85,232,"+(1-d/110)*.045+")";ctx.lineWidth=.6;ctx.stroke();}}requestAnimationFrame(draw);}draw();
     var rt;window.addEventListener("scroll",function(){clearTimeout(rt);rt=setTimeout(function(){H=cv.height=D.documentElement.scrollHeight;},300);});
