@@ -1,851 +1,681 @@
 # -*- coding: utf-8 -*-
 """
-可视化仪表盘 — Python 预渲染 HTML，JS 仅做过滤/切换
-完全避免 f-string + JS 模板字符串转义冲突
+MG 动效版仪表盘生成器
+数据驱动：读取 JSON → 内嵌到 HTML → 纯 JS 动态渲染全部组件
+所有 MG 动画保留：spring 曲线、粒子背景、几何漂浮、数字滚动
 """
 import json, os
 from datetime import datetime
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HTML = os.path.join(BASE, "仪表盘.html")
+DB_PATH = os.path.join(BASE, "数据", "选题库.json")
+CAL_PATH = os.path.join(BASE, "数据", "200期日历.json")
+PUB_PATH = os.path.join(BASE, "数据", "已发布.json")
+HTML_PATH = os.path.join(BASE, "仪表盘.html")
+INDEX_PATH = os.path.join(BASE, "index.html")
 
-# ═══════════════ 对标链接库 ═══════════════
-REFS = {
-    "剪映基础操作": [
-        ("陆一舟剪辑 · 剪映全套入门","https://www.douyin.com/search/陆一舟剪辑","体系最完整的剪映教学，零基础首选"),
-        ("三郎老师 · 唠嗑式剪映教学","https://www.douyin.com/search/三郎老师剪映","接地气，完全零基础跟练"),
-        ("路过我的生活 · 0基础入门","https://www.douyin.com/search/路过我的生活剪辑","全程无废话，音乐卡点+抠像拆解"),
-    ],
-    "转场特效": [
-        ("丝滑转场·普通人抄作业","https://post.smzdm.com/p/axkwe574/","电影级转场平替，不用特效自然到犯规"),
-        ("剪映最火10个转场动作详解","https://www.php.cn/faq/2589986.html","卡点闪白/左滑推进/色彩溶解等10种"),
-        ("迷核转场·梦想核滤镜卡点","https://www.douyin.com/shipin/7645123592253900863","2026抖音热款转场模板"),
-    ],
-    "卡点节奏": [
-        ("抖音自动卡点教程","https://17golang.com/article/573954.html","卡点拍摄+自动踩点完整指南"),
-        ("旅游卡点视频制作全指南","https://post.smzdm.com/p/aomkm3r7/","从参数设置到剪辑调色全流程"),
-        ("四分屏卡点教程·ahyeon风","https://www.douyin.com/shipin/7641791248625567763","画面分割定格+阶梯排列"),
-    ],
-    "调色教程": [
-        ("80万人看过·电影感调色教程","https://post.smzdm.com/p/arlvkdqz/","氛围感+电影感调色实战拆解"),
-        ("达芬奇电影感调色思路","https://post.smzdm.com/p/arlx04d7/","云桥饲羽博主·无LUT调色逻辑讲解"),
-        ("重启色彩卡点教程","https://www.douyin.com/shipin/7617655798461859878","红点移动+蒙版扩散+饱和度渐变恢复"),
-    ],
-    "文字动画": [
-        ("剪映文字动画·你喜欢的人是谁","https://post.smzdm.com/p/apq7g2v2/","逐字动画+关键帧全流程拆解"),
-        ("电影感Vlog片头·蒙版+文字","https://post.smzdm.com/p/a262dx3q/","遮幅开场+文字向右擦开入场"),
-    ],
-    "蒙版&关键帧": [
-        ("手机剪映关键帧10分钟速成","https://m.toutiao.com/article/7595576252665987626/","文字/画面/蒙版动画必学核心"),
-        ("剪映矩形蒙版使用教程","https://www.douyin.com/video/7562405980719140142","蒙版基础操作详解"),
-        ("剪映新版关键帧正确操作","https://www.douyin.com/video/7271196668698053899","0基础学新版关键帧逻辑"),
-    ],
-    "抠像&合成": [
-        ("抖音AI抠像特效教程","https://www.douyin.com/search/剪映智能抠像教程","一键去背景+精细边缘调整"),
-        ("剪映绿幕抠像+换背景","https://www.douyin.com/search/剪映绿幕抠像","在家拍出任意背景"),
-    ],
-    "音频处理": [
-        ("抖音热门BGM卡点剪辑","https://www.douyin.com/search/抖音热门BGM卡点","曲库+本地导入+抖音收藏全攻略"),
-    ],
-    "拍摄技巧": [
-        ("手持拍摄防抖5个技巧","https://www.douyin.com/search/手机拍摄防抖技巧","不用稳定器拍出稳定画面"),
-        ("南门录像厅·剪辑思维+叙事","https://www.douyin.com/search/南门录像厅","拉片式教学，逐帧分析镜头衔接"),
-        ("百万剪辑狮·爆款逻辑拆解","https://www.douyin.com/search/百万剪辑狮","揭秘爆款节奏和镜头衔接底层规律"),
-    ],
-    "热门跟拍": [
-        ("2026抖音一键成片全攻略","https://m.toutiao.com/article/7615130900577272370/","AI高光筛选+智能卡点+自动字幕"),
-        ("2026爆款视频剪映课·朱朱老师","https://www.doutianshi.com/51035.html","剪辑+AI+运营三大板块系统课"),
-    ],
-    "案例实战": [
-        ("80万人看过的小爆款剪辑全流程","https://post.smzdm.com/p/arlvkdqz/","音乐卡点+曲线变速+背影转场完整拆解"),
-        ("用手机+剪映复刻广告片","https://www.douyin.com/search/手机拍广告级视频","低成本拍出高级感实战"),
-        ("普通人Vlog从拍到剪全流程","https://www.douyin.com/search/Vlog拍摄剪辑全流程","200段素材整理+剪辑思路"),
-    ],
-}
-
-# ═══════════════ 帮助函数 ═══════════════
-DIFF_MAP = {1:"⭐",2:"⭐⭐",3:"⭐⭐⭐",4:"⭐⭐⭐⭐",5:"⭐⭐⭐⭐⭐"}
-TYPE_EMOJI = {"爆款":"🔺","干货":"🔸","深度":"🔹"}
-
-def diff_badge(d):
-    if d <= 2: return "green"
-    if d <= 3: return "orange"
-    return "red"
-
-def type_badge(t):
-    if t == "爆款": return "red"
-    if t == "干货": return "blue"
-    return "purple"
-
-def stage_pill(stage):
-    if "冷" in stage: return "green"
-    if "增" in stage: return "blue"
-    return "purple"
-
-def make_script(t):
-    """生成脚本文案"""
-    title = t.get("title","")
-    ctype = t.get("content_type","干货")
-    if ctype == "爆款":
-        core = title.split("：")[-1] if "：" in title else title
-        return {
-            "hook": f"「{core}」——你是不是也刷到过这种效果？今天30秒教会你。",
-            "steps": ["📱 打开剪映，导入素材",f"⚡ 关键操作：{core}的核心步骤","🎯 微调参数到最佳效果","✨ 对比展示：Before → After"],
-            "ending": "学会了点个赞收藏，下期见！",
-            "bgm": "节奏卡点BGM（Phut Hon / 病变 Remix）"
-        }
-    elif ctype == "深度":
-        return {
-            "hook": f"今天不教单个技巧，带你完整拆解「{title}」的全过程。",
-            "steps": ["📋 前期构思与策划思路","🎥 拍摄现场还原与要点","✂️ 剪辑全流程逐步拆解","📊 成片展示 + 关键技巧复盘"],
-            "ending": "觉得有用的话点个关注，我会持续更新这样的深度拆解。",
-            "bgm": "叙事感配乐（Epidemic Sound 风格）"
-        }
-    else:
-        return {
-            "hook": f"为什么别人的视频那么高级？问题就出在这一步——",
-            "steps": [f"🔍 常见错误：90%的人都做错了",f"🛠️ 正确方法：{title}的核心要点","📐 具体操作演示","✅ 效果对比 + 避坑提醒"],
-            "ending": "收藏起来慢慢练，关注我每天一个剪辑技巧。",
-            "bgm": "轻量氛围BGM（Lo-Fi / Jazz Hop）"
-        }
-
-# ═══════════════ HTML 组件生成器 ═══════════════
-def card_html(t, medal=""):
-    """单张选题卡片 HTML（纯 Python 生成）"""
-    cat = t.get("category","")
-    ctype = t.get("content_type","干货")
-    diff = t.get("difficulty",2)
-    title = t.get("title","")
-    dur = t.get("estimated_duration","?")
-    viral = t.get("viral_potential","中")
-    prod = t.get("production_time","?")
-    desc = t.get("description","")
-    mats = t.get("materials_needed","")
-    tid = t.get("id","")
-
-    tb = type_badge(ctype)
-    db = diff_badge(diff)
-    te = TYPE_EMOJI.get(ctype,"")
-
-    # 素材标签
-    mat_tags = ""
-    if mats:
-        for m in mats.replace("，",",").replace("、",",").split(","):
-            m = m.strip()
-            if m:
-                mat_tags += f'<span class="mat-tag">{m}</span>'
-
-    # 脚本
-    scr = make_script(t)
-
-    # 对标链接
-    ref_list = REFS.get(cat, [])[:3]
-    ref_html = ""
-    if ref_list:
-        for rtitle, rurl, rnote in ref_list:
-            ref_html += f'<a class="ref-link" href="{rurl}" target="_blank" rel="noopener">{rtitle} <span class="arrow">↗</span><span class="ref-note">{rnote}</span></a>'
-    else:
-        ref_html = f'<div class="empty-note">🔍 建议在抖音搜索「{title}」找参考</div>'
-
-    steps_html = ""
-    for s in scr["steps"]:
-        steps_html += f"<li>{s}</li>"
-
-    return f"""<div class="card" data-id="{tid}" data-cat="{cat}" data-type="{ctype}" data-diff="{diff}" data-title="{title}" onclick="openDetail(this)" tabindex="0">
-    <div class="card-body">
-        <div class="tags">
-            <span class="tag tag-{tb}">{te} {ctype}</span>
-            <span class="tag tag-{db}">{DIFF_MAP.get(diff,'⭐⭐')}</span>
-            <span class="tag tag-gray">{cat}</span>
-        </div>
-        <h3>{medal} {title}</h3>
-        <div class="meta">
-            <span>{dur}</span><span>涨粉{viral}</span><span>{prod}</span>
-        </div>
-    </div>
-    <div class="chevron">→</div>
-    <!-- hidden detail data -->
-    <div class="detail-data" style="display:none">
-        <div class="detail-title">{title}</div>
-        <div class="detail-cat">{cat}</div>
-        <div class="detail-type">{ctype}</div>
-        <div class="detail-diff">{diff}</div>
-        <div class="detail-dur">{dur}</div>
-        <div class="detail-viral">{viral}</div>
-        <div class="detail-prod">{prod}</div>
-        <div class="detail-desc">{desc}</div>
-        <div class="detail-hook">{scr['hook']}</div>
-        <div class="detail-steps">{''.join(steps_html)}</div>
-        <div class="detail-ending">{scr['ending']}</div>
-        <div class="detail-bgm">{scr['bgm']}</div>
-        <div class="detail-refs">{ref_html}</div>
-        <div class="detail-mats">{mat_tags}</div>
-    </div>
-</div>"""
-
-
-def cal_row_html(e):
-    """日历表格行"""
-    ep = e.get("episode","")
-    title = e.get("title","")
-    cat = e.get("category","")
-    diff = e.get("difficulty",2)
-    ctype = e.get("content_type","")
-    dur = e.get("estimated_duration","")
-    stage = e.get("stage","")
-    sp = stage_pill(stage)
-    return f"""<tr data-cat="{cat}" data-stage="{stage}" data-title="{title}" class="cal-row" onclick="openDetailByTitle('{title}')">
-        <td class="ep">#{ep}</td>
-        <td>{title}</td>
-        <td>{cat}</td>
-        <td>{DIFF_MAP.get(diff,'⭐⭐')}</td>
-        <td>{ctype}</td>
-        <td>{dur}</td>
-        <td><span class="pill pill-{sp}">{stage}</span></td>
-    </tr>"""
-
-
-# ═══════════════ 主生成 ═══════════════
 def build():
-    db = json.load(open(os.path.join(BASE,"数据","选题库.json"),encoding="utf-8"))
-    cal = json.load(open(os.path.join(BASE,"数据","200期日历.json"),encoding="utf-8"))
-    pub = json.load(open(os.path.join(BASE,"数据","已发布.json"),encoding="utf-8"))
-
+    # ── 读取数据 ──
+    db = json.load(open(DB_PATH, encoding="utf-8"))
+    cal = json.load(open(CAL_PATH, encoding="utf-8"))
+    pub = json.load(open(PUB_PATH, encoding="utf-8"))
     topics = db["topics"]
-    pending = [t for t in topics if t["status"]=="待发布"]
-    published = [t for t in topics if t["status"]=="已发布"]
-    skipped = [t for t in topics if t["status"]=="已跳过"]
     today = datetime.now().strftime("%Y-%m-%d")
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    pending = [t for t in topics if t["status"] == "待发布"]
+    published = [t for t in topics if t["status"] == "已发布"]
+    skipped = [t for t in topics if t["status"] == "已跳过"]
 
     # ── 今日推荐 ──
-    viral_p = [t for t in pending if t.get("content_type")=="爆款"]
-    dry_p   = [t for t in pending if t.get("content_type")=="干货"]
-    deep_p  = [t for t in pending if t.get("content_type")=="深度"]
+    viral_p = [t for t in pending if t.get("content_type") == "爆款"]
+    dry_p = [t for t in pending if t.get("content_type") == "干货"]
+    deep_p = [t for t in pending if t.get("content_type") == "深度"]
     picks = viral_p[:2] + dry_p[:2] + deep_p[:1]
     if len(picks) < 5:
         rest = [t for t in pending if t not in picks]
-        picks += rest[:5-len(picks)]
-    medals = ["🥇","🥈","🥉","4️⃣","5️⃣"]
-    today_cards = "".join(card_html(t, medals[i] if i<len(medals) else "") for i,t in enumerate(picks[:5]))
+        picks += rest[:5 - len(picks)]
 
-    # ── 选题库卡片 ──
-    all_cards = "".join(card_html(t) for t in topics)
+    # ── 序列化数据为 JS ──
+    topics_json = json.dumps(topics, ensure_ascii=False)
+    cal_json = json.dumps(cal, ensure_ascii=False)
+    picks_json = json.dumps(picks, ensure_ascii=False)
+    published_json = json.dumps(published, ensure_ascii=False)
 
-    # ── 日历行 ──
-    cal_rows = "".join(cal_row_html(e) for e in cal)
+    # ── 计时器 ──
+    total = len(topics)
+    total_pending = len(pending)
+    total_pub = len(published)
+    total_skip = len(skipped)
+    total_cal = len(cal)
 
-    # ── 分类下拉 ──
-    cats = sorted(set(t.get("category","") for t in topics))
-    cat_opts = "".join(f'<option value="{c}">{c}</option>' for c in cats)
-
-    # ── 统计 ──
-    cat_counts = {}
-    for t in topics:
-        c = t.get("category","")
-        cat_counts[c] = cat_counts.get(c,0)+1
-    cat_bars = ""
-    for c, n in sorted(cat_counts.items(), key=lambda x:-x[1]):
-        pct = n/len(topics)*100
-        cat_bars += f'<div class="bar"><div class="row"><span>{c}</span><span>{n}期 ({pct:.1f}%)</span></div><div class="track"><div class="fill" style="width:{pct}%"></div></div></div>'
-
-    tc = {}
-    for t in topics:
-        ty = t.get("content_type","?")
-        tc[ty] = tc.get(ty,0)+1
-    ty_colors = {"爆款":"var(--red)","干货":"var(--accent)","深度":"var(--purple)"}
-    type_bars = ""
-    for ty, n in tc.items():
-        pct = n/len(topics)*100
-        c = ty_colors.get(ty,"var(--text2)")
-        type_bars += f'<div class="bar"><div class="row"><span>{TYPE_EMOJI.get(ty,"")} {ty}</span><span>{n}期 ({pct:.1f}%)</span></div><div class="track"><div class="fill" style="width:{pct}%;background:{c}"></div></div></div>'
-
-    # ═══════════════ 完整 HTML ═══════════════
     page = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>剪辑选题系统</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🎬 剪辑选题系统</title>
 <style>
-/* ========== 全局配色变量 ========== */
-:root {{
-  --bg-main: #080c16;
-  --bg-card: rgba(16, 22, 36, 0.65);
-  --text-primary: #f0f4fc;
-  --text-secondary: #8a94a6;
-  --text-tertiary: #4a5268;
-  --tech-color: #00d0ff;
-  --tech-light: rgba(0, 208, 255, 0.18);
-  --tech-glow: 0 0 18px rgba(0, 208, 255, 0.35);
-  --red: #ff5e5e;
-  --orange: #ffa94d;
-  --green: #4ade80;
-  --purple: #c084fc;
-  --grid-opacity: 0.04;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-  --anim-fast: 0.25s var(--ease-smooth);
-  --anim-normal: 0.4s var(--ease-smooth);
+/* ==================== MG DESIGN SYSTEM ==================== */
+*,*::before,*::after{{margin:0;padding:0;box-sizing:border-box}}
+html{{scroll-behavior:smooth}}
+body{{
+    --bg:#f6f7fa;--card:#fff;
+    --text:#111318;--text2:#555a66;--text3:#8a8e9a;
+    --border:#e5e7ed;--border2:#dcdde6;
+    --accent:#0055e8;--accent2:#003bb5;
+    --red:#d92d20;--orange:#e04f16;--green:#188038;--purple:#7a1eb8;
+    --radius:16px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.04);
+    --shadow:0 2px 8px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.04);
+    --shadow-lg:0 8px 30px rgba(0,0,0,.07),0 20px 60px rgba(0,0,0,.04);
+    --spring:cubic-bezier(0.34,1.56,0.64,1);
+    --bounce:cubic-bezier(0.68,-0.55,0.27,1.55);
+    --smooth:cubic-bezier(0.22,0.61,0.36,1);
+    font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;
 }}
-* {{ margin: 0; padding: 0; box-sizing: border-box; }}
-body {{
-  font-family: 'Inter', system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background-color: var(--bg-main);
-  color: var(--text-secondary);
-  line-height: 1.6;
-  overflow-x: hidden;
-  background-image:
-    linear-gradient(rgba(0, 208, 255, var(--grid-opacity)) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 208, 255, var(--grid-opacity)) 1px, transparent 1px);
-  background-size: 40px 40px;
-  min-height: 100vh;
-}}
+h1,h2,h3,h4{{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;letter-spacing:-.025em}}
 
-/* ========== Scroll progress ========== */
-.scroll-progress {{
-  position: fixed; top: 0; left: 0; height: 2px;
-  background: var(--tech-color); box-shadow: 0 0 10px var(--tech-color);
-  z-index: 200; width: 0%; transition: width 0.1s linear;
-}}
+/* ═══ Canvas particles ═══ */
+#particles-canvas{{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.4}}
 
-/* ========== Particle canvas ========== */
-#particle-canvas {{
-  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  z-index: -1; pointer-events: none; opacity: 0.25;
+/* ═══ Floating geometry ═══ */
+.geo-shapes{{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}}
+.geo{{position:absolute;opacity:.05;animation:geoFloat 14s var(--spring) infinite}}
+@keyframes geoFloat{{
+    0%,100%{{transform:translate(0,0) rotate(0deg) scale(1)}}
+    20%{{transform:translate(25px,-40px) rotate(72deg) scale(1.3)}}
+    40%{{transform:translate(-15px,-80px) rotate(144deg) scale(.85)}}
+    60%{{transform:translate(-35px,-20px) rotate(216deg) scale(1.15)}}
+    80%{{transform:translate(20px,-60px) rotate(288deg) scale(.9)}}
 }}
+.geo.circle{{border-radius:50%;border:2px solid var(--accent)}}
+.geo.square{{border-radius:4px;border:2px solid var(--purple)}}
+.geo.dot{{border-radius:50%;background:var(--accent)!important;border:none!important}}
+.geo.ring{{border-radius:50%;border:2px dashed var(--accent);background:none!important}}
+.geo.triangle{{width:0!important;height:0!important;border:none!important;border-left:solid transparent;border-right:solid transparent;border-bottom:solid var(--accent);background:none!important}}
 
-/* ========== Cursor glow (desktop only) ========== */
-.cursor-glow {{
-  position: fixed; width: 400px; height: 400px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,208,255,0.10) 0%, transparent 70%);
-  pointer-events: none; z-index: 0; transform: translate(-50%, -50%); opacity: 0.12;
-}}
-@media (max-width: 768px) {{ .cursor-glow {{ display: none; }} }}
+/* ═══ Spring keyframes ═══ */
+@keyframes springIn{{0%{{opacity:0;transform:scale(.3) translateY(60px)}}60%{{opacity:1;transform:scale(1.08) translateY(-4px)}}80%{{transform:scale(.96) translateY(2px)}}100%{{opacity:1;transform:scale(1) translateY(0)}}}}
+@keyframes springInUp{{0%{{opacity:0;transform:translateY(50px) scale(.85)}}60%{{opacity:1;transform:translateY(-6px) scale(1.03)}}80%{{transform:translateY(2px) scale(.98)}}100%{{opacity:1;transform:translateY(0) scale(1)}}}}
+@keyframes fadeSlideUp{{0%{{opacity:0;transform:translateY(30px)}}100%{{opacity:1;transform:translateY(0)}}}}
 
-/* ========== Nav ========== */
-nav {{
-  position: fixed; top: 0; left: 0; width: 100%; padding: 18px 64px;
-  display: flex; justify-content: space-between; align-items: center;
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  background: rgba(8, 12, 22, 0.35); border-bottom: 1px solid var(--tech-light);
-  z-index: 100; transition: background var(--anim-normal);
-}}
-nav .logo {{
-  font-size: 20px; color: var(--text-primary); letter-spacing: 2px;
-  font-weight: 700; display: flex; align-items: center; gap: 12px;
-}}
-nav .logo .dot {{
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--tech-color); box-shadow: 0 0 14px var(--tech-color);
-}}
-nav .nav-links {{ display: flex; gap: 6px; background: rgba(255,255,255,0.03); border-radius: 10px; padding: 3px; }}
-nav .nav-links button {{
-  border: none; background: none; padding: 7px 20px; border-radius: 8px;
-  font-size: 13px; font-weight: 500; color: var(--text-secondary);
-  cursor: pointer; transition: all var(--anim-fast); font-family: inherit; letter-spacing: -0.1px;
-}}
-nav .nav-links button:hover {{ color: var(--text-primary); }}
-nav .nav-links button.active {{ background: rgba(0, 208, 255, 0.1); color: var(--tech-color); }}
-nav .time {{ font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.5px; font-feature-settings: "tnum"; }}
-@media (max-width: 768px) {{
-  nav {{ padding: 14px 20px; }}
-  nav .nav-links {{ gap: 2px; }}
-  nav .nav-links button {{ padding: 6px 12px; font-size: 11px; }}
-  nav .time {{ display: none; }}
-}}
+.wrap{{max-width:1240px;margin:0 auto;padding:0 28px;position:relative;z-index:1}}
 
-/* ========== Main ========== */
-main {{
-  position: relative; z-index: 1; max-width: 1280px; margin: 0 auto;
-  padding: 100px 28px 60px;
-}}
-@media (max-width: 768px) {{ main {{ padding: 90px 16px 40px; }} }}
-section {{ display: none; animation: fadeSlide 0.4s var(--ease-smooth); }}
-section.active {{ display: block; }}
-@keyframes fadeSlide {{
-  from {{ opacity: 0; transform: translateY(16px); }}
-  to {{ opacity: 1; transform: translateY(0); }}
-}}
+/* ═══ Nav ═══ */
+nav{{position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    background:rgba(246,247,250,.82);border-bottom:1px solid var(--border);padding:14px 0}}
+nav .nav-inner{{max-width:1240px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between}}
+nav .logo{{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.3px;display:flex;align-items:center;gap:10px}}
+nav .logo .dot{{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px rgba(0,85,232,.3)}}
+nav .tabs{{display:flex;gap:4px;background:rgba(0,0,0,.03);border-radius:10px;padding:3px}}
+nav .tabs button{{border:none;background:none;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s var(--spring);font-family:inherit}}
+nav .tabs button:hover{{color:var(--text)}}
+nav .tabs button.active{{background:var(--card);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.06)}}
+nav .time{{font-size:11px;color:var(--text3);letter-spacing:.5px;font-feature-settings:"tnum"}}
+@media(max-width:768px){{nav .time{{display:none}}nav .tabs button{{padding:6px 11px;font-size:11px}}}}
 
-/* ========== Stats ========== */
-.stats {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; }}
-@media (max-width: 768px) {{ .stats {{ grid-template-columns: repeat(2, 1fr); }} }}
-.stat {{
-  position: relative; background: var(--bg-card); border-radius: var(--radius-lg);
-  padding: 28px 30px; border: 1px solid var(--tech-light);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  transition: all var(--anim-normal); overflow: hidden;
-}}
-.stat::before {{
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,208,255,0.3), transparent);
-  opacity: 0; transition: opacity var(--anim-normal);
-}}
-.stat:hover {{ transform: translateY(-4px); border-color: rgba(0,208,255,0.3); box-shadow: var(--tech-glow); }}
-.stat:hover::before {{ opacity: 1; }}
-.stat .val {{
-  font-size: 48px; font-weight: 700; letter-spacing: -2px; line-height: 1;
-  font-feature-settings: "tnum"; transition: color var(--anim-normal);
-}}
-.stat .lbl {{
-  font-size: 11px; color: var(--text-tertiary); margin-top: 8px;
-  font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
-}}
+/* ═══ Sections ═══ */
+main{{position:relative;z-index:1;min-height:80vh}}
+section{{display:none;animation:fadeSlideUp .45s var(--smooth);padding:0 0 60px}}
+section.active{{display:block}}
 
-/* ========== Section headers ========== */
-.sec-head {{ display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; }}
-.sec-head h2 {{ font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.4px; }}
-.sec-head .sub {{ font-size: 13px; color: var(--text-tertiary); }}
+/* ═══ Hero ═══ */
+.hero{{position:relative;padding:80px 0 48px;overflow:visible}}
+.hero-bg{{position:absolute;inset:-60px -50px;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(0,85,232,.04) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 40% at 85% 100%,rgba(0,85,232,.02) 0%,transparent 50%)}}
+.hero-glow{{position:absolute;width:500px;height:500px;border-radius:50%;filter:blur(130px);opacity:.07;pointer-events:none;z-index:0;animation:glowFloat 10s var(--smooth) infinite}}
+.hero-glow.g1{{top:-250px;left:5%;background:radial-gradient(circle,#0055e8,transparent 70%)}}
+.hero-glow.g2{{top:10%;right:-150px;background:radial-gradient(circle,#7a1eb8,transparent 70%);animation-delay:-5s}}
+@keyframes glowFloat{{0%,100%{{transform:translate(0,0) scale(1)}}33%{{transform:translate(35px,-25px) scale(1.2)}}66%{{transform:translate(-20px,12px) scale(.85)}}}}
 
-/* ========== Glass cards ========== */
-.grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 12px; }}
-@media (max-width: 768px) {{ .grid {{ grid-template-columns: 1fr; }} }}
-.card {{
-  background: var(--bg-card); border-radius: var(--radius-lg);
-  border: 1px solid var(--tech-light); backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px); cursor: pointer;
-  transition: all var(--anim-normal); position: relative; overflow: hidden;
-}}
-.card:hover {{
-  transform: translateY(-4px);
-  border-color: rgba(0,208,255,0.35); box-shadow: var(--tech-glow);
-}}
-.card:active {{ transform: scale(0.985); }}
-.card-body {{ padding: 22px 28px 20px; position: relative; z-index: 1; }}
-.card .tags {{ display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }}
-.tag {{
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 10px; border-radius: 6px; font-size: 10.5px;
-  font-weight: 600; letter-spacing: 0.3px; font-feature-settings: "tnum";
-}}
-.tag-red {{ background: rgba(255, 94, 94, 0.12); color: var(--red); }}
-.tag-blue {{ background: rgba(0, 208, 255, 0.12); color: var(--tech-color); }}
-.tag-purple {{ background: rgba(192, 132, 252, 0.12); color: var(--purple); }}
-.tag-green {{ background: rgba(74, 222, 128, 0.12); color: var(--green); }}
-.tag-orange {{ background: rgba(255, 169, 77, 0.12); color: var(--orange); }}
-.tag-gray {{ background: rgba(255, 255, 255, 0.04); color: var(--text-secondary); }}
-.card h3 {{ font-size: 15.5px; font-weight: 600; line-height: 1.4; margin-bottom: 10px; color: var(--text-primary); letter-spacing: -0.3px; }}
-.card .meta {{ font-size: 12px; color: var(--text-tertiary); display: flex; gap: 16px; align-items: center; }}
-.card .chevron {{
-  position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-  width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.03);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; color: var(--text-tertiary); transition: all var(--anim-fast);
-}}
-.card:hover .chevron {{ background: var(--tech-color); color: #080c16; box-shadow: 0 0 18px rgba(0,208,255,0.4); }}
-.card.hidden {{ display: none; }}
+.hero-toy{{position:absolute;pointer-events:none;z-index:0}}
+.hero-toy.t1{{top:18%;left:8%;width:55px;height:55px;border:3px solid var(--accent);border-radius:50%;opacity:.05;animation:toyBounce 8s var(--spring) infinite}}
+.hero-toy.t2{{top:35%;right:12%;width:38px;height:38px;background:var(--accent);border-radius:8px;opacity:.03;animation:toyBounce 10s var(--spring) infinite;transform:rotate(45deg);animation-delay:-4s}}
+.hero-toy.t3{{bottom:15%;left:18%;width:45px;height:45px;border:3px dashed var(--purple);border-radius:50%;opacity:.04;animation:toySpin 12s linear infinite}}
+.hero-toy.t4{{top:22%;right:28%;width:22px;height:22px;border-radius:50%;background:var(--purple);opacity:.03;animation:toyBounce 7s var(--spring) infinite;animation-delay:-6s}}
+@keyframes toyBounce{{0%,100%{{transform:translateY(0) rotate(0deg)}}30%{{transform:translateY(-45px) rotate(55deg)}}60%{{transform:translateY(-18px) rotate(110deg)}}80%{{transform:translateY(-30px) rotate(165deg)}}}}
+@keyframes toySpin{{0%{{transform:rotate(0deg) scale(1)}}50%{{transform:rotate(180deg) scale(1.35)}}100%{{transform:rotate(360deg) scale(1)}}}}
 
-/* Card entrance stagger */
-@keyframes cardIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
-.card {{ animation: cardIn 0.5s var(--ease-smooth) both; }}
-.card:nth-child(1) {{ animation-delay: 0s; }}
-.card:nth-child(2) {{ animation-delay: 0.06s; }}
-.card:nth-child(3) {{ animation-delay: 0.12s; }}
-.card:nth-child(4) {{ animation-delay: 0.18s; }}
-.card:nth-child(5) {{ animation-delay: 0.24s; }}
+.hero .label{{position:relative;display:inline-block;padding:6px 20px;border-radius:24px;background:rgba(0,85,232,.05);color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.8px;margin-bottom:22px;z-index:1;
+    text-shadow:0 0 20px rgba(0,85,232,.1);box-shadow:0 2px 12px rgba(0,85,232,.04),inset 0 1px 0 rgba(255,255,255,.5);
+    animation:springIn .7s var(--spring) .1s both}}
+.hero h1{{position:relative;font-size:clamp(38px,5.5vw,68px);font-weight:800;line-height:1.08;margin-bottom:16px;z-index:1;
+    text-shadow:0 2px 4px rgba(0,0,0,.03),0 8px 28px rgba(0,85,232,.05);
+    animation:springIn .8s var(--spring) .2s both}}
+.hero h1 em{{font-style:normal;
+    background:linear-gradient(135deg,#0055e8 0%,#7a1eb8 40%,#e04f16 70%,#0055e8 100%);
+    background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    display:inline-block;animation:shimmer 4s linear infinite;
+    filter:drop-shadow(0 4px 8px rgba(0,85,232,.15))}}
+@keyframes shimmer{{0%{{background-position:0% center}}100%{{background-position:300% center}}}}
+.hero .sub{{position:relative;font-size:clamp(15px,1.8vw,18px);color:var(--text2);max-width:540px;margin-bottom:36px;z-index:1;
+    text-shadow:0 1px 2px rgba(0,0,0,.02);animation:fadeSlideUp .6s var(--smooth) .3s both}}
+.hero-stats{{position:relative;display:flex;gap:40px;flex-wrap:wrap;z-index:1}}
+.hero-stat{{animation:springInUp .65s var(--spring) both}}
+.hero-stat:nth-child(1){{animation-delay:.35s}}.hero-stat:nth-child(2){{animation-delay:.42s}}.hero-stat:nth-child(3){{animation-delay:.49s}}.hero-stat:nth-child(4){{animation-delay:.56s}}
+.hero-stat .num{{font-size:38px;font-weight:800;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;color:var(--accent);line-height:1;
+    text-shadow:0 2px 8px rgba(0,85,232,.1);transition:transform .3s var(--spring)}}
+.hero-stat:hover .num{{transform:scale(1.12)}}
+.hero-stat .lbl{{font-size:11px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;
+    text-shadow:0 1px 2px rgba(0,0,0,.02)}}
 
-/* ========== Modal overlay ========== */
-.overlay {{
-  position: fixed; inset: 0; z-index: 999;
-  background: rgba(0,0,0,0.55); backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-}}
-.overlay.show {{ opacity: 1; pointer-events: auto; }}
-.modal {{
-  background: rgba(14, 20, 34, 0.88); border-radius: 24px;
-  width: min(720px, 94vw); max-height: 86vh; overflow-y: auto;
-  border: 1px solid rgba(0,208,255,0.2);
-  box-shadow: 0 0 0 1px rgba(0,208,255,0.04), 0 32px 80px rgba(0,0,0,0.55);
-  transform: translateY(24px) scale(0.96);
-  transition: transform 0.35s var(--ease-smooth);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-}}
-.overlay.show .modal {{ transform: translateY(0) scale(1); }}
-.modal-header {{ padding: 30px 34px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }}
-.modal-header h2 {{ font-size: 21px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.4px; line-height: 1.3; }}
-.modal-close {{
-  width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03); font-size: 15px; cursor: pointer;
-  color: var(--text-secondary); flex-shrink: 0; transition: all 0.2s;
-  display: flex; align-items: center; justify-content: center;
-}}
-.modal-close:hover {{ background: rgba(255,255,255,0.08); color: var(--text-primary); border-color: var(--tech-color); }}
-.modal-body {{ padding: 24px 34px 36px; }}
-.modal-body .sec {{ margin-bottom: 26px; }}
-.modal-body .sec h4 {{
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.5px; color: var(--text-tertiary); margin-bottom: 12px;
-}}
-.modal-body .steps {{
-  background: rgba(255,255,255,0.02); border-radius: 12px;
-  padding: 16px 20px; list-style: none; border: 1px solid rgba(255,255,255,0.04);
-}}
-.modal-body .steps li {{
-  padding: 10px 0; font-size: 14px; line-height: 1.65;
-  border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 8px;
-}}
-.modal-body .steps li:last-child {{ border-bottom: none; }}
-.ref-link {{
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-  border-radius: 10px; background: rgba(255,255,255,0.02);
-  margin-bottom: 6px; text-decoration: none; color: var(--text-primary);
-  transition: all 0.2s; font-size: 13px; border: 1px solid transparent;
-}}
-.ref-link:hover {{ background: rgba(0,208,255,0.06); color: var(--tech-color); border-color: rgba(0,208,255,0.15); }}
-.ref-link .arrow {{ color: var(--text-tertiary); font-size: 13px; transition: all 0.2s; }}
-.ref-link:hover .arrow {{ color: var(--tech-color); transform: translateX(3px); }}
-.ref-note {{ font-size: 11px; color: var(--text-tertiary); margin-left: auto; }}
-.mat-tag {{
-  display: inline-block; padding: 6px 14px; border-radius: 8px;
-  background: rgba(0,208,255,0.08); color: var(--tech-color);
-  font-size: 12px; font-weight: 500; margin: 3px; letter-spacing: -0.1px;
-}}
-.bgm-tip {{
-  margin-top: 12px; padding: 14px 18px; border-radius: 10px;
-  background: rgba(255,169,77,0.06); color: var(--orange);
-  font-size: 13px; display: flex; align-items: center; gap: 8px;
-  border: 1px solid rgba(255,169,77,0.1);
-}}
-.empty-note {{ text-align: center; padding: 24px; color: var(--text-tertiary); font-size: 13px; }}
+/* ═══ Section headers ═══ */
+.sec{{}}
+.sec-hd{{margin-bottom:24px}}
+.sec-hd .kicker{{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--accent);margin-bottom:8px;
+    text-shadow:0 0 18px rgba(0,85,232,.08)}}
+.sec-hd h2{{font-size:clamp(24px,3.2vw,36px);font-weight:800;margin-bottom:4px;
+    text-shadow:0 2px 3px rgba(0,0,0,.03),0 8px 24px rgba(0,85,232,.03)}}
+.sec-hd .sub{{font-size:13px;color:var(--text3);text-shadow:0 1px 1px rgba(0,0,0,.01)}}
+.divider{{width:100%;height:1px;background:var(--border);position:relative;overflow:hidden;margin:16px 0}}
+.divider::after{{content:'';position:absolute;top:0;left:-100%;width:40%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(0,85,232,.12),transparent);
+    animation:dividerShine 5s var(--smooth) infinite}}
+@keyframes dividerShine{{0%{{left:-40%}}100%{{left:140%}}}}
 
-/* ========== Filters ========== */
-.filters {{ display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }}
-.filters select, .filters input {{
-  padding: 9px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
-  background: var(--bg-card); color: var(--text-primary); font-size: 13px;
-  font-family: inherit; outline: none; transition: all 0.2s;
-  backdrop-filter: blur(8px);
+/* ═══ Cards ═══ */
+.card-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}}
+.card{{
+    position:relative;background:var(--card);border-radius:var(--radius);padding:28px 24px 38px;
+    border:1px solid var(--border);overflow:hidden;cursor:pointer;
+    transition:transform .4s var(--spring),box-shadow .4s var(--spring),border-color .3s ease;
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 3px 14px rgba(0,0,0,.03);
+    background-image:radial-gradient(circle at 100% 0%,rgba(0,85,232,.012) 0%,transparent 50%);
+    animation:springInUp .6s var(--spring) both;
 }}
-.filters select:hover, .filters input:hover {{ border-color: rgba(0,208,255,0.2); }}
-.filters select:focus, .filters input:focus {{ border-color: var(--tech-color); box-shadow: 0 0 0 3px rgba(0,208,255,0.1); }}
-.filters input {{ min-width: 170px; }}
-.filters .count {{ font-size: 11px; color: var(--text-tertiary); }}
-.filters select option {{ background: #101622; color: var(--text-primary); }}
+.card:hover{{transform:translateY(-7px) scale(1.02);box-shadow:0 12px 38px rgba(0,85,232,.08),0 3px 10px rgba(0,0,0,.05);border-color:var(--accent)}}
+.card::after{{content:'→';position:absolute;bottom:10px;right:16px;font-size:14px;color:var(--accent);opacity:0;transition:all .3s var(--spring);transform:translateX(-4px);font-weight:700}}
+.card:hover::after{{opacity:1;transform:translateX(0)}}
+.card::before{{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,85,232,.04) 0%,transparent 50%);
+    pointer-events:none;opacity:0;transition:opacity .4s ease;z-index:0}}
+.card:hover::before{{opacity:1}}
+.card>*{{position:relative;z-index:1}}
+.card-bar{{position:absolute;top:0;left:0;right:0;height:3px;z-index:2;transition:height .2s var(--spring)}}
+.card:hover .card-bar{{height:4px}}
+.card-bar.red{{background:var(--red)}}.card-bar.blue{{background:var(--accent)}}.card-bar.purple{{background:var(--purple)}}
+.card-medal{{font-size:26px;position:absolute;top:10px;right:14px;opacity:.1;transition:all .4s var(--spring)}}
+.card:hover .card-medal{{opacity:.28;transform:scale(1.25) rotate(-6deg);filter:drop-shadow(0 4px 6px rgba(0,85,232,.15))}}
+.card .tag{{display:inline-block;padding:2px 10px;border-radius:6px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-bottom:10px}}
+.card .tag.red{{background:rgba(217,45,32,.06);color:var(--red)}}
+.card .tag.blue{{background:rgba(0,85,232,.06);color:var(--accent)}}
+.card .tag.purple{{background:rgba(122,30,184,.06);color:var(--purple)}}
+.card .tag.gray{{background:rgba(0,0,0,.03);color:var(--text3)}}
+.card h3{{font-size:14.5px;font-weight:700;line-height:1.35;margin-bottom:8px;text-shadow:0 1px 2px rgba(0,0,0,.02)}}
+.card .meta{{font-size:11.5px;color:var(--text2)}}
+.card.hidden{{display:none}}
 
-/* ========== Table ========== */
-.tbl-wrap {{
-  border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.06);
-  overflow: hidden; background: var(--bg-card); max-height: 70vh; overflow-y: auto;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+/* ═══ Stage cards ═══ */
+.stage-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}}
+@media(max-width:768px){{.stage-grid{{grid-template-columns:1fr}}}}
+.stage-card{{
+    display:flex;gap:20px;align-items:flex-start;background:var(--card);border-radius:var(--radius);
+    padding:28px 40px 28px 26px;border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;
+    transition:transform .4s var(--spring),box-shadow .4s var(--spring),border-color .3s ease;
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 16px rgba(0,0,0,.03);
+    background-image:linear-gradient(135deg,rgba(0,85,232,.012) 0%,transparent 50%);
 }}
-.tbl-wrap table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
-.tbl-wrap th {{
-  text-align: left; padding: 13px 18px; font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary);
-  background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(0,208,255,0.1);
-  position: sticky; top: 0; z-index: 5;
-}}
-.tbl-wrap td {{ padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,0.03); }}
-.tbl-wrap tr:last-child td {{ border-bottom: none; }}
-.tbl-wrap tr:hover td {{ background: rgba(0,208,255,0.03); }}
-.tbl-wrap .ep {{ font-weight: 700; color: var(--tech-color); }}
-.cal-row {{ cursor: pointer; }}
-.cal-row.hidden {{ display: none; }}
-.pill {{ display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.3px; }}
-.pill-green {{ background: rgba(74,222,128,0.1); color: var(--green); }}
-.pill-blue {{ background: rgba(0,208,255,0.1); color: var(--tech-color); }}
-.pill-purple {{ background: rgba(192,132,252,0.1); color: var(--purple); }}
+.stage-card:hover{{transform:translateY(-5px) scale(1.012);box-shadow:0 12px 36px rgba(0,85,232,.08);border-color:var(--accent)}}
+.stage-card::after{{content:'→';position:absolute;top:50%;right:16px;transform:translateY(-50%) translateX(-4px);font-size:18px;color:var(--accent);opacity:0;transition:all .3s var(--spring);font-weight:700}}
+.stage-card:hover::after{{opacity:1;transform:translateY(-50%) translateX(0)}}
+.stage-num{{font-size:42px;font-weight:900;color:var(--accent);opacity:.05;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;line-height:1;flex-shrink:0;width:48px;text-align:center;transition:all .4s var(--spring);
+    text-shadow:0 0 36px rgba(0,85,232,.25)}}
+.stage-card:hover .stage-num{{opacity:.12;transform:scale(1.18)}}
+.stage-content h4{{font-size:18px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:10px;text-shadow:0 1px 2px rgba(0,0,0,.03)}}
+.stage-content h4 span{{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.2px;padding:2px 10px;border-radius:6px;background:rgba(0,85,232,.04)}}
+.stage-title{{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px}}
+.stage-desc{{font-size:12.5px;color:var(--text3);line-height:1.5}}
+.info-row{{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}}
+@media(max-width:768px){{.info-row{{grid-template-columns:1fr}}}}
+.info-card{{background:var(--card);border-radius:var(--radius);padding:22px 26px;border:1px solid var(--border);font-size:13.5px;color:var(--text2);line-height:1.6;
+    background-image:linear-gradient(135deg,rgba(0,85,232,.01) 0%,transparent 50%);
+    transition:transform .3s var(--spring),box-shadow .3s var(--spring);
+    box-shadow:0 1px 2px rgba(0,0,0,.02),0 3px 12px rgba(0,0,0,.02)}}
+.info-card:hover{{transform:translateY(-2px) scale(1.01);box-shadow:0 6px 24px rgba(0,0,0,.04)}}
+.info-card strong{{color:var(--text);font-weight:700;text-shadow:0 1px 1px rgba(0,0,0,.01)}}
 
-/* ========== Stats page ========== */
-.stats-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }}
-@media (max-width: 768px) {{ .stats-grid {{ grid-template-columns: 1fr; }} }}
-.stat-panel {{
-  background: var(--bg-card); border-radius: var(--radius-lg);
-  border: 1px solid var(--tech-light); padding: 28px 30px;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-}}
-.stat-panel h3 {{ font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; }}
-.bar {{ margin-bottom: 10px; }}
-.bar .row {{ display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }}
-.bar .track {{ height: 5px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }}
-.bar .fill {{
-  height: 100%; border-radius: 3px;
-  transition: width 0.8s var(--ease-smooth);
-  background: linear-gradient(90deg, var(--tech-color), var(--purple));
-}}
+/* ═══ Table ═══ */
+.tbl-wrap{{border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;background:var(--card);max-height:60vh;overflow-y:auto;
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 16px rgba(0,0,0,.03)}}
+.tbl-wrap table{{width:100%;border-collapse:collapse;font-size:13px}}
+.tbl-wrap th{{text-align:left;padding:12px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}}
+.tbl-wrap td{{padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.03)}}
+.tbl-wrap tr:last-child td{{border-bottom:none}}
+.tbl-wrap tr:hover td{{background:rgba(0,85,232,.02)}}
+.tbl-wrap .ep{{font-weight:700;color:var(--accent)}}
+.pill{{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.3px}}
+.pill.green{{background:rgba(24,128,56,.08);color:var(--green)}}
+.pill.blue{{background:rgba(0,85,232,.08);color:var(--accent)}}
+.pill.purple{{background:rgba(122,30,184,.08);color:var(--purple)}}
+.cal-row.hidden{{display:none}}
+.cal-row{{cursor:pointer;transition:background .15s}}
 
-/* ========== Scrollbar ========== */
-.modal::-webkit-scrollbar, .tbl-wrap::-webkit-scrollbar {{ width: 5px; }}
-.modal::-webkit-scrollbar-track, .tbl-wrap::-webkit-scrollbar-track {{ background: transparent; }}
-.modal::-webkit-scrollbar-thumb, .tbl-wrap::-webkit-scrollbar-thumb {{ background: rgba(255,255,255,0.06); border-radius: 3px; }}
-.modal::-webkit-scrollbar-thumb:hover {{ background: rgba(255,255,255,0.12); }}
+/* ═══ Filters ═══ */
+.filters{{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}}
+.filters select,.filters input{{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:all .2s}}
+.filters select:hover,.filters input:hover{{border-color:var(--border2)}}
+.filters select:focus,.filters input:focus{{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,85,232,.06)}}
+.filters input{{min-width:150px}}
+.filters .count{{font-size:11px;color:var(--text3)}}
 
-::selection {{ background: rgba(0,208,255,0.3); color: #fff; }}
+/* ═══ Stats ═══ */
+.stats-grid{{display:grid;grid-template-columns:1fr 1fr;gap:20px}}
+@media(max-width:768px){{.stats-grid{{grid-template-columns:1fr}}}}
+.stat-panel{{background:var(--card);border-radius:var(--radius);padding:28px;border:1px solid var(--border);
+    transition:transform .3s var(--spring),box-shadow .3s var(--spring);
+    box-shadow:0 1px 2px rgba(0,0,0,.02),0 4px 16px rgba(0,0,0,.03);
+    background-image:radial-gradient(circle at 100% 0%,rgba(0,85,232,.01) 0%,transparent 50%)}}
+.stat-panel:hover{{transform:translateY(-2px) scale(1.01);box-shadow:0 8px 28px rgba(0,0,0,.05)}}
+.stat-panel h3{{font-size:16px;font-weight:800;margin-bottom:20px;text-shadow:0 1px 2px rgba(0,0,0,.02)}}
+.bar-row{{display:flex;align-items:center;gap:10px;margin-bottom:9px}}
+.bar-label{{font-size:11.5px;color:var(--text2);min-width:85px;text-align:right;font-weight:600}}
+.bar-track{{flex:1;height:7px;background:rgba(0,0,0,.03);border-radius:4px;overflow:hidden;position:relative;box-shadow:inset 0 1px 3px rgba(0,0,0,.03)}}
+.bar-track::after{{content:'';position:absolute;top:0;left:0;height:100%;width:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
+    animation:barShine 2.5s ease-in-out infinite}}
+@keyframes barShine{{0%{{width:0;left:0}}50%{{width:18%;left:30%}}100%{{width:0;left:100%}}}}
+.bar-fill{{height:100%;border-radius:4px;width:0;transition:width 1.4s var(--spring);
+    background:linear-gradient(90deg,var(--accent),#7a1eb8);box-shadow:0 0 8px rgba(0,85,232,.15)}}
+.bar-fill.r{{background:var(--red);box-shadow:0 0 8px rgba(217,45,32,.12)}}
+.bar-fill.b{{background:var(--accent);box-shadow:0 0 8px rgba(0,85,232,.12)}}
+.bar-fill.pu{{background:var(--purple);box-shadow:0 0 8px rgba(122,30,184,.12)}}
+.bar-num{{font-size:11px;color:var(--text3);min-width:28px;font-weight:600;text-align:left}}
+
+/* ═══ KPI ═══ */
+.kpi-row{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}}
+@media(max-width:768px){{.kpi-row{{grid-template-columns:repeat(2,1fr)}}}}
+.kpi{{background:var(--card);border-radius:var(--radius);padding:26px 18px;border:1px solid var(--border);text-align:center;position:relative;overflow:hidden;
+    transition:transform .3s var(--spring),box-shadow .3s var(--spring);
+    box-shadow:0 1px 2px rgba(0,0,0,.02),0 3px 12px rgba(0,0,0,.03)}}
+.kpi:hover{{transform:translateY(-3px) scale(1.03);box-shadow:0 8px 28px rgba(0,0,0,.05)}}
+.kpi .val{{font-size:44px;font-weight:900;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;position:relative;z-index:1;
+    text-shadow:0 2px 8px rgba(0,85,232,.08)}}
+.kpi .lbl{{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;font-weight:700;position:relative;z-index:1}}
+.kpi-ring{{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;border:2px solid rgba(0,85,232,.04);pointer-events:none;transition:all .4s var(--spring)}}
+.kpi:hover .kpi-ring{{transform:translate(-50%,-50%) scale(1.35);border-color:rgba(0,85,232,.1);border-width:3px}}
+
+/* ═══ Modal ═══ */
+.modal-overlay{{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}}
+.modal-overlay.active{{opacity:1;pointer-events:auto}}
+.modal-box{{background:var(--card);border-radius:var(--radius);max-width:680px;width:92vw;max-height:82vh;overflow-y:auto;padding:40px 36px 32px;position:relative;transform:translateY(35px) scale(.93);transition:transform .4s var(--spring);box-shadow:0 20px 70px rgba(0,0,0,.15)}}
+.modal-overlay.active .modal-box{{transform:translateY(0) scale(1)}}
+.modal-close{{position:absolute;top:14px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .3s var(--spring);box-shadow:0 1px 3px rgba(0,0,0,.03)}}
+.modal-close:hover{{background:var(--bg);color:var(--text);transform:rotate(90deg) scale(1.1)}}
+.modal-tag{{display:inline-block;padding:3px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(0,85,232,.05);color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px;
+    box-shadow:0 1px 3px rgba(0,85,232,.03)}}
+.modal-box h2{{font-size:26px;font-weight:800;margin-bottom:10px;line-height:1.2;text-shadow:0 2px 4px rgba(0,0,0,.03)}}
+.modal-difficulty{{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:20px}}
+.modal-box .ds{{margin-bottom:22px}}
+.modal-box .ds h4{{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:var(--accent);margin-bottom:8px;font-weight:700}}
+.modal-box .ds p,.modal-box .ds ul,.modal-box .ds ol{{font-size:14px;color:var(--text2);line-height:1.75}}
+.modal-box .ds ul,.modal-box .ds ol{{padding-left:18px}}
+.modal-box .ds li{{margin-bottom:6px;font-size:14px;color:var(--text2);line-height:1.65}}
+.bgm-tip{{margin-top:10px;padding:12px 16px;border-radius:10px;background:rgba(224,79,22,.04);color:var(--orange);font-size:13px;display:flex;align-items:center;gap:8px;border:1px solid rgba(224,79,22,.08)}}
+@media(max-width:768px){{.modal-box{{padding:26px 22px 22px;max-width:96vw}}.modal-box h2{{font-size:21px}}}}
+
+/* ═══ Click pulse ═══ */
+@keyframes clickPulse{{0%{{box-shadow:0 0 0 0 rgba(0,85,232,.2)}}70%{{box-shadow:0 0 0 12px rgba(0,85,232,0)}}100%{{box-shadow:0 0 0 0 rgba(0,85,232,0)}}}}
+.card:active,.stage-card:active{{animation:clickPulse .5s ease-out}}
+
+/* ═══ Footer ═══ */
+footer{{padding:32px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}}
+footer span{{color:var(--accent);font-weight:700}}
+
+::-webkit-scrollbar{{width:5px}}::-webkit-scrollbar-track{{background:transparent}}::-webkit-scrollbar-thumb{{background:rgba(0,0,0,.08);border-radius:3px}}
 </style>
 </head>
 <body>
-<div class="scroll-progress"></div>
-<canvas id="particle-canvas"></canvas>
-<div class="cursor-glow"></div>
 
+<canvas id="particles-canvas"></canvas>
+<div class="geo-shapes">
+    <div class="geo circle" style="top:8%;left:5%;width:75px;height:75px"></div>
+    <div class="geo triangle" style="top:28%;right:10%;border-left:32px solid transparent;border-right:32px solid transparent;border-bottom:55px solid;animation-delay:-3s"></div>
+    <div class="geo square" style="top:55%;left:3%;width:40px;height:40px;animation-delay:-7s"></div>
+    <div class="geo dot" style="top:70%;right:8%;width:16px;height:16px;animation-delay:-5s"></div>
+    <div class="geo ring" style="top:18%;left:55%;width:60px;height:60px;animation-delay:-9s"></div>
+    <div class="geo circle" style="top:82%;left:12%;width:45px;height:45px;animation-delay:-2s"></div>
+    <div class="geo triangle" style="top:58%;left:62%;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:36px solid;animation-delay:-11s"></div>
+    <div class="geo dot" style="top:14%;right:32%;width:10px;height:10px;animation-delay:-6s"></div>
+    <div class="geo square" style="top:38%;right:6%;width:32px;height:32px;animation-delay:-4s;border-color:var(--purple)"></div>
+    <div class="geo ring" style="top:75%;left:42%;width:50px;height:50px;animation-delay:-8s"></div>
+</div>
+
+<!-- ═══ Nav ═══ -->
 <nav>
-    <div class="logo"><span class="dot"></span>剪辑选题系统</div>
-    <div class="nav-links">
-        <button class="active" data-panel="today">今日选题</button>
-        <button data-panel="calendar">内容日历</button>
-        <button data-panel="library">选题库</button>
-        <button data-panel="stats">数据</button>
+    <div class="nav-inner">
+        <div class="logo"><span class="dot"></span>剪辑选题系统</div>
+        <div class="tabs">
+            <button class="active" data-panel="today">今日选题</button>
+            <button data-panel="calendar">内容日历</button>
+            <button data-panel="library">选题库</button>
+            <button data-panel="stats">数据</button>
+        </div>
+        <div class="time">{now}</div>
     </div>
-    <div class="time">{now}</div>
 </nav>
 
+<div class="wrap">
 <main>
 
-<!-- ═══ 今日选题 ═══ -->
+<!-- ═══ Today ═══ -->
 <section class="active" id="sec-today">
-    <div class="stats">
-        <div class="stat"><div class="val" style="color:var(--tech-color)">{len(topics)}</div><div class="lbl">总选题</div></div>
-        <div class="stat"><div class="val" style="color:var(--green)">{len(pending)}</div><div class="lbl">待发布</div></div>
-        <div class="stat"><div class="val" style="color:var(--purple)">{len(published)}</div><div class="lbl">已发布</div></div>
-        <div class="stat"><div class="val" style="color:var(--orange)">{len(cal)}</div><div class="lbl">日历规划</div></div>
+    <div class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-glow g1"></div><div class="hero-glow g2"></div>
+        <div class="hero-toy t1"></div><div class="hero-toy t2"></div><div class="hero-toy t3"></div><div class="hero-toy t4"></div>
+        <div class="label">🎬 DAILY TOPIC SYSTEM</div>
+        <h1>拍摄<em>+</em>剪辑<br>选题系统</h1>
+        <p class="sub">每天一个选题 · 从拍到剪全流程 · {total_cal} 期完整规划</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><div class="num" style="color:var(--accent)" data-target="{total}">0</div><div class="lbl">总选题</div></div>
+            <div class="hero-stat"><div class="num" style="color:var(--green)" data-target="{total_pending}">0</div><div class="lbl">待发布</div></div>
+            <div class="hero-stat"><div class="num" style="color:var(--purple)" data-target="{total_pub}">0</div><div class="lbl">已发布</div></div>
+            <div class="hero-stat"><div class="num" style="color:var(--orange)" data-target="11">0</div><div class="lbl">大分类</div></div>
+        </div>
     </div>
-    <div class="sec-head"><h2>🔥 今日推荐</h2><span class="sub">{today}</span></div>
-    <div class="grid" id="today-grid">
-        {today_cards}
-    </div>
+    <div class="divider"></div>
+    <div class="sec-hd" style="margin-top:24px"><div class="kicker">Today's Picks</div><h2>🔥 今日推荐选题</h2><p class="sub">{today} · 点击任意卡片查看完整制作指南</p></div>
+    <div class="card-grid" id="today-grid"></div>
 </section>
 
-<!-- ═══ 内容日历 ═══ -->
+<!-- ═══ Calendar ═══ -->
 <section id="sec-calendar">
-    <div class="sec-head"><h2>🗓️ 200期内容日历</h2></div>
+    <div class="sec-hd" style="padding-top:90px"><div class="kicker">Content Calendar</div><h2>🗓️ 200期内容日历</h2></div>
+    <div class="stage-grid">
+        <div class="stage-card" onclick="filterCalByStage('冷启动期')">
+            <div class="stage-num">01</div><div class="stage-content"><h4>冷启动期<span>第 1–30 期</span></h4><p class="stage-title">剪映基础 + 拍摄入门</p><p class="stage-desc">面向零基础 · 快速上手</p></div>
+        </div>
+        <div class="stage-card" onclick="filterCalByStage('增长期')">
+            <div class="stage-num">02</div><div class="stage-content"><h4>增长期<span>第 31–100 期</span></h4><p class="stage-title">转场 · 卡点 · 调色 · 蒙版</p><p class="stage-desc">系统技能进阶 · 建立专业度</p></div>
+        </div>
+        <div class="stage-card" onclick="filterCalByStage('成熟期')">
+            <div class="stage-num">03</div><div class="stage-content"><h4>成熟期<span>第 101–200 期</span></h4><p class="stage-title">案例实战 + 抠像合成</p><p class="stage-desc">深度壁垒 · IP护城河</p></div>
+        </div>
+    </div>
+    <div class="info-row">
+        <div class="info-card"><strong>📐 内容节奏</strong><br>30% 爆款 · 50% 干货 · 20% 深度</div>
+        <div class="info-card"><strong>⚡ 更新建议</strong><br>前期日更 · 稳定期隔日更 · 提前储备1–2周选题</div>
+    </div>
+    <div class="divider"></div>
     <div class="filters">
-        <select id="f-stage" onchange="filterCal()">
-            <option value="all">全部阶段</option>
-            <option value="冷启动期">冷启动期 1-30</option>
-            <option value="增长期">增长期 31-100</option>
-            <option value="成熟期">成熟期 101-200</option>
-        </select>
-        <select id="f-cal-cat" onchange="filterCal()">
-            <option value="all">全部分类</option>
-            {cat_opts}
-        </select>
+        <select id="f-stage" onchange="filterCal()"><option value="all">全部阶段</option><option value="冷启动期">冷启动期 1-30</option><option value="增长期">增长期 31-100</option><option value="成熟期">成熟期 101-200</option></select>
+        <select id="f-cal-cat" onchange="filterCal()"><option value="all">全部分类</option></select>
         <input type="text" id="f-cal-search" placeholder="搜索标题…" oninput="filterCal()">
-        <span class="count" id="cal-num">{len(cal)} 期</span>
+        <span class="count" id="cal-num">{total_cal} 期</span>
     </div>
-    <div class="tbl-wrap">
-    <table><thead><tr><th>#</th><th>标题</th><th>分类</th><th>难度</th><th>类型</th><th>时长</th><th>阶段</th></tr></thead>
-    <tbody id="cal-tbody">{cal_rows}</tbody></table>
-    </div>
+    <div class="tbl-wrap"><table><thead><tr><th>#</th><th>标题</th><th>分类</th><th>难度</th><th>类型</th><th>时长</th><th>阶段</th></tr></thead>
+    <tbody id="cal-tbody"></tbody></table></div>
 </section>
 
-<!-- ═══ 选题库 ═══ -->
+<!-- ═══ Library ═══ -->
 <section id="sec-library">
-    <div class="sec-head"><h2>📚 全部选题</h2></div>
+    <div class="sec-hd" style="padding-top:90px"><div class="kicker">Full Library</div><h2>📚 全部选题</h2></div>
     <div class="filters">
-        <select id="f-cat" onchange="filterLib()"><option value="all">全部分类</option>{cat_opts}</select>
-        <select id="f-type" onchange="filterLib()">
-            <option value="all">全部类型</option><option value="爆款">🔺 爆款</option><option value="干货">🔸 干货</option><option value="深度">🔹 深度</option>
-        </select>
-        <select id="f-diff" onchange="filterLib()">
-            <option value="all">全部难度</option><option value="1">⭐ 入门</option><option value="2">⭐⭐ 基础</option><option value="3">⭐⭐⭐ 进阶</option><option value="4">⭐⭐⭐⭐ 高级</option><option value="5">⭐⭐⭐⭐⭐ 专家</option>
-        </select>
+        <select id="f-cat" onchange="filterLib()"><option value="all">全部分类</option></select>
+        <select id="f-type" onchange="filterLib()"><option value="all">全部类型</option><option value="爆款">🔺 爆款</option><option value="干货">🔸 干货</option><option value="深度">🔹 深度</option></select>
+        <select id="f-diff" onchange="filterLib()"><option value="all">全部难度</option><option value="1">⭐ 入门</option><option value="2">⭐⭐ 基础</option><option value="3">⭐⭐⭐ 进阶</option><option value="4">⭐⭐⭐⭐ 高级</option><option value="5">⭐⭐⭐⭐⭐ 专家</option></select>
         <input type="text" id="f-search" placeholder="搜索选题…" oninput="filterLib()">
-        <span class="count" id="lib-num">{len(topics)} 条</span>
+        <span class="count" id="lib-num">{total} 条</span>
     </div>
-    <div class="grid" id="lib-grid">
-        {all_cards}
-    </div>
+    <div class="card-grid" id="lib-grid"></div>
 </section>
 
-<!-- ═══ 数据统计 ═══ -->
+<!-- ═══ Stats ═══ -->
 <section id="sec-stats">
-    <div class="sec-head"><h2>📊 数据概览</h2></div>
-    <div class="stats">
-        <div class="stat"><div class="val" style="color:var(--tech-color)">{len(topics)}</div><div class="lbl">总选题</div></div>
-        <div class="stat"><div class="val" style="color:var(--green)">{len(pending)}</div><div class="lbl">待发布</div></div>
-        <div class="stat"><div class="val" style="color:var(--purple)">{len(published)}</div><div class="lbl">已发布</div></div>
-        <div class="stat"><div class="val" style="color:var(--red)">{len(skipped)}</div><div class="lbl">已跳过</div></div>
+    <div class="sec-hd" style="padding-top:90px"><div class="kicker">Statistics</div><h2>📊 数据概览</h2></div>
+    <div class="kpi-row">
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--accent)" data-target="{total}">0</div><div class="lbl">总选题</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--green)" data-target="{total_pending}">0</div><div class="lbl">待发布</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--purple)" data-target="{total_pub}">0</div><div class="lbl">已发布</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--orange)" data-target="{total_cal}">0</div><div class="lbl">日历期数</div></div>
     </div>
-    <div class="stats-grid">
-        <div class="stat-panel"><h3>📂 分类覆盖</h3>{cat_bars}</div>
-        <div class="stat-panel"><h3>📈 内容类型</h3>{type_bars}</div>
+    <div class="stats-grid" style="margin-top:24px">
+        <div class="stat-panel"><h3>📂 分类覆盖</h3><div id="cat-bars"></div></div>
+        <div class="stat-panel"><h3>📈 内容类型</h3><div id="type-bars"></div></div>
     </div>
 </section>
 
 </main>
+</div>
+
+<footer><p>数据截止 {today} · 每日 <span>8:57</span> 自动刷新 · 数据驱动 · 点击卡片查看完整指南</p></footer>
 
 <!-- ═══ Modal ═══ -->
-<div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
-    <div class="modal" id="modal"></div>
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box" id="modal-box"></div>
 </div>
 
 <script>
-// ═══ Scroll progress ═══
-window.addEventListener('scroll', function(){{
-    var p = (document.documentElement.scrollTop / (document.documentElement.scrollHeight - document.documentElement.clientHeight)) * 100;
-    document.querySelector('.scroll-progress').style.width = p + '%';
-}});
+// ═══════════════════ DATA ═══════════════════
+var TOPICS = {topics_json};
+var CALENDAR = {cal_json};
+var PICKS = {picks_json};
+var MEDALS = ["🥇","🥈","🥉","4️⃣","5️⃣"];
+var DIFF_MAP = {{1:"⭐",2:"⭐⭐",3:"⭐⭐⭐",4:"⭐⭐⭐⭐",5:"⭐⭐⭐⭐⭐"}};
+var TYPE_EMOJI = {{"爆款":"🔺","干货":"🔸","深度":"🔹"}};
+var TYPE_COLORS = {{"爆款":"red","干货":"blue","深度":"purple"}};
+var STAGE_COLORS = {{"冷启动期":"green","增长期":"blue","成熟期":"purple"}};
 
-// ═══ Cursor glow ═══
-if(window.innerWidth > 768) {{
-    document.addEventListener('mousemove', function(e){{
-        var g = document.querySelector('.cursor-glow');
-        g.style.left = e.clientX + 'px';
-        g.style.top = e.clientY + 'px';
-    }});
-}}
-
-// ═══ Particle background ═══
+// ═══ Particle canvas ═══
 (function(){{
-    var c = document.getElementById('particle-canvas');
-    var ctx = c.getContext('2d');
-    var w, h, particles = [];
-    function resize() {{ w = c.width = window.innerWidth; h = c.height = window.innerHeight; }}
-    window.addEventListener('resize', resize); resize();
-    var N = window.innerWidth < 768 ? 25 : 55;
-    for(var i=0; i<N; i++) {{
-        particles.push({{
-            x: Math.random()*w, y: Math.random()*h,
-            r: Math.random()*1.2+0.3,
-            sx: (Math.random()-0.5)*0.35,
-            sy: (Math.random()-0.5)*0.35,
-            o: Math.random()*0.35+0.08
-        }});
-    }}
-    function anim() {{
-        ctx.clearRect(0,0,w,h);
-        for(var i=0; i<particles.length; i++) {{
-            var p = particles[i];
-            p.x += p.sx; p.y += p.sy;
-            if(p.x<0||p.x>w) p.sx *= -1;
-            if(p.y<0||p.y>h) p.sy *= -1;
-            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-            ctx.fillStyle = 'rgba(0,208,255,'+p.o+')'; ctx.fill();
-        }}
-        requestAnimationFrame(anim);
-    }}
-    anim();
+    var cv=document.getElementById('particles-canvas'),ctx=cv.getContext('2d'),W,H,pts=[];
+    function rs(){{W=cv.width=window.innerWidth;H=cv.height=document.documentElement.scrollHeight}}
+    rs();window.addEventListener('resize',rs);
+    for(var i=0;i<45;i++)pts.push({{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.5,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,a:Math.random()*.4+.12}});
+    function draw(){{
+        ctx.clearRect(0,0,W,H);
+        for(var i=0;i<pts.length;i++){{var p=pts[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+            ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,85,232,'+p.a+')';ctx.fill()}}
+        for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){{var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+            if(d<110){{ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle='rgba(0,85,232,'+(1-d/110)*.04+')';ctx.lineWidth=.5;ctx.stroke()}}}}
+        requestAnimationFrame(draw);
+    }}draw();
+    var rt;window.addEventListener('scroll',function(){{clearTimeout(rt);rt=setTimeout(function(){{H=cv.height=document.documentElement.scrollHeight}},300)}});
 }})();
 
-// ═══ Navigation ═══
-document.querySelectorAll(".nav-links button").forEach(function(b){{
+// ═══ Card mouse glow ═══
+document.addEventListener('mousemove',function(e){{
+    document.querySelectorAll('.card:hover').forEach(function(c){{
+        var r=c.getBoundingClientRect();c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%')
+    }})
+}});
+
+// ═══ Count-up ═══
+function countUp(el,target,dur){{
+    var s=parseInt(el.textContent)||0,st=null;
+    function step(ts){{if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,4);el.textContent=Math.round(s+(target-s)*e);if(p<1)requestAnimationFrame(step);else el.textContent=target}}
+    requestAnimationFrame(step);
+}}
+
+// ═══ Render card ═══
+function renderCard(t,medal){{
+    var cat=t.category||"",ctype=t.content_type||"干货",diff=t.difficulty||2;
+    var title=t.title||"",dur=t.estimated_duration||"?",viral=t.viral_potential||"中";
+    var tc=TYPE_COLORS[ctype]||"blue",dc=diff<=2?"red":(diff<=3?"blue":"purple");
+    var m=medal?'<span class="card-medal">'+medal+'</span>':'';
+    return'<div class="card" data-id="'+t.id+'" data-cat="'+cat+'" data-type="'+ctype+'" data-diff="'+diff+'" data-title="'+title+'" onclick="openDetail(this)" style="animation-delay:'+(Math.random()*.15).toFixed(3)+'s">'
+    +'<div class="card-bar '+dc+'"></div>'+m
+    +'<span class="tag '+tc+'">'+(TYPE_EMOJI[ctype]||"")+' '+ctype+'</span>'
+    +'<h3>'+title+'</h3>'
+    +'<div class="meta">'+DIFF_MAP[diff]+' · '+dur+' · 涨粉'+viral+'</div>'
+    +'</div>';
+}}
+
+// ═══ Render calendar row ═══
+function renderCalRow(e){{
+    var ep=e.episode||"",title=e.title||"",cat=e.category||"",diff=e.difficulty||2;
+    var ctype=e.content_type||"",dur=e.estimated_duration||"",stage=e.stage||"";
+    var sc=STAGE_COLORS[stage]||"blue";
+    return'<tr class="cal-row" data-cat="'+cat+'" data-stage="'+stage+'" data-title="'+title+'" onclick="openDetailByTitle(\''+title.replace(/'/g,"\\'")+'\')">'
+    +'<td class="ep">#'+ep+'</td><td>'+title+'</td><td>'+cat+'</td><td>'+DIFF_MAP[diff]+'</td><td>'+ctype+'</td><td>'+dur+'</td>'
+    +'<td><span class="pill '+sc+'">'+stage+'</span></td></tr>';
+}}
+
+// ═══ Initial render ═══
+(function init(){{
+    // Today picks
+    var tg=document.getElementById('today-grid');
+    PICKS.forEach(function(t,i){{tg.innerHTML+=renderCard(t,MEDALS[i]||"")}});
+
+    // Calendar
+    var ct=document.getElementById('cal-tbody');
+    CALENDAR.forEach(function(e){{ct.innerHTML+=renderCalRow(e)}});
+
+    // Library
+    var lg=document.getElementById('lib-grid');
+    TOPICS.forEach(function(t){{lg.innerHTML+=renderCard(t)}});
+
+    // Category dropdowns
+    var cats=[];TOPICS.forEach(function(t){{var c=t.category||"";if(cats.indexOf(c)<0)cats.push(c)}});
+    cats.sort();
+    var catOpts=cats.map(function(c){{return'<option value="'+c+'">'+c+'</option>'}}).join('');
+    document.getElementById('f-cal-cat').innerHTML+='<option value="all">全部分类</option>'+catOpts;
+    document.getElementById('f-cat').innerHTML+='<option value="all">全部分类</option>'+catOpts;
+
+    // Stats bars
+    var cc={{}};TOPICS.forEach(function(t){{var c=t.category||"";cc[c]=(cc[c]||0)+1}});
+    var cb=document.getElementById('cat-bars');
+    Object.entries(cc).sort(function(a,b){{return b[1]-a[1]}}).forEach(function(e){{
+        var pct=e[1]/TOPICS.length*100;
+        cb.innerHTML+='<div class="bar-row"><span class="bar-label">'+e[0]+'</span><div class="bar-track"><div class="bar-fill" data-w="'+pct.toFixed(1)+'"></div></div><span class="bar-num">'+e[1]+'</span></div>';
+    }});
+
+    var tc={{}};TOPICS.forEach(function(t){{var ty=t.content_type||"?";tc[ty]=(tc[ty]||0)+1}});
+    var tb=document.getElementById('type-bars');
+    var bc={{"爆款":"r","干货":"b","深度":"pu"}};
+    Object.entries(tc).forEach(function(e){{
+        var pct=e[1]/TOPICS.length*100,klass=bc[e[0]]||"";
+        tb.innerHTML+='<div class="bar-row"><span class="bar-label">'+(TYPE_EMOJI[e[0]]||"")+' '+e[0]+'</span><div class="bar-track"><div class="bar-fill '+klass+'" data-w="'+pct.toFixed(1)+'"></div></div><span class="bar-num">'+e[1]+'</span></div>';
+    }});
+
+    // Count-up
+    setTimeout(function(){{
+        document.querySelectorAll('[data-target]').forEach(function(el){{
+            var t=parseInt(el.getAttribute('data-target'));if(t>0&&!el._done){{el._done=true;countUp(el,t,1800)}}
+        }});
+    }},400);
+
+    // Animate bars on scroll
+    var bo=new IntersectionObserver(function(es){{es.forEach(function(e){{if(e.isIntersecting){{var bars=e.target.querySelectorAll('[data-w]');bars.forEach(function(b,i){{if(!b._done){{b._done=true;setTimeout(function(){{b.style.width=b.getAttribute('data-w')+'%'}},i*50)}}}})}}}})}},{{threshold:.1}});
+    document.querySelectorAll('.stat-panel').forEach(function(p){{bo.observe(p)}});
+    setTimeout(function(){{document.querySelectorAll('.stat-panel').forEach(function(p){{bo.observe(p)}})}},600);
+}})();
+
+// ═══ Nav ═══
+document.querySelectorAll(".tabs button").forEach(function(b){{
     b.onclick=function(){{
-        document.querySelectorAll(".nav-links button").forEach(function(x){{x.classList.remove("active")}});
+        document.querySelectorAll(".tabs button").forEach(function(x){{x.classList.remove("active")}});
         document.querySelectorAll("section").forEach(function(s){{s.classList.remove("active")}});
         b.classList.add("active");
         document.getElementById("sec-"+b.dataset.panel).classList.add("active");
-    }};
+        // Re-trigger bar animations
+        setTimeout(function(){{
+            document.querySelectorAll('.stat-panel [data-w]').forEach(function(b){{if(!b._done){{b._done=true;b.style.width=b.getAttribute('data-w')+'%'}}}})
+        }},300);
+    }}
 }});
 
-// ═══ Calendar Filter ═══
+// ═══ Filters ═══
 function filterCal(){{
-    var stage=document.getElementById("f-stage").value;
-    var cat=document.getElementById("f-cal-cat").value;
-    var q=(document.getElementById("f-cal-search").value||"").toLowerCase();
-    var rows=document.querySelectorAll("#cal-tbody .cal-row");
-    var count=0;
-    rows.forEach(function(r){{
-        var show=true;
-        if(stage!=="all" && r.dataset.stage!==stage) show=false;
-        if(cat!=="all" && r.dataset.cat!==cat) show=false;
-        if(q && r.dataset.title.toLowerCase().indexOf(q)===-1) show=false;
-        r.classList.toggle("hidden",!show);
-        if(show) count++;
+    var stage=document.getElementById("f-stage").value,cat=document.getElementById("f-cal-cat").value;
+    var q=(document.getElementById("f-cal-search").value||"").toLowerCase(),count=0;
+    document.querySelectorAll("#cal-tbody .cal-row").forEach(function(r){{
+        var s=true;if(stage!=="all"&&r.dataset.stage!==stage)s=false;if(cat!=="all"&&r.dataset.cat!==cat)s=false;
+        if(q&&r.dataset.title.toLowerCase().indexOf(q)===-1)s=false;
+        r.classList.toggle("hidden",!s);if(s)count++;
     }});
     document.getElementById("cal-num").textContent=count+" 期";
 }}
 
-// ═══ Library Filter ═══
+function filterCalByStage(stage){{
+    document.querySelectorAll(".tabs button").forEach(function(x){{x.classList.remove("active")}});
+    document.querySelectorAll("section").forEach(function(s){{s.classList.remove("active")}});
+    document.querySelector('[data-panel="calendar"]').classList.add("active");
+    document.getElementById("sec-calendar").classList.add("active");
+    document.getElementById("f-stage").value=stage;filterCal();
+}}
+
 function filterLib(){{
-    var cat=document.getElementById("f-cat").value;
-    var type=document.getElementById("f-type").value;
-    var diff=document.getElementById("f-diff").value;
-    var q=(document.getElementById("f-search").value||"").toLowerCase();
-    var cards=document.querySelectorAll("#lib-grid .card");
-    var count=0;
-    cards.forEach(function(c){{
-        var show=true;
-        if(cat!=="all" && c.dataset.cat!==cat) show=false;
-        if(type!=="all" && c.dataset.type!==type) show=false;
-        if(diff!=="all" && c.dataset.diff!==diff) show=false;
-        if(q && c.dataset.title.toLowerCase().indexOf(q)===-1) show=false;
-        c.classList.toggle("hidden",!show);
-        if(show) count++;
+    var cat=document.getElementById("f-cat").value,type=document.getElementById("f-type").value;
+    var diff=document.getElementById("f-diff").value,q=(document.getElementById("f-search").value||"").toLowerCase(),count=0;
+    document.querySelectorAll("#lib-grid .card").forEach(function(c){{
+        var s=true;if(cat!=="all"&&c.dataset.cat!==cat)s=false;if(type!=="all"&&c.dataset.type!==type)s=false;
+        if(diff!=="all"&&c.dataset.diff!==diff)s=false;
+        if(q&&c.dataset.title.toLowerCase().indexOf(q)===-1)s=false;
+        c.classList.toggle("hidden",!s);if(s)count++;
     }});
     document.getElementById("lib-num").textContent=count+" 条";
 }}
 
-// ═══ Detail Modal ═══
+// ═══ Modal ═══
 function openDetail(card){{
-    var t=card.querySelector(".detail-data");
-    if(!t) return;
-    var title=t.querySelector(".detail-title").textContent;
-    var cat=t.querySelector(".detail-cat").textContent;
-    var ctype=t.querySelector(".detail-type").textContent;
-    var diff=parseInt(t.querySelector(".detail-diff").textContent);
-    var dur=t.querySelector(".detail-dur").textContent;
-    var viral=t.querySelector(".detail-viral").textContent;
-    var prod=t.querySelector(".detail-prod").textContent;
-    var desc=t.querySelector(".detail-desc").textContent;
-    var hook=t.querySelector(".detail-hook").textContent;
-    var steps=t.querySelector(".detail-steps").innerHTML;
-    var ending=t.querySelector(".detail-ending").textContent;
-    var bgm=t.querySelector(".detail-bgm").textContent;
-    var refs=t.querySelector(".detail-refs").innerHTML;
-    var mats=t.querySelector(".detail-mats").innerHTML;
+    var t=TOPICS.find(function(x){{return x.id===card.dataset.id}})||TOPICS.find(function(x){{return x.title===card.dataset.title}});
+    if(!t)return;
+    var cat=t.category||"",ctype=t.content_type||"",diff=t.difficulty||2,title=t.title||"";
+    var dur=t.estimated_duration||"?",viral=t.viral_potential||"中",prod=t.production_time||"?";
+    var desc=t.description||"",mats=t.materials_needed||"";
+    var tc=TYPE_COLORS[ctype]||"blue";
 
-    var DM={{1:"⭐",2:"⭐⭐",3:"⭐⭐⭐",4:"⭐⭐⭐⭐",5:"⭐⭐⭐⭐⭐"}};
-    var TE={{"爆款":"🔺","干货":"🔸","深度":"🔹"}};
-    var tcl=ctype==="爆款"?"tag-red":(ctype==="干货"?"tag-blue":"tag-purple");
-    var dcl=diff<=2?"tag-green":(diff<=3?"tag-orange":"tag-red");
-    var descBlock=desc?'<div class="sec"><h4>💡 内容说明</h4><p style="font-size:14px;color:var(--text-secondary)">'+desc+'</p></div>':'';
+    // Generate script
+    var hook,steps=[],ending,bgm;
+    if(ctype==="爆款"){{
+        hook='「'+(title.split("：")[1]||title)+'」——你是不是也刷到过这种效果？今天30秒教会你。';
+        steps=["📱 打开剪映，导入素材","⚡ 关键操作演示","🎯 微调参数到最佳效果","✨ Before → After 对比展示"];
+        ending="学会了点个赞收藏，下期见！";bgm="节奏卡点BGM（Phut Hon / 病变 Remix）";
+    }}else if(ctype==="深度"){{
+        hook='今天不教单个技巧，带你完整拆解「'+title+'」的全过程。';
+        steps=["📋 前期构思与策划思路","🎥 拍摄现场还原与要点","✂️ 剪辑全流程逐步拆解","📊 成片展示 + 关键技巧复盘"];
+        ending="觉得有用的话点个关注，持续更新深度拆解。";bgm="叙事感配乐（Epidemic Sound 风格）";
+    }}else{{
+        hook="为什么别人的视频那么高级？问题就出在这一步——";
+        steps=["🔍 常见错误：90%的人都做错了","🛠️ 正确方法详解","📐 具体操作演示","✅ 效果对比 + 避坑提醒"];
+        ending="收藏起来慢慢练，关注我每天一个剪辑技巧。";bgm="轻量氛围BGM（Lo-Fi / Jazz Hop）";
+    }}
 
-    document.getElementById("modal").innerHTML=
-        '<div class="modal-header"><div><div class="tags" style="margin-bottom:8px">'+
-        '<span class="tag '+tcl+'">'+(TE[ctype]||"")+" "+ctype+'</span>'+
-        '<span class="tag '+dcl+'">'+(DM[diff]||"⭐⭐")+'</span>'+
-        '<span class="tag tag-gray">'+cat+'</span></div>'+
-        '<h2>'+title+'</h2></div>'+
-        '<button class="modal-close" onclick="closeDetail()">✕</button></div>'+
-        '<div class="modal-body">'+descBlock+
-        '<div class="sec"><h4>✍️ 脚本文案</h4>'+
-        '<div style="font-size:15px;font-weight:500;margin-bottom:12px;line-height:1.5;color:var(--text-primary)">💬 '+hook+'</div>'+
-        '<ol class="steps">'+steps+'</ol>'+
-        '<div style="font-size:14px;color:var(--text-secondary);margin-top:8px">'+ending+'</div>'+
-        '<div class="bgm-tip">🎵 推荐BGM：'+bgm+'</div></div>'+
-        '<div class="sec"><h4>📦 所需素材</h4>'+(mats||'<span style="color:var(--text-tertiary);font-size:13px">无特殊要求</span>')+'</div>'+
-        '<div class="sec"><h4>🔗 对标参考</h4><p style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">以下链接来自真实热门教程，点击可跳转参考</p>'+(refs||'<div class="empty-note">🔍 建议在抖音搜索「'+title+'」找参考</div>')+'</div>'+
-        '<div class="sec"><h4>📋 基本信息</h4>'+
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">'+
-        '<div>⏱ 时长：'+dur+'</div><div>🔥 涨粉潜力：'+viral+'</div>'+
-        '<div>⏳ 制作耗时：'+prod+'</div></div></div></div>';
+    var descBlock=desc?'<div class="ds"><h4>💡 内容说明</h4><p>'+desc+'</p></div>':'';
+    var matTags=mats?mats.replace(/，/g,',').replace(/、/g,',').split(',').map(function(m){{m=m.trim();return m?'<span style="display:inline-block;padding:5px 12px;border-radius:7px;background:rgba(0,85,232,.04);color:var(--accent);font-size:12px;font-weight:600;margin:2px">'+m+'</span>':''}}).join(''):'<span style="font-size:13px;color:var(--text3)">无特殊要求</span>';
 
-    document.getElementById("overlay").classList.add("show");
+    document.getElementById("modal-box").innerHTML=
+        '<button class="modal-close" onclick="closeModal()">✕</button>'
+        +'<div class="modal-tag">'+cat+' · '+ctype+'</div>'
+        +'<h2>'+title+'</h2>'
+        +'<div class="modal-difficulty">'+DIFF_MAP[diff]+' · '+dur+' · 涨粉'+viral+' · 制作'+prod+'</div>'
+        +descBlock
+        +'<div class="ds"><h4>✍️ 脚本文案</h4>'
+        +'<p style="font-size:15px;font-weight:600;margin-bottom:10px;color:var(--text)">💬 '+hook+'</p>'
+        +'<ol style="padding-left:18px">'+steps.map(function(s){{return'<li>'+s+'</li>'}}).join('')+'</ol>'
+        +'<p style="font-size:14px;color:var(--text2);margin-top:8px">'+ending+'</p>'
+        +'<div class="bgm-tip">🎵 推荐BGM：'+bgm+'</div></div>'
+        +'<div class="ds"><h4>📦 所需素材</h4>'+matTags+'</div>';
+    document.getElementById("modal-overlay").classList.add("active");
     document.body.style.overflow="hidden";
 }}
 
 function openDetailByTitle(title){{
     var cards=document.querySelectorAll(".card");
-    for(var i=0;i<cards.length;i++){{
-        if(cards[i].dataset.title===title){{openDetail(cards[i]);return;}}
-    }}
+    for(var i=0;i<cards.length;i++){{if(cards[i].dataset.title===title){{openDetail(cards[i]);return}}}}
 }}
 
-function closeDetail(){{
-    document.getElementById("overlay").classList.remove("show");
-    document.body.style.overflow="";
-}}
-document.addEventListener("keydown",function(e){{if(e.key==="Escape")closeDetail()}});
+function closeModal(){{document.getElementById("modal-overlay").classList.remove("active");document.body.style.overflow=""}}
+document.addEventListener("keydown",function(e){{if(e.key==="Escape")closeModal()}});
 </script>
 </body>
 </html>'''
 
+   # ═══════════ 写入 ═══════════
+    for path in [HTML_PATH, INDEX_PATH]:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(page)
 
-
-    with open(HTML,"w",encoding="utf-8") as f:
-        f.write(page)
-
-    print(f"✅ 仪表盘已生成：{HTML}")
-    print(f"   大小：{len(page.encode('utf-8'))/1024:.1f} KB")
-    print(f"   今日推荐 {len(picks)} 条 | 题库 {len(topics)} 条 | 日历 {len(cal)} 期")
-
+    size_kb = len(page.encode("utf-8")) / 1024
+    print(f"✅ MG 动效仪表盘已生成")
+    print(f"   📊 {HTML_PATH}")
+    print(f"   🌐 {INDEX_PATH}")
+    print(f"   大小：{size_kb:.1f} KB")
+    print(f"   今日推荐 {len(picks)} 条 | 题库 {total} 条 | 日历 {total_cal} 期")
 
 if __name__ == "__main__":
     build()

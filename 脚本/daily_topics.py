@@ -347,7 +347,7 @@ def run_daily():
     print("🎨 正在刷新可视化仪表盘...")
     try:
         import generate_dashboard
-        generate_dashboard.main()
+        generate_dashboard.build()
         dashboard_path = os.path.join(BASE_DIR, "仪表盘.html")
         print(f"   📊 仪表盘：{dashboard_path}")
     except Exception as e:
