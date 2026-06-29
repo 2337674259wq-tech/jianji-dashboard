@@ -376,7 +376,7 @@ footer a:hover{text-decoration:underline}
             <button data-panel="stats">数据</button>
             <button data-panel="inspire">💡 灵感</button>
         </div>
-        <div class="time">2026-06-29 11:42</div>
+        <div class="time">2026-06-29 11:57</div>
     </div>
 </nav>
 
@@ -499,7 +499,8 @@ footer a:hover{text-decoration:underline}
 
     <div class="search-wrap">
         <span class="search-icon">💭</span>
-        <input type="text" id="inspire-search" placeholder="描述你的想法，回车搜索匹配选题…" onkeydown="if(event.key==='Enter')inspireSearch()">
+        <input type="text" id="inspire-search" placeholder="🤖 描述想法，让AI找选题… 比如「很酷的转场」「Vlog怎么拍」" onkeydown="if(event.key==='Enter'){var q=this.value;if(q)askAssistant(q)}">
+    <div style="text-align:center;padding:8px 0 6px"><button onclick="var q=document.getElementById('inspire-search').value;if(!q){var ex=['转场特效','调色教程','Vlog拍摄','蒙版抠图','卡点剪辑'];q=ex[Math.floor(Math.random()*ex.length)];document.getElementById('inspire-search').value=q}askAssistant(q)" style="padding:9px 22px;border-radius:10px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer;font-weight:600;font-size:13px;font-family:inherit;transition:all .2s var(--spring)">🤖 点我随机选题 / 输入想法搜索</button></div>
     </div>
 
     <div class="sec-hd" style="margin-bottom:14px"><h2>🎲 随机选题组合</h2><p class="sub">点击刷新，看看有什么新灵感</p></div>
@@ -515,7 +516,7 @@ footer a:hover{text-decoration:underline}
 </main>
 </div>
 
-<footer><p>数据截止 2026-06-29 · 每日 <span>8:57</span> 自动刷新 · <a href="#" onclick="resetPicks()">重置今日推荐</a> · 灵感来源：王松傲寒 · 宋叔都会了 · 南门录像厅 · 四维像素 · 陶阿狗君 · 几何生长 · 百万剪辑狮</p></footer>
+<footer><p>数据截止 2026-06-29 · 每日 <span>8:57</span> 自动刷新 · <a href="#" onclick="resetPicks()">重置今日推荐</a> · <a href="#" onclick="var ex=['转场','调色','Vlog','蒙版','卡点'];var q=ex[Math.floor(Math.random()*ex.length)];askAssistant(q);return false">🤖 AI助手</a> · 灵感来源：王松傲寒 · 宋叔都会了 · 南门录像厅 · 四维像素 · 陶阿狗君 · 几何生长 · 百万剪辑狮</p></footer>
 
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal-box" id="modal-box"></div>
@@ -532,6 +533,7 @@ footer a:hover{text-decoration:underline}
 document.addEventListener('DOMContentLoaded',function(){
 try{
 var TOPICS=JSON.parse(document.getElementById('data-topics').textContent);
+    var navBtns=document.querySelectorAll('.tabs button');
 var CALENDAR=JSON.parse(document.getElementById('data-calendar').textContent);
 var PICKS=JSON.parse(document.getElementById('data-picks').textContent);
 var STATS=JSON.parse(document.getElementById('data-stats').textContent);
@@ -710,7 +712,7 @@ refreshCombo();
 /* ── Search suggestions ── */
 function searchSuggest(q){
     var ss=document.getElementById('search-suggestions');
-    if(!q||q.length<1){ss.classList.remove('active');return}
+    if(!q||q.length<1){ss.innerHTML='<div class="item" style="color:var(--text3);cursor:default;font-size:12px;padding:8px 16px">💡 试试搜索：转场 ｜ 调色 ｜ Vlog ｜ 蒙版 ｜ 卡点 ｜ 拍摄技巧</div>';ss.classList.add('active');return}
     var ql=q.toLowerCase();
     var matches=[];
     for(var i=0;i<TOPICS.length;i++){
@@ -800,32 +802,6 @@ var barObserver=new IntersectionObserver(function(entries){
 var panels=document.querySelectorAll('.stat-panel');
 for(var i=0;i<panels.length;i++)barObserver.observe(panels[i]);
 
-/* ═══ Nav ═══ */
-document.querySelectorAll('.tabs button').forEach(function(b){
-    b.onclick=function(){
-        document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('active')});
-        document.querySelectorAll('section').forEach(function(s){s.classList.remove('active')});
-        b.classList.add('active');
-        var sec=document.getElementById('sec-'+b.dataset.panel);
-        if(sec)sec.classList.add('active');
-        if(b.dataset.panel==='stats'){
-            setTimeout(function(){
-                var allBars=document.querySelectorAll('#sec-stats [data-w]');
-                for(var i=0;i<allBars.length;i++)(function(b2,d){setTimeout(function(){b2.style.width=b2.getAttribute('data-w')+'%'},d)})(allBars[i],i*45);
-            },400);
-        }
-    };
-});
-
-/* ═══ Filters ═══ */
-function filterCal(){
-    var stage=document.getElementById('f-stage').value,cat=document.getElementById('f-cal-cat').value;
-    var q=(document.getElementById('f-cal-search').value||'').toLowerCase(),count=0;
-    document.querySelectorAll('#cal-tbody .cal-row').forEach(function(r){
-        var s=true;if(stage!=='all'&&r.dataset.stage!==stage)s=false;if(cat!=='all'&&r.dataset.cat!==cat)s=false;
-        if(q&&r.dataset.title.toLowerCase().indexOf(q)===-1)s=false;
-        r.classList.toggle('hidden',!s);if(s)count++;
-    });
     document.getElementById('cal-num').textContent=count+' 期';
 }
 
@@ -984,6 +960,47 @@ document.addEventListener('mousemove',function(e){
 });
 
 console.log('✅ Dashboard v3: '+TOPICS.length+' topics, '+CALENDAR.length+' calendar, '+PICKS.length+' picks, '+Object.keys(BLOGGERS).length+' blogger refs');
+    /* ═══ Nav ═══ */
+    for(var ni=0;ni<navBtns.length;ni++){(function(b){b.onclick=function(){
+        for(var j=0;j<navBtns.length;j++)navBtns[j].classList.remove('active');
+        var allSecs=document.querySelectorAll('section');
+        for(var k=0;k<allSecs.length;k++)allSecs[k].classList.remove('active');
+        this.classList.add('active');
+        var sec=document.getElementById('sec-'+this.dataset.panel);
+        if(sec)sec.classList.add('active');
+        if(this.dataset.panel==='stats'){
+            setTimeout(function(){
+                var allBars=document.querySelectorAll('#sec-stats [data-w]');
+                for(var bi=0;bi<allBars.length;bi++)(function(b2,d){setTimeout(function(){b2.style.width=b2.getAttribute('data-w')+'%'},d)})(allBars[bi],bi*45);
+            },400);
+        }
+    }})(navBtns[ni]);}
+
+    /* Smart Assistant */
+    window.askAssistant=function(q){
+        if(!q||q.length<2)return;
+        var ql=q.toLowerCase();
+        var matches=[];
+        for(var i=0;i<TOPICS.length;i++){
+            var t=TOPICS[i],title=(t.title||'').toLowerCase(),desc=(t.description||'').toLowerCase(),cat=(t.category||'').toLowerCase();
+            var words=ql.split(/\s+/);var score=0;
+            for(var w=0;w<words.length;w++){if(words[w].length<2)continue;if(title.indexOf(words[w])>=0)score+=10;if(desc.indexOf(words[w])>=0)score+=5;if(cat.indexOf(words[w])>=0)score+=4}
+            if(score>0)matches.push({t:t,score:score});
+        }
+        matches.sort(function(a,b){return b.score-a.score});
+        var html='<button class="modal-close" onclick="closeModal()">&#10005;</button><div class="modal-tag">&#x1F916; AI选题助手</div>';
+        if(!matches.length){
+            html+='<h2>未找到匹配选题</h2><p style="color:var(--text3);margin:12px 0;line-height:1.8">试试搜索：<br>&#x1F947; <b>转场</b> — 20期特效<br>&#x1F948; <b>调色</b> — 24期教程<br>&#x1F949; <b>Vlog</b> — 全流程<br>&#x1F50D; <b>蒙版</b> <b>卡点</b> <b>拍摄</b> <b>抠像</b>...</p>';
+        }else{
+            html+='<h2>&#x1F50D; 找到 '+matches.length+' 个选题</h2>';
+            html+='<div class="card-grid" style="margin-top:16px">';
+            for(var i=0;i<Math.min(matches.length,6);i++)html+=renderCard(matches[i].t,i<3?['&#x1F947;','&#x1F948;','&#x1F949;'][i]:'');
+            html+='</div>';
+        }
+        document.getElementById('modal-box').innerHTML=html;
+        document.getElementById('modal-overlay').classList.add('active');
+        document.body.style.overflow='hidden';
+    };
 }catch(e){console.error('Dashboard init error:',e)}
 });
 </script>

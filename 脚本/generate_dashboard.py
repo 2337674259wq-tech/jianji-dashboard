@@ -590,6 +590,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 document.addEventListener('DOMContentLoaded',function(){
 try{
 var TOPICS=JSON.parse(document.getElementById('data-topics').textContent);
+    var navBtns=document.querySelectorAll('.tabs button');
 var CALENDAR=JSON.parse(document.getElementById('data-calendar').textContent);
 var PICKS=JSON.parse(document.getElementById('data-picks').textContent);
 var STATS=JSON.parse(document.getElementById('data-stats').textContent);
@@ -858,32 +859,6 @@ var barObserver=new IntersectionObserver(function(entries){
 var panels=document.querySelectorAll('.stat-panel');
 for(var i=0;i<panels.length;i++)barObserver.observe(panels[i]);
 
-/* ═══ Nav ═══ */
-document.querySelectorAll('.tabs button').forEach(function(b){
-    b.onclick=function(){
-        document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('active')});
-        document.querySelectorAll('section').forEach(function(s){s.classList.remove('active')});
-        b.classList.add('active');
-        var sec=document.getElementById('sec-'+b.dataset.panel);
-        if(sec)sec.classList.add('active');
-        if(b.dataset.panel==='stats'){
-            setTimeout(function(){
-                var allBars=document.querySelectorAll('#sec-stats [data-w]');
-                for(var i=0;i<allBars.length;i++)(function(b2,d){setTimeout(function(){b2.style.width=b2.getAttribute('data-w')+'%'},d)})(allBars[i],i*45);
-            },400);
-        }
-    };
-});
-
-/* ═══ Filters ═══ */
-function filterCal(){
-    var stage=document.getElementById('f-stage').value,cat=document.getElementById('f-cal-cat').value;
-    var q=(document.getElementById('f-cal-search').value||'').toLowerCase(),count=0;
-    document.querySelectorAll('#cal-tbody .cal-row').forEach(function(r){
-        var s=true;if(stage!=='all'&&r.dataset.stage!==stage)s=false;if(cat!=='all'&&r.dataset.cat!==cat)s=false;
-        if(q&&r.dataset.title.toLowerCase().indexOf(q)===-1)s=false;
-        r.classList.toggle('hidden',!s);if(s)count++;
-    });
     document.getElementById('cal-num').textContent=count+' 期';
 }
 
@@ -1042,6 +1017,21 @@ document.addEventListener('mousemove',function(e){
 });
 
 console.log('✅ Dashboard v3: '+TOPICS.length+' topics, '+CALENDAR.length+' calendar, '+PICKS.length+' picks, '+Object.keys(BLOGGERS).length+' blogger refs');
+    /* ═══ Nav ═══ */
+    for(var ni=0;ni<navBtns.length;ni++){(function(b){b.onclick=function(){
+        for(var j=0;j<navBtns.length;j++)navBtns[j].classList.remove('active');
+        var allSecs=document.querySelectorAll('section');
+        for(var k=0;k<allSecs.length;k++)allSecs[k].classList.remove('active');
+        this.classList.add('active');
+        var sec=document.getElementById('sec-'+this.dataset.panel);
+        if(sec)sec.classList.add('active');
+        if(this.dataset.panel==='stats'){
+            setTimeout(function(){
+                var allBars=document.querySelectorAll('#sec-stats [data-w]');
+                for(var bi=0;bi<allBars.length;bi++)(function(b2,d){setTimeout(function(){b2.style.width=b2.getAttribute('data-w')+'%'},d)})(allBars[bi],bi*45);
+            },400);
+        }
+    }})(navBtns[ni]);}
 }catch(e){console.error('Dashboard init error:',e)}
 });
 </script>
