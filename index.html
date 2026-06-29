@@ -123,7 +123,7 @@ nav .time{font-size:11px;color:var(--text3)}
 .tc-item.s3{font-size:16px;background:rgba(0,85,232,.08);color:var(--accent);font-weight:800}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(6px)}
 .modal-overlay.active{opacity:1;pointer-events:auto}
-.modal-box{background:var(--card);border-radius:var(--radius);max-width:720px;width:92vw;max-height:84vh;overflow-y:auto;padding:44px 40px 36px;position:relative;transform:translateY(40px) scale(.9);transition:transform .5s var(--extreme);box-shadow:0 24px 80px rgba(0,0,0,.18)}
+.modal-box{background:var(--card);border-radius:var(--radius);max-width:720px;width:92vw;max-height:84vh;overflow-y:auto;padding:44px 40px 36px;position:relative;transform:translateY(16px) scale(.97);transition:transform .4s var(--smooth);box-shadow:0 20px 60px rgba(0,0,0,.14)}
 .modal-overlay.active .modal-box{transform:translateY(0) scale(1)}
 .modal-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text3)}
 .modal-close:hover{background:var(--bg);color:var(--text);transform:rotate(90deg)}
@@ -159,7 +159,7 @@ footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent
 <button data-panel="library">选题库</button>
 <button data-panel="stats">数据</button>
 <button data-panel="inspire">灵感</button>
-</div><div class="time">2026-06-29 14:51</div></div></nav>
+</div><div class="time">2026-06-29 15:01</div></div></nav>
 <div class="wrap"><main>
 <section class="active" id="sec-today">
 <div class="hero"><div class="hero-bg"></div><div class="hero-glow g1"></div><div class="hero-glow g2"></div>
@@ -346,6 +346,10 @@ function runAI(){
     else{h+="<h2>找到 "+matches.length+" 个选题</h2><div class=card-grid style=margin-top:16px>";for(var i=0;i<Math.min(matches.length,6);i++)h+=cardHTML(matches[i].t,i<3?["🥇","🥈","🥉"][i]:"");h+="</div>";}
     D.getElementById("modal-box").innerHTML=h;D.getElementById("modal-overlay").classList.add("active");D.body.style.overflow="hidden";
 }
+
+/* Expose handlers globally for inline onclick */
+window.openCard=openCard;window.openByTitle=openByTitle;window.closeModal=closeModal;
+window.runAI=runAI;window.switchTab=switchTab;window.filterCal=filterCal;window.filterLib=filterLib;
 
 /* COUNTUP */
 setTimeout(function(){
