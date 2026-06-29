@@ -163,6 +163,52 @@ TOPIC_SEEDS = {
         {"title": "一条视频从0到发布的全过程（含脚本/拍摄/剪辑）", "diff": 3, "type": "深度", "duration": "5min", "viral": "中", "time": "4h", "desc": "最完整的创作流程展示", "materials": "完整创作过程记录"},
         {"title": "普通人拍视频最容易犯的10个错误（合集修正）", "diff": 2, "type": "干货", "duration": "4min", "viral": "高", "time": "3h", "desc": "错误合集容易引发共鸣和讨论", "materials": "常见错误案例+正确示范"},
     ],
+
+    "AE动效制作": [
+        {"title": "AE界面速览：和剪映有什么不同？", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "1h", "desc": "从剪映过渡到AE的第一课", "materials": "AE软件截图"},
+        {"title": "AE关键帧入门：比剪映强在哪", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "关键帧是AE的灵魂，从入门到理解", "materials": "AE关键帧演示"},
+        {"title": "PS人偶导出+AE动起来：30秒炸裂效果", "diff": 3, "type": "爆款", "duration": "30s", "viral": "高", "time": "2h", "desc": "DUIK骨骼绑定让静态角色动起来，视觉冲击强", "materials": "PS分层人偶素材+AE"},
+        {"title": "AE轨道遮罩：比剪映蒙版强10倍", "diff": 3, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "遮罩是AE的核心，做文字透出/画面过渡", "materials": "AE遮罩演示素材"},
+        {"title": "AE实景合成：把假东西放进真实画面", "diff": 4, "type": "爆款", "duration": "35s", "viral": "高", "time": "3h", "desc": "摄像机跟踪+3D合成，效果炸裂", "materials": "实拍素材+合成元素"},
+        {"title": "AE粒子特效：3步做出流星/光晕/烟雾", "diff": 3, "type": "爆款", "duration": "25s", "viral": "高", "time": "2h", "desc": "粒子是涨粉利器，视觉冲击力极强", "materials": "AE Particular插件"},
+        {"title": "AE文字动画：比剪映花字高级10倍", "diff": 3, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "MG文字动画让标题活起来", "materials": "AE文字层+动画预设"},
+        {"title": "匀速转场vs AE缓入缓出：丝滑的秘诀", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "速度曲线是高级感的来源", "materials": "对比素材"},
+        {"title": "AE抠像：绿幕+头发丝级别精细抠图", "diff": 4, "type": "干货", "duration": "3min", "viral": "中", "time": "2h", "desc": "Keylight+蒙版精细处理", "materials": "绿幕素材"},
+        {"title": "AE摄像机：让2D图片有3D空间感", "diff": 3, "type": "爆款", "duration": "25s", "viral": "高", "time": "1.5h", "desc": "摄像机推拉+3D图层=伪3D效果", "materials": "高清图片+AE"},
+        {"title": "AE+剪映工作流：什么时候用哪个", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "不是替代关系，是互补关系", "materials": "同一案例的剪映版和AE版对比"},
+        {"title": "AE Wiggle表达式：让画面自然抖动", "diff": 3, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "一行代码让画面有手持感", "materials": "AE表达式演示"},
+        {"title": "AE换天/换背景：3分钟把阴天变日落", "diff": 3, "type": "爆款", "duration": "25s", "viral": "高", "time": "1.5h", "desc": "环境替换是爆款密码", "materials": "实拍素材+天空素材"},
+        {"title": "拆解：四维像素/陶阿狗君的一个效果怎么做的", "diff": 4, "type": "深度", "duration": "4min", "viral": "高", "time": "3h", "desc": "对标账号拆解，借流量+展示实力", "materials": "陶阿狗君视频+AE工程"},
+        {"title": "AE模板的正确用法：不改就套=白花钱", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "模板是起点不是终点", "materials": "AE模板文件"},
+    ],
+
+    "视听语言&蒙太奇": [
+        {"title": "什么是蒙太奇？3分钟讲清楚", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "1h", "desc": "影视学问翻译成人话第一课", "materials": "经典电影片段"},
+        {"title": "库里肖夫效应：两个镜头顺序决定情绪", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "镜头顺序比单镜头内容更重要", "materials": "同镜头不同顺序对比"},
+        {"title": "180度法则：拍对话别再跳轴了", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "最常犯的错误，一分钟纠正", "materials": "越轴/正轴对比素材"},
+        {"title": "景别的秘密：远全中近特什么时候用", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "景别用对了，Vlog瞬间有电影感", "materials": "5种景别对比素材"},
+        {"title": "正反打镜头：最基础的对话拍摄公式", "diff": 1, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "拍Vlog对话必学的万能公式", "materials": "两人对话拍摄素材"},
+        {"title": "希区柯克变焦：手机也能拍的电影级效果", "diff": 2, "type": "爆款", "duration": "20s", "viral": "高", "time": "1h", "desc": "推拉同时变焦，视觉冲击力极强", "materials": "手机+变焦拍摄素材"},
+        {"title": "剪辑节奏：为什么你的视频让人想划走", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "画面切换频率和信息密度的关系", "materials": "快/慢节奏对比素材"},
+        {"title": "交叉蒙太奇：同时讲两条线让观众停不下来", "diff": 3, "type": "干货", "duration": "3min", "viral": "中", "time": "2h", "desc": "双线叙事是完播率神器", "materials": "双线叙事案例"},
+        {"title": "跳切的正确用法：故意打破连贯反而更高级", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "跳切不是剪辑失误，是风格", "materials": "跳切案例"},
+        {"title": "匹配剪辑：用画面相似性做无缝过渡", "diff": 2, "type": "爆款", "duration": "25s", "viral": "高", "time": "1h", "desc": "形状/颜色/运动匹配=丝滑转场", "materials": "匹配剪辑案例"},
+        {"title": "声音蒙太奇：画面没变，声音变了就是另一个意思", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "声音比画面更能操控情绪", "materials": "同画面不同声音对比"},
+        {"title": "长镜头：一镜到底的拍摄和后期秘密", "diff": 3, "type": "干货", "duration": "3min", "viral": "中", "time": "2h", "desc": "前期运镜+后期遮罩缝合", "materials": "长镜头拍摄+后期工程"},
+    ],
+
+    "Vlog实战": [
+        {"title": "Vlog叙事结构：3种万能开头模板", "diff": 1, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "勾起好奇心的开头决定完播率", "materials": "3种开头案例"},
+        {"title": "日常Vlog怎么拍才不无聊：5个B-roll思路", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "2h", "desc": "B-roll是Vlog质感的来源", "materials": "日常场景B-roll示例"},
+        {"title": "拍Vlog的器材最低配置：一部手机就够了", "diff": 1, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "降低门槛，别让人以为要买很多设备", "materials": "手机+简单配件"},
+        {"title": "Vlog转场思路：不用特效也丝滑", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1.5h", "desc": "拍摄时就想好转场，后期省事", "materials": "Vlog转场案例"},
+        {"title": "声音设计：Vlog里的环境音怎么录怎么用", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "1.5h", "desc": "声音是Vlog被忽略的维度", "materials": "环境音录制示例"},
+        {"title": "旅行Vlog：从拍到剪的完整思路", "diff": 3, "type": "深度", "duration": "5min", "viral": "中", "time": "4h", "desc": "旅行最容易产出爆款Vlog", "materials": "旅行素材库"},
+        {"title": "探店Vlog：3个机位让食物拍出高级感", "diff": 2, "type": "干货", "duration": "2min", "viral": "中", "time": "1.5h", "desc": "美食探店是Vlog热门赛道", "materials": "美食探店素材"},
+        {"title": "一条Vlog的完整工作流：从拍到剪到发布", "diff": 2, "type": "深度", "duration": "5min", "viral": "中", "time": "3h", "desc": "全流程透明展示，建立信任", "materials": "完整Vlog创作过程"},
+        {"title": "Vlog封面的3种设计思路：点击率翻倍", "diff": 1, "type": "干货", "duration": "2min", "viral": "中", "time": "1h", "desc": "封面是Vlog的第一张脸", "materials": "封面设计案例"},
+        {"title": "慢生活Vlog：怎么把普通日子拍出治愈感", "diff": 2, "type": "干货", "duration": "3min", "viral": "中", "time": "2h", "desc": "慢生活是Vlog的稳定流量池", "materials": "治愈系Vlog案例"},
+    ],
 }
 
 
@@ -182,41 +228,49 @@ def generate_calendar(total_episodes: int = 200) -> list:
     calendar = []
 
     # 按阶段规划分类权重
-    stage_1_cats = {  # 第1-30期：基础为主
-        "剪映基础操作": 12,
-        "拍摄技巧": 6,
-        "热门跟拍": 3,
+    stage_1_cats = {  # 第1-30期：剪映打地基，穿插视听/Vlog
+        "剪映基础操作": 10,
+        "拍摄技巧": 5,
+        "视听语言&蒙太奇": 3,
+        "Vlog实战": 2,
+        "热门跟拍": 2,
         "卡点节奏": 2,
         "转场特效": 2,
         "音频处理": 2,
-        "调色教程": 2,
+        "调色教程": 1,
         "文字动画": 1,
     }
 
-    stage_2_cats = {  # 第31-100期：进阶为主
-        "转场特效": 10,
-        "卡点节奏": 8,
-        "调色教程": 12,
-        "文字动画": 8,
-        "音频处理": 8,
+    stage_2_cats = {  # 第31-100期：剪映进阶为主，AE小试牛刀
+        "转场特效": 8,
+        "卡点节奏": 7,
+        "调色教程": 9,
+        "文字动画": 7,
+        "音频处理": 6,
         "蒙版&关键帧": 6,
-        "拍摄技巧": 8,
-        "热门跟拍": 5,
-        "抠像&合成": 3,
-        "案例实战": 2,
+        "拍摄技巧": 6,
+        "AE动效制作": 6,
+        "视听语言&蒙太奇": 4,
+        "Vlog实战": 4,
+        "热门跟拍": 4,
+        "抠像&合成": 2,
+        "案例实战": 1,
     }
 
-    stage_3_cats = {  # 第101-200期：深度为主
-        "蒙版&关键帧": 15,
+    stage_3_cats = {  # 第101-200期：剪映深度技巧 + AE进阶 + 全链路
+        "蒙版&关键帧": 12,
         "抠像&合成": 12,
         "调色教程": 10,
-        "案例实战": 20,
-        "拍摄技巧": 15,
-        "转场特效": 8,
+        "案例实战": 10,
+        "拍摄技巧": 10,
+        "AE动效制作": 10,
+        "视听语言&蒙太奇": 6,
+        "Vlog实战": 6,
+        "转场特效": 6,
         "文字动画": 6,
         "卡点节奏": 5,
-        "热门跟拍": 5,
-        "音频处理": 4,
+        "热门跟拍": 4,
+        "音频处理": 3,
     }
 
     def pick_topics_from_category(category: str, count: int, used_titles: set) -> list:
