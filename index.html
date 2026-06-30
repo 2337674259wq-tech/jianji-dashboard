@@ -1,415 +1,981 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>剪辑选题系统</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🎬 剪辑选题系统</title>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-    --bg:#f6f7fa;--card:#fff;--text:#111318;--text2:#555a66;--text3:#8a8e9a;
-    --border:#e5e7ed;--accent:#0055e8;--red:#d92d20;--orange:#e04f16;--green:#188038;--purple:#7a1eb8;
-    --radius:16px;--spring:cubic-bezier(0.34,1.56,0.64,1);--extreme:cubic-bezier(0.34,1.56,0.64,1);--smooth:cubic-bezier(0.22,0.61,0.36,1);
+    --bg:#f6f7fa;--card:#fff;
+    --text:#111318;--text2:#555a66;--text3:#8a8e9a;
+    --border:#e5e7ed;--border2:#dcdde6;
+    --accent:#0055e8;--accent2:#003bb5;
+    --red:#d92d20;--orange:#e04f16;--green:#188038;--purple:#7a1eb8;
+    --radius:16px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.04);
+    --shadow:0 2px 8px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.04);
+    --shadow-lg:0 8px 30px rgba(0,0,0,.07),0 20px 60px rgba(0,0,0,.04);
+    --extreme:cubic-bezier(0.68,-0.80,0.27,1.80);
+    --spring:cubic-bezier(0.34,1.56,0.64,1);
+    --smooth:cubic-bezier(0.22,0.61,0.36,1);
     font-family:"Segoe UI Variable Text","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
-    background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;
+    background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;
+    cursor:default;
 }
-h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif}
-#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.45}
+h1,h2,h3,h4{font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;letter-spacing:-.025em}
+
+/* ═══ Canvas layers ═══ */
+#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35}
+#cursor-trail{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+
+/* ═══ Floating geometry - more and wilder ═══ */
 .geo-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.geo{position:absolute;animation:geoFloat 11s var(--extreme) infinite}
-@keyframes geoFloat{0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}20%{transform:translate(50px,-70px) rotate(100deg) scale(1.5)}40%{transform:translate(-30px,-140px) rotate(200deg) scale(.7)}60%{transform:translate(-60px,-40px) rotate(300deg) scale(1.3)}80%{transform:translate(40px,-100px) rotate(20deg) scale(.8)}}
-.geo.circle{border-radius:50%;border:3px solid var(--accent)}
-.geo.square{border-radius:8px;border:3px solid var(--purple)}
+.geo{position:absolute;animation:geoFloat 12s var(--extreme) infinite}
+@keyframes geoFloat{
+    0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}
+    15%{transform:translate(40px,-60px) rotate(90deg) scale(1.4)}
+    30%{transform:translate(-25px,-120px) rotate(180deg) scale(.7)}
+    50%{transform:translate(-50px,-30px) rotate(270deg) scale(1.25)}
+    70%{transform:translate(30px,-90px) rotate(330deg) scale(.8)}
+    85%{transform:translate(15px,-15px) rotate(30deg) scale(1.3)}
+}
+.geo.circle{border-radius:50%;border:2px solid var(--accent)}
+.geo.square{border-radius:6px;border:2px solid var(--purple);transform-origin:center}
 .geo.dot{border-radius:50%;background:var(--accent)!important;border:none!important}
-.geo.ring{border-radius:50%;border:3px dashed var(--accent);background:none!important}
-.geo.tri{width:0!important;height:0!important;border-left:22px solid transparent!important;border-right:22px solid transparent!important;border-bottom:38px solid var(--accent)!important;background:none!important;border-radius:0!important;border-top:none!important}
+.geo.ring{border-radius:50%;border:2px dashed var(--accent);background:none!important}
+.geo.tri{width:0!important;height:0!important;border:none!important;border-left:18px solid transparent;border-right:18px solid transparent;border-bottom:32px solid var(--accent);background:none!important}
+
+/* ═══ SVG geometric characters ═══ */
+.geo-char{position:fixed;pointer-events:none;z-index:0;animation:charFloat 10s var(--extreme) infinite;opacity:.08}
+@keyframes charFloat{
+    0%,100%{transform:translate(0,0) rotate(0deg)}
+    25%{transform:translate(30px,-50px) rotate(15deg)}
+    50%{transform:translate(-20px,-90px) rotate(-10deg)}
+    75%{transform:translate(-40px,-30px) rotate(5deg)}
+}
+.geo-char svg{width:100%;height:100%}
+
+/* ═══ Aggressive spring keyframes ═══ */
 @keyframes megaSpring{0%{opacity:0;transform:scale(.15) translateY(80px) rotate(-10deg)}50%{opacity:1;transform:scale(1.12) translateY(-10px) rotate(3deg)}70%{transform:scale(.9) translateY(4px) rotate(-2deg)}85%{transform:scale(1.04) translateY(-2px) rotate(1deg)}100%{opacity:1;transform:scale(1) translateY(0) rotate(0deg)}}
 @keyframes springInUp{0%{opacity:0;transform:translateY(60px) scale(.7)}55%{opacity:1;transform:translateY(-12px) scale(1.06)}75%{transform:translateY(5px) scale(.95)}90%{transform:translateY(-3px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes fadeSlideUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
-@keyframes shimmer{0%{background-position:0% center}100%{background-position:300% center}}
-@keyframes glowFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,-40px) scale(1.3)}66%{transform:translate(-40px,20px) scale(.75)}}
-@keyframes toyBounce{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-65px) rotate(80deg)}50%{transform:translateY(-20px) rotate(160deg)}75%{transform:translateY(-50px) rotate(240deg)}}
-@keyframes toySpin{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.5)}100%{transform:rotate(360deg) scale(1)}}
-@keyframes dividerShine{0%{left:-40%}100%{left:140%}}
-@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:.5}}
-@keyframes clickPulse{0%{box-shadow:0 0 0 0 rgba(0,85,232,.25)}70%{box-shadow:0 0 0 16px rgba(0,85,232,0)}100%{box-shadow:0 0 0 0 rgba(0,85,232,0)}}
-section{display:none;animation:fadeSlideUp .4s var(--smooth);padding:0 0 60px}
+@keyframes popIn{0%{opacity:0;transform:scale(0)}60%{opacity:1;transform:scale(1.2)}80%{transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+
+/* ═══ Page transition ═══ */
+@keyframes pageEnter{0%{opacity:0;filter:blur(8px);transform:scale(.97)}100%{opacity:1;filter:blur(0);transform:scale(1)}}
+section{display:none;animation:pageEnter .5s var(--spring);padding:0 0 60px}
 section.active{display:block}
+
+/* ═══ Layout ═══ */
 .wrap{max-width:1240px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
-nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(246,247,250,.85);border-bottom:1px solid var(--border);padding:12px 0}
+
+/* ═══ Nav ═══ */
+nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    background:rgba(246,247,250,.85);border-bottom:1px solid var(--border);padding:12px 0}
 nav .nav-inner{max-width:1240px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between}
-nav .logo{font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px}
+nav .logo{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
 nav .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 16px rgba(0,85,232,.35);animation:pulse-dot 2s var(--smooth) infinite}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:.5}}
 nav .tabs{display:flex;gap:4px;background:rgba(0,0,0,.025);border-radius:10px;padding:3px}
-nav .tabs button{border:none;background:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .25s var(--spring);font-family:inherit}
+nav .tabs button{border:none;background:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .25s var(--spring);font-family:inherit;position:relative}
 nav .tabs button:hover{color:var(--text)}
-nav .tabs button.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.06)}
-nav .time{font-size:11px;color:var(--text3)}
+nav .tabs button.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.06);transform:scale(1.04)}
+nav .tabs button .badge{position:absolute;top:-4px;right:-6px;background:var(--red);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:700;animation:popIn .4s var(--spring) .2s both}
+nav .time{font-size:11px;color:var(--text3);letter-spacing:.5px;font-feature-settings:"tnum"}
 @media(max-width:768px){nav .time{display:none}nav .tabs button{padding:6px 11px;font-size:11px}}
-.hero{position:relative;padding:90px 0 56px}
-.hero-bg{position:absolute;inset:-80px -50px;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 35% at 45% 0%,rgba(0,85,232,.05) 0%,transparent 60%),radial-gradient(ellipse 28% 35% at 80% 100%,rgba(122,30,184,.03) 0%,transparent 50%)}
-.hero-glow{position:absolute;width:700px;height:700px;border-radius:50%;filter:blur(160px);opacity:.07;pointer-events:none;z-index:0;animation:glowFloat 10s var(--smooth) infinite}
-.hero-glow.g1{top:-350px;left:5%;background:radial-gradient(circle,#0055e8,transparent 70%)}
-.hero-glow.g2{top:5%;right:-250px;background:radial-gradient(circle,#7a1eb8,transparent 70%);animation-delay:-5s}
+
+/* ═══ Hero ═══ */
+.hero{position:relative;padding:90px 0 56px;overflow:visible}
+.hero-bg{position:absolute;inset:-80px -50px;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 55% 35% at 45% 0%,rgba(0,85,232,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 28% 35% at 80% 100%,rgba(122,30,184,.03) 0%,transparent 50%)}
+.hero-glow{position:absolute;width:600px;height:600px;border-radius:50%;filter:blur(150px);opacity:.06;pointer-events:none;z-index:0;animation:glowFloat 10s var(--smooth) infinite}
+.hero-glow.g1{top:-300px;left:5%;background:radial-gradient(circle,#0055e8,transparent 70%)}
+.hero-glow.g2{top:5%;right:-200px;background:radial-gradient(circle,#7a1eb8,transparent 70%);animation-delay:-5s}
+@keyframes glowFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,-35px) scale(1.25)}66%{transform:translate(-30px,18px) scale(.8)}}
 .hero-toy{position:absolute;pointer-events:none;z-index:0}
-.hero-toy.t1{top:15%;left:6%;width:80px;height:80px;border:4px solid var(--accent);border-radius:50%;opacity:.08;animation:toyBounce 7s var(--extreme) infinite}
-.hero-toy.t2{top:38%;right:10%;width:55px;height:55px;background:var(--accent);border-radius:12px;opacity:.06;animation:toyBounce 9s var(--extreme) infinite;transform:rotate(45deg);animation-delay:-3s}
-.hero-toy.t3{bottom:18%;left:16%;width:70px;height:70px;border:4px dashed var(--purple);border-radius:50%;opacity:.06;animation:toySpin 11s linear infinite}
-.hero .label{position:relative;display:inline-block;padding:6px 22px;border-radius:24px;background:rgba(0,85,232,.05);color:var(--accent);font-size:12px;font-weight:700;letter-spacing:1px;margin-bottom:24px;z-index:1}
-.hero h1{position:relative;font-size:clamp(42px,6vw,76px);font-weight:900;line-height:1.06;margin-bottom:18px;z-index:1;text-shadow:0 2px 5px rgba(0,0,0,.03)}
-.hero h1 em{font-style:normal;background:linear-gradient(135deg,#0055e8 0%,#7a1eb8 35%,#e04f16 65%,#0055e8 100%);background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;animation:shimmer 3.5s linear infinite}
-.hero .sub{position:relative;font-size:clamp(15px,1.8vw,18px);color:var(--text2);max-width:560px;margin-bottom:42px;z-index:1}
+.hero-toy.t1{top:15%;left:6%;width:60px;height:60px;border:3px solid var(--accent);border-radius:50%;opacity:.05;animation:toyBounce 7s var(--extreme) infinite}
+.hero-toy.t2{top:38%;right:10%;width:42px;height:42px;background:var(--accent);border-radius:10px;opacity:.03;animation:toyBounce 9s var(--extreme) infinite;transform:rotate(45deg);animation-delay:-3s}
+.hero-toy.t3{bottom:18%;left:16%;width:50px;height:50px;border:3px dashed var(--purple);border-radius:50%;opacity:.04;animation:toySpin 11s linear infinite}
+.hero-toy.t4{top:20%;right:25%;width:24px;height:24px;background:var(--purple);border-radius:50%;opacity:.025;animation:toyBounce 6s var(--extreme) infinite;animation-delay:-5s}
+@keyframes toyBounce{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-55px) rotate(70deg)}50%{transform:translateY(-15px) rotate(140deg)}75%{transform:translateY(-40px) rotate(210deg)}}
+@keyframes toySpin{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.45)}100%{transform:rotate(360deg) scale(1)}}
+
+.hero .label{position:relative;display:inline-block;padding:6px 22px;border-radius:24px;background:rgba(0,85,232,.05);color:var(--accent);font-size:12px;font-weight:700;letter-spacing:1px;margin-bottom:24px;z-index:1;
+    text-shadow:0 0 20px rgba(0,85,232,.08);box-shadow:0 2px 14px rgba(0,85,232,.04),inset 0 1px 0 rgba(255,255,255,.5);
+    animation:megaSpring .9s var(--extreme) .1s both}
+.hero h1{position:relative;font-size:clamp(42px,6vw,76px);font-weight:900;line-height:1.06;margin-bottom:18px;z-index:1;
+    text-shadow:0 2px 5px rgba(0,0,0,.03),0 10px 35px rgba(0,85,232,.06);
+    animation:megaSpring 1s var(--extreme) .2s both}
+.hero h1 em{font-style:normal;
+    background:linear-gradient(135deg,#0055e8 0%,#7a1eb8 35%,#e04f16 65%,#0055e8 100%);
+    background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    display:inline-block;animation:shimmer 3.5s linear infinite;
+    filter:drop-shadow(0 6px 12px rgba(0,85,232,.2))}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:300% center}}
+.hero .sub{position:relative;font-size:clamp(15px,1.8vw,18px);color:var(--text2);max-width:560px;margin-bottom:42px;z-index:1;
+    text-shadow:0 1px 2px rgba(0,0,0,.02);animation:fadeSlideUp .7s var(--smooth) .35s both}
 .hero-stats{position:relative;display:flex;gap:44px;flex-wrap:wrap;z-index:1}
-.hero-stat .num{font-size:42px;font-weight:900;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;line-height:1;transition:transform .3s var(--extreme)}
+.hero-stat{animation:springInUp .7s var(--extreme) both}
+.hero-stat:nth-child(1){animation-delay:.4s}.hero-stat:nth-child(2){animation-delay:.48s}.hero-stat:nth-child(3){animation-delay:.56s}.hero-stat:nth-child(4){animation-delay:.64s}
+.hero-stat .num{font-size:42px;font-weight:900;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;line-height:1;
+    text-shadow:0 3px 10px rgba(0,85,232,.12);transition:transform .3s var(--extreme);font-feature-settings:"tnum"}
 .hero-stat:hover .num{transform:scale(1.18) rotate(-2deg)}
 .hero-stat .lbl{font-size:11.5px;color:var(--text3);margin-top:7px;text-transform:uppercase;letter-spacing:.8px;font-weight:700}
+
+/* ═══ Section headers ═══ */
 .sec-hd{margin-bottom:28px}
-.sec-hd .kicker{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:8px}
-.sec-hd h2{font-size:clamp(24px,3.2vw,38px);font-weight:800;margin-bottom:4px}
+.sec-hd .kicker{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:8px;
+    text-shadow:0 0 20px rgba(0,85,232,.06)}
+.sec-hd h2{font-size:clamp(24px,3.2vw,38px);font-weight:800;margin-bottom:4px;
+    text-shadow:0 2px 4px rgba(0,0,0,.03),0 8px 28px rgba(0,85,232,.03)}
 .sec-hd .sub{font-size:13px;color:var(--text3)}
 .divider{width:100%;height:1px;background:var(--border);position:relative;overflow:hidden;margin:20px 0}
-.divider::after{content:'';position:absolute;top:0;left:-100%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,85,232,.14),transparent);animation:dividerShine 4s var(--smooth) infinite}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.card{position:relative;background:var(--card);border-radius:var(--radius);padding:30px 26px 40px;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:transform .5s var(--extreme),box-shadow .5s var(--extreme),border-color .3s ease;box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 18px rgba(0,0,0,.03);animation:springInUp .7s var(--extreme) both}
-.card:hover{transform:translateY(-10px) scale(1.03);box-shadow:0 16px 48px rgba(0,85,232,.12);border-color:var(--accent);z-index:5}
-.card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,85,232,.06) 0%,transparent 50%);pointer-events:none;opacity:0;transition:opacity .4s ease;z-index:0}
+.divider::after{content:'';position:absolute;top:0;left:-100%;width:40%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(0,85,232,.14),transparent);
+    animation:dividerShine 4s var(--smooth) infinite}
+@keyframes dividerShine{0%{left:-40%}100%{left:140%}}
+
+/* ═══ Search ═══ */
+.search-wrap{position:relative;margin-bottom:20px;max-width:500px}
+.search-wrap input{width:100%;padding:12px 18px 12px 44px;border-radius:12px;border:1px solid var(--border);background:var(--card);font-size:14px;font-family:inherit;outline:none;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.02)}
+.search-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(0,85,232,.06)}
+.search-wrap .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.search-suggestions{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);z-index:50;max-height:240px;overflow-y:auto;display:none;margin-top:4px}
+.search-suggestions.active{display:block;animation:popIn .3s var(--spring)}
+.search-suggestions .item{padding:10px 16px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(0,0,0,.03);transition:background .15s}
+.search-suggestions .item:hover,.search-suggestions .item.focus{background:rgba(0,85,232,.04)}
+.search-suggestions .item .hl{color:var(--accent);font-weight:600}
+.search-suggestions .item .cat{font-size:10px;color:var(--text3);margin-left:8px}
+
+/* ═══ Cards ═══ */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;perspective:1000px}
+.card{
+    position:relative;background:var(--card);border-radius:var(--radius);padding:30px 26px 40px;
+    border:1px solid var(--border);overflow:hidden;cursor:pointer;
+    transition:transform .5s var(--extreme),box-shadow .5s var(--extreme),border-color .3s ease;
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 18px rgba(0,0,0,.03);
+    background-image:radial-gradient(circle at 100% 0%,rgba(0,85,232,.012) 0%,transparent 50%);
+    animation:springInUp .7s var(--extreme) both;
+    transform-style:preserve-3d;
+}
+.card:hover{transform:translateY(-10px) scale(1.03);box-shadow:0 16px 48px rgba(0,85,232,.12),0 4px 12px rgba(0,0,0,.06);border-color:var(--accent);z-index:5}
+.card::after{content:'→';position:absolute;bottom:12px;right:18px;font-size:15px;color:var(--accent);opacity:0;transition:all .3s var(--extreme);transform:translateX(-8px);font-weight:700}
+.card:hover::after{opacity:1;transform:translateX(0)}
+.card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,85,232,.06) 0%,transparent 50%);
+    pointer-events:none;opacity:0;transition:opacity .4s ease;z-index:0}
 .card:hover::before{opacity:1}
 .card>*{position:relative;z-index:1}
 .card-bar{position:absolute;top:0;left:0;right:0;height:3px;z-index:2;transition:height .2s var(--extreme)}
 .card:hover .card-bar{height:5px}
 .card-bar.r{background:var(--red)}.card-bar.b{background:var(--accent)}.card-bar.pu{background:var(--purple)}
-.card-medal{font-size:28px;position:absolute;top:12px;right:16px;opacity:.12;transition:all .5s var(--extreme)}
-.card:hover .card-medal{opacity:.35;transform:scale(1.4) rotate(-10deg)}
+.card-medal{font-size:28px;position:absolute;top:12px;right:16px;opacity:.1;transition:all .5s var(--extreme)}
+.card:hover .card-medal{opacity:.3;transform:scale(1.35) rotate(-10deg);filter:drop-shadow(0 6px 10px rgba(0,85,232,.18))}
 .card .tag{display:inline-block;padding:2px 10px;border-radius:6px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-bottom:10px}
-.card .tag.r{background:rgba(217,45,32,.06);color:var(--red)}.card .tag.b{background:rgba(0,85,232,.06);color:var(--accent)}.card .tag.pu{background:rgba(122,30,184,.06);color:var(--purple)}
-.card h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:10px}
-.card .meta{font-size:11.5px;color:var(--text2)}.card.hidden{display:none}
-.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}@media(max-width:768px){.stage-grid{grid-template-columns:1fr}}
-.stage-card{display:flex;gap:22px;align-items:flex-start;background:var(--card);border-radius:var(--radius);padding:30px 44px 30px 28px;border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;transition:transform .5s var(--extreme),box-shadow .5s var(--extreme);box-shadow:0 1px 3px rgba(0,0,0,.02),0 6px 22px rgba(0,0,0,.03)}
+.card .tag.r{background:rgba(217,45,32,.06);color:var(--red)}.card .tag.b{background:rgba(0,85,232,.06);color:var(--accent)}.card .tag.pu{background:rgba(122,30,184,.06);color:var(--purple)}.card .tag.gray{background:rgba(0,0,0,.03);color:var(--text3)}
+.card h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:10px;text-shadow:0 1px 2px rgba(0,0,0,.02)}
+.card .meta{font-size:11.5px;color:var(--text2)}
+.card .desc{font-size:12px;color:var(--text3);margin-top:6px;line-height:1.4}
+.card.hidden{display:none}
+
+/* ═══ Stage cards ═══ */
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:768px){.stage-grid{grid-template-columns:1fr}}
+.stage-card{
+    display:flex;gap:22px;align-items:flex-start;background:var(--card);border-radius:var(--radius);
+    padding:30px 44px 30px 28px;border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;
+    transition:transform .5s var(--extreme),box-shadow .5s var(--extreme),border-color .3s ease;
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 6px 22px rgba(0,0,0,.03);
+    background-image:linear-gradient(135deg,rgba(0,85,232,.012) 0%,transparent 50%);
+}
 .stage-card:hover{transform:translateY(-8px) scale(1.015);box-shadow:0 16px 48px rgba(0,85,232,.1);border-color:var(--accent)}
-.stage-num{font-size:48px;font-weight:900;color:var(--accent);opacity:.05;line-height:1;flex-shrink:0;width:52px;text-align:center;transition:all .5s var(--extreme)}
-.stage-card:hover .stage-num{opacity:.15;transform:scale(1.25)}
-.stage-content h4{font-size:19px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px}
-.stage-content h4 span{font-size:12px;font-weight:600;color:var(--accent);padding:2px 10px;border-radius:6px;background:rgba(0,85,232,.04)}
-.stage-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px}.stage-desc{font-size:13px;color:var(--text3)}
-.info-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}@media(max-width:768px){.info-row{grid-template-columns:1fr}}
-.info-card{background:var(--card);border-radius:var(--radius);padding:24px 28px;border:1px solid var(--border);font-size:13.5px;color:var(--text2);line-height:1.7}
-.tbl-wrap{border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;background:var(--card);max-height:60vh;overflow-y:auto}
+.stage-card::after{content:'→';position:absolute;top:50%;right:18px;transform:translateY(-50%) translateX(-6px);font-size:20px;color:var(--accent);opacity:0;transition:all .3s var(--extreme);font-weight:700}
+.stage-card:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
+.stage-num{font-size:48px;font-weight:900;color:var(--accent);opacity:.05;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;line-height:1;flex-shrink:0;width:52px;text-align:center;transition:all .5s var(--extreme);
+    text-shadow:0 0 40px rgba(0,85,232,.3)}
+.stage-card:hover .stage-num{opacity:.14;transform:scale(1.25)}
+.stage-content h4{font-size:19px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px;text-shadow:0 1px 3px rgba(0,0,0,.03)}
+.stage-content h4 span{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.3px;padding:2px 10px;border-radius:6px;background:rgba(0,85,232,.04)}
+.stage-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px}
+.stage-desc{font-size:13px;color:var(--text3);line-height:1.5}
+.stage-count{font-size:22px;font-weight:800;color:var(--accent);margin-top:8px}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+@media(max-width:768px){.info-row{grid-template-columns:1fr}}
+.info-card{background:var(--card);border-radius:var(--radius);padding:24px 28px;border:1px solid var(--border);font-size:13.5px;color:var(--text2);line-height:1.7;
+    background-image:linear-gradient(135deg,rgba(0,85,232,.01) 0%,transparent 50%);
+    transition:transform .3s var(--extreme),box-shadow .3s var(--extreme);
+    box-shadow:0 1px 2px rgba(0,0,0,.02),0 3px 14px rgba(0,0,0,.02)}
+.info-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 30px rgba(0,0,0,.05)}
+.info-card strong{color:var(--text);font-weight:700;text-shadow:0 1px 1px rgba(0,0,0,.01)}
+
+/* ═══ Table ═══ */
+.tbl-wrap{border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;background:var(--card);max-height:60vh;overflow-y:auto;
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 6px 22px rgba(0,0,0,.03)}
 .tbl-wrap table{width:100%;border-collapse:collapse;font-size:13px}
-.tbl-wrap th{text-align:left;padding:13px 18px;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
-.tbl-wrap td{padding:13px 18px;border-bottom:1px solid rgba(0,0,0,.03)}.tbl-wrap tr:hover td{background:rgba(0,85,232,.02)}
-.tbl-wrap .ep{font-weight:700;color:var(--accent)}.cal-row.hidden{display:none}.cal-row{cursor:pointer}
-.pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:600}
+.tbl-wrap th{text-align:left;padding:13px 18px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.tbl-wrap td{padding:13px 18px;border-bottom:1px solid rgba(0,0,0,.03)}
+.tbl-wrap tr:last-child td{border-bottom:none}
+.tbl-wrap tr:hover td{background:rgba(0,85,232,.02)}
+.tbl-wrap .ep{font-weight:700;color:var(--accent)}
+.pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.3px}
 .pill.green{background:rgba(24,128,56,.08);color:var(--green)}.pill.blue{background:rgba(0,85,232,.08);color:var(--accent)}.pill.purple{background:rgba(122,30,184,.08);color:var(--purple)}
+.cal-row.hidden{display:none}.cal-row{cursor:pointer;transition:background .15s}
+
+/* ═══ Filters ═══ */
 .filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.filters select,.filters input{padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none}
-.filters input{min-width:150px}.filters .count{font-size:11px;color:var(--text3);margin-left:auto}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}@media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
-.stat-panel{background:var(--card);border-radius:var(--radius);padding:30px;border:1px solid var(--border)}
-.stat-panel h3{font-size:16px;font-weight:800;margin-bottom:22px}
+.filters select,.filters input{padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:all .2s}
+.filters select:hover,.filters input:hover{border-color:var(--border2)}
+.filters select:focus,.filters input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,85,232,.06)}
+.filters input{min-width:150px}
+.filters .count{font-size:11px;color:var(--text3);margin-left:auto}
+
+/* ═══ Stats ═══ */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
+.stat-panel{background:var(--card);border-radius:var(--radius);padding:30px;border:1px solid var(--border);
+    transition:transform .3s var(--extreme),box-shadow .3s var(--extreme);
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 6px 20px rgba(0,0,0,.03);
+    background-image:radial-gradient(circle at 100% 0%,rgba(0,85,232,.01) 0%,transparent 50%)}
+.stat-panel:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 10px 38px rgba(0,0,0,.06)}
+.stat-panel h3{font-size:16px;font-weight:800;margin-bottom:22px;text-shadow:0 1px 3px rgba(0,0,0,.02)}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .bar-label{font-size:11.5px;color:var(--text2);min-width:90px;text-align:right;font-weight:600}
-.bar-track{flex:1;height:8px;background:rgba(0,0,0,.03);border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.8s var(--extreme);background:linear-gradient(90deg,var(--accent),#7a1eb8)}
-.bar-fill.r{background:var(--red)}.bar-fill.b{background:var(--accent)}.bar-fill.pu{background:var(--purple)}
-.bar-num{font-size:11px;color:var(--text3);min-width:30px;font-weight:600}
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--card);border-radius:var(--radius);padding:30px 20px;border:1px solid var(--border);text-align:center}
-.kpi .val{font-size:50px;font-weight:900}
+.bar-track{flex:1;height:8px;background:rgba(0,0,0,.03);border-radius:4px;overflow:hidden;position:relative;box-shadow:inset 0 1px 3px rgba(0,0,0,.03)}
+.bar-track::after{content:'';position:absolute;top:0;left:0;height:100%;width:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);
+    animation:barShine 2.5s ease-in-out infinite}
+@keyframes barShine{0%{width:0;left:0}50%{width:18%;left:30%}100%{width:0;left:100%}}
+.bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.8s var(--extreme);
+    background:linear-gradient(90deg,var(--accent),#7a1eb8);box-shadow:0 0 10px rgba(0,85,232,.2)}
+.bar-fill.r{background:var(--red);box-shadow:0 0 10px rgba(217,45,32,.15)}.bar-fill.b{background:var(--accent);box-shadow:0 0 10px rgba(0,85,232,.15)}.bar-fill.pu{background:var(--purple);box-shadow:0 0 10px rgba(122,30,184,.15)}
+.bar-num{font-size:11px;color:var(--text3);min-width:30px;font-weight:600;text-align:left}
+
+/* ═══ KPI ═══ */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border-radius:var(--radius);padding:30px 20px;border:1px solid var(--border);text-align:center;position:relative;overflow:hidden;
+    transition:transform .35s var(--extreme),box-shadow .35s var(--extreme);
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 16px rgba(0,0,0,.03)}
+.kpi:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 12px 38px rgba(0,0,0,.06)}
+.kpi .val{font-size:50px;font-weight:900;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;position:relative;z-index:1;
+    text-shadow:0 2px 12px rgba(0,85,232,.1);font-feature-settings:"tnum"}
+.kpi .lbl{font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:5px;font-weight:700;position:relative;z-index:1}
+.kpi-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90px;height:90px;border-radius:50%;border:2px solid rgba(0,85,232,.04);pointer-events:none;transition:all .5s var(--extreme)}
+.kpi:hover .kpi-ring{transform:translate(-50%,-50%) scale(1.45);border-color:rgba(0,85,232,.12);border-width:3px}
+
+/* ═══ Tag cloud ═══ */
 .tag-cloud{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:20px 0}
-.tc-item{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s var(--extreme)}
-.tc-item:hover{transform:scale(1.1) translateY(-3px)}
-.tc-item.s1{font-size:12px;background:rgba(0,85,232,.04);color:var(--accent)}
-.tc-item.s2{font-size:14px;background:rgba(0,85,232,.06);color:var(--accent);font-weight:700}
-.tc-item.s3{font-size:16px;background:rgba(0,85,232,.08);color:var(--accent);font-weight:800}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(6px)}
+.tag-cloud .tc-item{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s var(--extreme);border:1px solid transparent}
+.tag-cloud .tc-item:hover{transform:scale(1.08) translateY(-2px)}
+.tag-cloud .tc-item.size1{font-size:12px;background:rgba(0,85,232,.04);color:var(--accent)}
+.tag-cloud .tc-item.size2{font-size:14px;background:rgba(0,85,232,.06);color:var(--accent);font-weight:700}
+.tag-cloud .tc-item.size3{font-size:16px;background:rgba(0,85,232,.08);color:var(--accent);font-weight:800;box-shadow:0 2px 8px rgba(0,85,232,.06)}
+
+/* ═══ Quick ref cards ═══ */
+.quick-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:16px}
+.quick-card{background:var(--card);border-radius:var(--radius);padding:22px 24px;border:1px solid var(--border);cursor:pointer;transition:all .3s var(--extreme);
+    box-shadow:0 1px 2px rgba(0,0,0,.02),0 3px 12px rgba(0,0,0,.02);
+    background-image:linear-gradient(135deg,rgba(0,85,232,.008) 0%,transparent 50%)}
+.quick-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 28px rgba(0,85,232,.06);border-color:var(--accent)}
+.quick-card .emoji{font-size:28px;margin-bottom:10px}
+.quick-card h4{font-size:15px;font-weight:700;margin-bottom:6px}
+.quick-card p{font-size:12.5px;color:var(--text3);line-height:1.5}
+
+/* ═══ Publish tracker ═══ */
+.pub-tracker{background:var(--card);border-radius:var(--radius);padding:24px 28px;border:1px solid var(--border);margin-bottom:20px;
+    box-shadow:0 1px 3px rgba(0,0,0,.02),0 4px 16px rgba(0,0,0,.03)}
+.pub-tracker h3{font-size:16px;font-weight:800;margin-bottom:14px}
+.pub-stats{display:flex;gap:30px;flex-wrap:wrap}
+.pub-stat{text-align:center}
+.pub-stat .n{font-size:36px;font-weight:900;font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC",sans-serif;font-feature-settings:"tnum"}
+.pub-stat .l{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.pub-bar-track{height:6px;background:rgba(0,0,0,.04);border-radius:3px;margin-top:14px;overflow:hidden}
+.pub-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--green));width:0%;transition:width 1.5s var(--extreme)}
+
+/* ═══ Modal ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.38);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .modal-overlay.active{opacity:1;pointer-events:auto}
 .modal-box{background:var(--card);border-radius:var(--radius);max-width:720px;width:92vw;max-height:84vh;overflow-y:auto;padding:44px 40px 36px;position:relative;transform:translateY(40px) scale(.9);transition:transform .5s var(--extreme);box-shadow:0 24px 80px rgba(0,0,0,.18)}
 .modal-overlay.active .modal-box{transform:translateY(0) scale(1)}
-.modal-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text3)}
-.modal-close:hover{background:var(--bg);color:var(--text);transform:rotate(90deg)}
-.modal-tag{display:inline-block;padding:4px 14px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(0,85,232,.05);color:var(--accent);margin-bottom:16px}
-.modal-box h2{font-size:28px;font-weight:800;margin-bottom:12px}
+.modal-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .3s var(--extreme);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.modal-close:hover{background:var(--bg);color:var(--text);transform:rotate(90deg) scale(1.15)}
+.modal-tag{display:inline-block;padding:4px 14px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(0,85,232,.05);color:var(--accent);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,85,232,.03)}
+.modal-box h2{font-size:28px;font-weight:800;margin-bottom:12px;line-height:1.22;text-shadow:0 2px 5px rgba(0,0,0,.03)}
 .modal-difficulty{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:22px}
-.modal-box .ds{margin-bottom:24px}.modal-box .ds h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;font-weight:700}
-.modal-box .ds p,.modal-box .ds li{font-size:14px;color:var(--text2);line-height:1.8}
+.modal-box .ds{margin-bottom:24px}
+.modal-box .ds h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;font-weight:700}
+.modal-box .ds p,.modal-box .ds ul,.modal-box .ds ol{font-size:14px;color:var(--text2);line-height:1.8}
+.modal-box .ds ul,.modal-box .ds ol{padding-left:20px}
+.modal-box .ds li{margin-bottom:8px;font-size:14px;color:var(--text2);line-height:1.7}
+.bgm-tip{margin-top:10px;padding:13px 18px;border-radius:10px;background:rgba(224,79,22,.04);color:var(--orange);font-size:13px;display:flex;align-items:center;gap:8px;border:1px solid rgba(224,79,22,.08)}
+.blogger-ref{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:10px;background:rgba(0,85,232,.02);margin-bottom:6px;text-decoration:none;color:var(--text);transition:all .2s;font-size:13px;border:1px solid transparent}
+.blogger-ref:hover{background:rgba(0,85,232,.05);color:var(--accent);border-color:rgba(0,85,232,.1)}
+.blogger-ref .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0}
+.blogger-ref .info{flex:1}.blogger-ref .info .name{font-weight:600}.blogger-ref .info .note{font-size:11px;color:var(--text3)}
+.blogger-ref .arrow{color:var(--text3);transition:all .2s}
+.blogger-ref:hover .arrow{color:var(--accent);transform:translateX(2px)}
+.platform-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.platform-tags span{padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;background:rgba(0,85,232,.04);color:var(--accent)}
+@media(max-width:768px){.modal-box{padding:26px 22px 22px;max-width:96vw}.modal-box h2{font-size:22px}}
+
+/* ═══ Click pulse ═══ */
+@keyframes clickPulse{0%{box-shadow:0 0 0 0 rgba(0,85,232,.25)}70%{box-shadow:0 0 0 16px rgba(0,85,232,0)}100%{box-shadow:0 0 0 0 rgba(0,85,232,0)}}
+.card:active,.stage-card:active{animation:clickPulse .4s ease-out}
+
 footer{padding:36px 0;text-align:center;font-size:12.5px;color:var(--text3);position:relative;z-index:1}
-footer a{color:var(--accent);text-decoration:none}footer span{color:var(--accent);font-weight:700}
-.card:active{animation:clickPulse .4s ease-out}
-</style></head>
+footer span{color:var(--accent);font-weight:700}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{text-decoration:underline}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:3px}
+
+</style>
+</head>
 <body>
+
 <canvas id="particles-canvas"></canvas>
+<canvas id="cursor-trail"></canvas>
+
 <div class="geo-shapes">
-<div class="geo circle" style="top:5%;left:3%;width:120px;height:120px;opacity:.1"></div>
-<div class="geo tri" style="top:22%;right:6%;opacity:.09;animation-delay:-2s;border-bottom-color:var(--purple)"></div>
-<div class="geo square" style="top:48%;left:2%;width:80px;height:80px;opacity:.1;animation-delay:-5s"></div>
-<div class="geo dot" style="top:65%;right:5%;width:35px;height:35px;opacity:.1;animation-delay:-3s"></div>
-<div class="geo ring" style="top:14%;left:48%;width:100px;height:100px;opacity:.1;animation-delay:-7s"></div>
-<div class="geo circle" style="top:78%;left:8%;width:90px;height:90px;opacity:.08;animation-delay:-1s"></div>
-<div class="geo tri" style="top:50%;left:55%;opacity:.07;animation-delay:-9s;border-bottom-color:var(--orange)"></div>
-<div class="geo dot" style="top:10%;right:28%;width:22px;height:22px;opacity:.09;animation-delay:-4s"></div>
-<div class="geo square" style="top:33%;right:3%;width:60px;height:60px;opacity:.07;animation-delay:-8s;border-color:var(--orange)"></div>
-<div class="geo ring" style="top:70%;left:35%;width:90px;height:90px;opacity:.07;animation-delay:-6s"></div>
-<div class="geo dot" style="top:40%;left:25%;width:28px;height:28px;opacity:.08;animation-delay:-10s"></div>
-<div class="geo circle" style="top:88%;right:15%;width:70px;height:70px;opacity:.06;animation-delay:-3.5s;border-color:var(--green)"></div>
+    <div class="geo circle" style="top:6%;left:4%;width:80px;height:80px;opacity:.06;animation-delay:0s"></div>
+    <div class="geo tri" style="top:25%;right:8%;opacity:.05;animation-delay:-2s;border-bottom-color:var(--purple)"></div>
+    <div class="geo square" style="top:52%;left:3%;width:48px;height:48px;opacity:.058;animation-delay:-5s"></div>
+    <div class="geo dot" style="top:68%;right:6%;width:18px;height:18px;opacity:.06;animation-delay:-3s"></div>
+    <div class="geo ring" style="top:16%;left:52%;width:65px;height:65px;opacity:.058;animation-delay:-7s"></div>
+    <div class="geo circle" style="top:80%;left:10%;width:50px;height:50px;opacity:.04;animation-delay:-1s"></div>
+    <div class="geo tri" style="top:55%;left:58%;opacity:.04;animation-delay:-9s;border-bottom-color:var(--orange)"></div>
+    <div class="geo dot" style="top:12%;right:30%;width:12px;height:12px;opacity:.05;animation-delay:-4s"></div>
+    <div class="geo square" style="top:36%;right:4%;width:36px;height:36px;opacity:.04;animation-delay:-8s;border-color:var(--orange)"></div>
+    <div class="geo ring" style="top:72%;left:38%;width:55px;height:55px;opacity:.04;animation-delay:-6s"></div>
+    <div class="geo tri" style="top:42%;left:20%;opacity:.03;animation-delay:-10s"></div>
+    <div class="geo dot" style="top:88%;right:22%;width:16px;height:16px;opacity:.04;animation-delay:-2s"></div>
 </div>
-<nav><div class="nav-inner"><div class="logo"><span class="dot"></span>剪辑选题系统</div>
-<div class="tabs">
-<button class="active" data-panel="today">今日选题</button>
-<button data-panel="calendar">内容日历</button>
-<button data-panel="library">选题库</button>
-<button data-panel="stats">数据</button>
-<button data-panel="inspire">灵感</button>
-</div><div class="time">2026-06-29 16:40</div></div></nav>
-<div class="wrap"><main>
+
+<!-- SVG geo characters -->
+<div class="geo-char" style="top:15%;left:8%;width:70px;height:70px;animation-delay:0s">
+    <svg viewBox="0 0 70 70"><circle cx="35" cy="30" r="25" fill="none" stroke="#0055e8" stroke-width="3"/><circle cx="25" cy="25" r="3" fill="#0055e8"/><circle cx="45" cy="25" r="3" fill="#0055e8"/><path d="M25 40 Q35 50 45 40" fill="none" stroke="#0055e8" stroke-width="2.5" stroke-linecap="round"/></svg>
+</div>
+<div class="geo-char" style="top:55%;right:6%;width:80px;height:80px;animation-delay:-4s">
+    <svg viewBox="0 0 80 80"><polygon points="40,8 70,65 10,65" fill="none" stroke="#7a1eb8" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="45" r="3.5" fill="#7a1eb8"/><circle cx="48" cy="45" r="3.5" fill="#7a1eb8"/></svg>
+</div>
+<div class="geo-char" style="top:30%;left:60%;width:55px;height:55px;animation-delay:-7s">
+    <svg viewBox="0 0 55 55"><rect x="8" y="8" width="39" height="39" rx="8" fill="none" stroke="#e04f16" stroke-width="2.8"/><circle cx="23" cy="26" r="3" fill="#e04f16"/><circle cx="33" cy="26" r="3" fill="#e04f16"/></svg>
+</div>
+
+<nav>
+    <div class="nav-inner">
+        <div class="logo"><span class="dot"></span>剪辑选题系统</div>
+        <div class="tabs">
+            <button class="active" data-panel="today">今日选题</button>
+            <button data-panel="calendar">内容日历</button>
+            <button data-panel="library">选题库</button>
+            <button data-panel="stats">数据</button>
+            <button data-panel="inspire">💡 灵感</button>
+        </div>
+        <div class="time">2026-06-30 04:55</div>
+    </div>
+</nav>
+
+<div class="wrap">
+<main>
+
+<!-- ═══ 今日选题 ═══ -->
 <section class="active" id="sec-today">
-<div class="hero"><div class="hero-bg"></div><div class="hero-glow g1"></div><div class="hero-glow g2"></div>
-<div class="hero-toy t1"></div><div class="hero-toy t2"></div><div class="hero-toy t3"></div>
-<div class="label">DAILY TOPIC SYSTEM</div>
-<h1>拍摄<em>+</em>剪辑<br>选题系统</h1>
-<p class="sub">每天一个选题 · 从拍到剪全流程 · 30 期完整规划</p>
-<div class="hero-stats">
-<div class="hero-stat"><div class="num" style="color:var(--accent)" id="hero-total">0</div><div class="lbl">总选题</div></div>
-<div class="hero-stat"><div class="num" style="color:var(--green)" id="hero-pending">0</div><div class="lbl">待发布</div></div>
-<div class="hero-stat"><div class="num" style="color:var(--purple)" id="hero-pub">0</div><div class="lbl">已发布</div></div>
-<div class="hero-stat"><div class="num" style="color:var(--orange)" id="hero-cats">0</div><div class="lbl">大分类</div></div>
-</div></div><div class="divider"></div>
-<div class="sec-hd" style="margin-top:28px"><div class="kicker">Today's Picks</div><h2>今日推荐选题</h2><p class="sub">2026-06-29 · 智能推荐 · 点击查看详情</p></div>
-<div class="card-grid" id="today-grid"></div><div class="divider"></div>
-<div class="sec-hd"><h2>热门标签</h2></div><div class="tag-cloud" id="tag-cloud"></div>
+    <div class="hero">
+        <div class="hero-bg"></div><div class="hero-glow g1"></div><div class="hero-glow g2"></div>
+        <div class="hero-toy t1"></div><div class="hero-toy t2"></div><div class="hero-toy t3"></div><div class="hero-toy t4"></div>
+        <div class="label">🎬 DAILY TOPIC SYSTEM</div>
+        <h1>拍摄<em>+</em>剪辑<br>选题系统</h1>
+        <p class="sub">每天一个选题 · 从拍到剪全流程 · 30 期完整规划</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><div class="num" style="color:var(--accent)" id="hero-total">0</div><div class="lbl">总选题</div></div>
+            <div class="hero-stat"><div class="num" style="color:var(--green)" id="hero-pending">0</div><div class="lbl">待发布</div></div>
+            <div class="hero-stat"><div class="num" style="color:var(--purple)" id="hero-pub">0</div><div class="lbl">已发布</div></div>
+            <div class="hero-stat"><div class="num" style="color:var(--orange)" id="hero-cats">0</div><div class="lbl">大分类</div></div>
+        </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- 发布追踪 -->
+    <div class="pub-tracker" id="pub-tracker">
+        <h3>📊 发布追踪</h3>
+        <div class="pub-stats">
+            <div class="pub-stat"><div class="n" style="color:var(--accent)" id="pub-total">0</div><div class="l">已发布视频</div></div>
+            <div class="pub-stat"><div class="n" style="color:var(--green)" id="pub-month">0</div><div class="l">本月发布</div></div>
+            <div class="pub-stat"><div class="n" style="color:var(--purple)" id="pub-streak">0</div><div class="l">连续更新天</div></div>
+            <div class="pub-stat"><div class="n" style="color:var(--orange)" id="pub-remain">0</div><div class="l">待发布</div></div>
+        </div>
+        <div class="pub-bar-track"><div class="pub-bar-fill" id="pub-progress"></div></div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:28px"><div class="kicker">Today's Picks</div><h2>🔥 今日推荐选题</h2><p class="sub">2026-06-30 · 加权随机智能推荐 · 每天不一样 · 点击卡片查看完整制作指南</p></div>
+
+    <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="today-search" placeholder="搜索选题、灵感、技巧…" oninput="searchSuggest(this.value)" onkeydown="if(event.key==='Enter')jumpToSearch()">
+        <div class="search-suggestions" id="search-suggestions"></div>
+    </div>
+
+    <div class="card-grid" id="today-grid"></div>
+    <div class="divider"></div>
+
+    <!-- 热门标签云 -->
+    <div class="sec-hd"><h2>🏷️ 热门标签</h2></div>
+    <div class="tag-cloud" id="tag-cloud"></div>
 </section>
+
+<!-- ═══ 内容日历 ═══ -->
 <section id="sec-calendar">
-<div class="sec-hd" style="padding-top:90px"><div class="kicker">Content Calendar</div><h2>200期内容日历</h2></div>
-<div class="stage-grid">
-<div class="stage-card" data-stage="冷启动期"><div class="stage-num">01</div><div class="stage-content"><h4>冷启动期<span>第1-30期</span></h4><p class="stage-title">剪映基础+拍摄入门</p><p class="stage-desc">面向零基础·快速上手</p></div></div>
-<div class="stage-card" data-stage="增长期"><div class="stage-num">02</div><div class="stage-content"><h4>增长期<span>第31-100期</span></h4><p class="stage-title">转场·卡点·调色·蒙版</p><p class="stage-desc">系统技能进阶</p></div></div>
-<div class="stage-card" data-stage="成熟期"><div class="stage-num">03</div><div class="stage-content"><h4>成熟期<span>第101-200期</span></h4><p class="stage-title">案例实战+抠像合成</p><p class="stage-desc">深度壁垒·IP护城河</p></div></div>
-</div>
-<div class="info-row"><div class="info-card"><strong>内容节奏</strong><br>30%爆款·50%干货·20%深度</div><div class="info-card"><strong>更新建议</strong><br>前期日更·稳定期隔日更</div></div>
-<div class="divider"></div>
-<div class="filters">
-<select id="f-stage"><option value="all">全部阶段</option><option value="冷启动期">冷启动期</option><option value="增长期">增长期</option><option value="成熟期">成熟期</option></select>
-<select id="f-cal-cat"><option value="all">全部分类</option></select>
-<input type="text" id="f-cal-search" placeholder="搜索标题">
-<span class="count" id="cal-num">30 期</span></div>
-<div class="tbl-wrap"><table><thead><tr><th>#</th><th>标题</th><th>分类</th><th>难度</th><th>类型</th><th>时长</th><th>阶段</th></tr></thead><tbody id="cal-tbody"></tbody></table></div>
+    <div class="sec-hd" style="padding-top:90px"><div class="kicker">Content Calendar</div><h2>🗓️ 200期内容日历</h2></div>
+    <div class="stage-grid" id="stage-summary-grid">
+        <div class="stage-card" data-stage="冷启动期">
+            <div class="stage-num">01</div><div class="stage-content"><h4>冷启动期<span>第 1–30 期</span></h4><p class="stage-title">剪映基础 + 拍摄入门</p><p class="stage-desc">面向零基础 · 快速上手</p><div class="stage-count" id="stage-count-0">0 期</div></div>
+        </div>
+        <div class="stage-card" data-stage="增长期">
+            <div class="stage-num">02</div><div class="stage-content"><h4>增长期<span>第 31–100 期</span></h4><p class="stage-title">转场 · 卡点 · 调色 · 蒙版</p><p class="stage-desc">系统技能进阶 · 建立专业度</p><div class="stage-count" id="stage-count-1">0 期</div></div>
+        </div>
+        <div class="stage-card" data-stage="成熟期">
+            <div class="stage-num">03</div><div class="stage-content"><h4>成熟期<span>第 101–200 期</span></h4><p class="stage-title">案例实战 + 抠像合成</p><p class="stage-desc">深度壁垒 · IP护城河</p><div class="stage-count" id="stage-count-2">0 期</div></div>
+        </div>
+    </div>
+    <div class="info-row">
+        <div class="info-card"><strong>📐 内容节奏</strong><br>30% 爆款 · 50% 干货 · 20% 深度 · 每3–4条干货穿插1条爆款，每8条穿插1条深度案例</div>
+        <div class="info-card"><strong>⚡ 更新建议</strong><br>前期日更 · 稳定期隔日更 · 提前储备1–2周选题 · 每周复盘数据调整方向</div>
+    </div>
+    <div class="divider"></div>
+    <div class="filters">
+        <select id="f-stage" onchange="filterCal()"><option value="all">全部阶段</option><option value="冷启动期">冷启动期 1-30</option><option value="增长期">增长期 31-100</option><option value="成熟期">成熟期 101-200</option></select>
+        <select id="f-cal-cat" onchange="filterCal()"><option value="all">全部分类</option></select>
+        <input type="text" id="f-cal-search" placeholder="搜索标题…" oninput="filterCal()">
+        <span class="count" id="cal-num">30 期</span>
+    </div>
+    <div class="tbl-wrap"><table><thead><tr><th>#</th><th>标题</th><th>分类</th><th>难度</th><th>类型</th><th>时长</th><th>阶段</th></tr></thead>
+    <tbody id="cal-tbody"></tbody></table></div>
 </section>
+
+<!-- ═══ 选题库 ═══ -->
 <section id="sec-library">
-<div class="sec-hd" style="padding-top:90px"><div class="kicker">Full Library</div><h2>全部选题</h2><p class="sub">30 条·7 分类</p></div>
-<div class="filters">
-<select id="f-cat"><option value="all">全部分类</option></select>
-<select id="f-type"><option value="all">全部类型</option><option value="爆款">爆款</option><option value="干货">干货</option><option value="深度">深度</option></select>
-<select id="f-diff"><option value="all">全部难度</option><option value="1">⭐入门</option><option value="2">⭐⭐基础</option><option value="3">⭐⭐⭐进阶</option><option value="4">⭐⭐⭐⭐高级</option><option value="5">⭐⭐⭐⭐⭐专家</option></select>
-<input type="text" id="f-search" placeholder="搜索标题">
-<span class="count" id="lib-num">30 条</span></div>
-<div class="card-grid" id="lib-grid"></div>
+    <div class="sec-hd" style="padding-top:90px"><div class="kicker">Full Library</div><h2>📚 全部选题</h2><p class="sub">共 30 条 · 14 个分类 · 3 种内容类型</p></div>
+    <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="f-search" placeholder="搜索选题标题、描述、分类…" oninput="filterLib()">
+    </div>
+    <div class="filters">
+        <select id="f-cat" onchange="filterLib()"><option value="all">全部分类</option></select>
+        <select id="f-type" onchange="filterLib()"><option value="all">全部类型</option><option value="爆款">🔺 爆款</option><option value="干货">🔸 干货</option><option value="深度">🔹 深度</option></select>
+        <select id="f-diff" onchange="filterLib()"><option value="all">全部难度</option><option value="1">⭐ 入门</option><option value="2">⭐⭐ 基础</option><option value="3">⭐⭐⭐ 进阶</option><option value="4">⭐⭐⭐⭐ 高级</option><option value="5">⭐⭐⭐⭐⭐ 专家</option></select>
+        <span class="count" id="lib-num">30 条</span>
+    </div>
+    <div class="card-grid" id="lib-grid"></div>
 </section>
+
+<!-- ═══ 数据统计 ═══ -->
 <section id="sec-stats">
-<div class="sec-hd" style="padding-top:90px"><div class="kicker">Statistics</div><h2>数据概览</h2></div>
-<div class="kpi-row">
-<div class="kpi"><div class="val" style="color:var(--accent)" id="kpi-total">0</div><div class="lbl">总选题</div></div>
-<div class="kpi"><div class="val" style="color:var(--green)" id="kpi-pending">0</div><div class="lbl">待发布</div></div>
-<div class="kpi"><div class="val" style="color:var(--purple)" id="kpi-pub">0</div><div class="lbl">已发布</div></div>
-<div class="kpi"><div class="val" style="color:var(--orange)" id="kpi-cal">0</div><div class="lbl">日历期数</div></div>
-</div>
-<div class="stats-grid" style="margin-top:28px">
-<div class="stat-panel"><h3>分类覆盖</h3><div id="cat-bars"></div></div>
-<div class="stat-panel"><h3>内容类型</h3><div id="type-bars"></div></div>
-</div>
+    <div class="sec-hd" style="padding-top:90px"><div class="kicker">Statistics</div><h2>📊 数据概览</h2></div>
+    <div class="kpi-row">
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--accent)" id="kpi-total">0</div><div class="lbl">总选题</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--green)" id="kpi-pending">0</div><div class="lbl">待发布</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--purple)" id="kpi-pub">0</div><div class="lbl">已发布</div></div>
+        <div class="kpi"><div class="kpi-ring"></div><div class="val" style="color:var(--orange)" id="kpi-cal">0</div><div class="lbl">日历期数</div></div>
+    </div>
+    <div class="stats-grid" style="margin-top:28px">
+        <div class="stat-panel"><h3>📂 分类覆盖</h3><div id="cat-bars"></div></div>
+        <div class="stat-panel"><h3>📈 内容类型分布</h3><div id="type-bars"></div></div>
+    </div>
+    <div class="divider" style="margin:28px 0"></div>
+    <div class="pub-tracker">
+        <h3>📅 发布日历（本月）</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="pub-cal-grid"></div>
+    </div>
 </section>
+
+<!-- ═══ 灵感 ═══ -->
 <section id="sec-inspire">
-<div class="sec-hd" style="padding-top:90px"><div class="kicker">Creative Lab</div><h2>创意灵感</h2></div>
-<div style="text-align:center;padding:16px 0"><input type="text" id="inspire-search" placeholder="输入想法找选题：很酷的转场 Vlog怎么拍" style="padding:10px 16px;width:400px;max-width:75vw;border-radius:10px;border:1px solid var(--border);font-size:14px;font-family:inherit;outline:none"><button onclick="runAI()" style="margin-left:8px;padding:10px 24px;border-radius:10px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">AI选题</button></div>
-<div class="info-row" id="rand-combo" style="margin-bottom:20px"></div>
-<div class="sec-hd"><h2>拍摄速查</h2></div>
-<div id="quick-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+    <div class="sec-hd" style="padding-top:90px"><div class="kicker">Creative Lab</div><h2>💡 创意灵感</h2><p class="sub">探索组合 · 激发新思路 · 每日刷新</p></div>
+
+    <div class="search-wrap">
+        <span class="search-icon">💭</span>
+        <input type="text" id="inspire-search" placeholder="描述你的想法，回车搜索匹配选题…" onkeydown="if(event.key==='Enter')inspireSearch()">
+    </div>
+
+    <div class="sec-hd" style="margin-bottom:14px"><h2>🎲 随机选题组合</h2><p class="sub">点击刷新，看看有什么新灵感</p></div>
+    <div class="info-row" id="rand-combo" style="margin-bottom:28px"></div>
+
+    <div class="sec-hd" style="margin-bottom:14px"><h2>📸 拍摄技巧速查</h2></div>
+    <div class="quick-cards" id="quick-cards"></div>
+
+    <div class="sec-hd" style="margin-top:28px;margin-bottom:14px"><h2>🏷️ 全部标签云</h2></div>
+    <div class="tag-cloud" id="inspire-tag-cloud"></div>
 </section>
-</main></div>
-<footer><p>数据截止 2026-06-29 · 每日 <span>8:57</span> 自动刷新 · <a href="#" onclick="runAI()">AI助手</a></p></footer>
-<div class="modal-overlay" id="modal-overlay"><div class="modal-box" id="modal-box"></div></div>
-<script id="data-topics" type="application/json">[{"id": "t01", "title": "3分钟认识剪映所有功能区", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "屏幕录制剪映界面，用画中画+红圈标注4个核心区域，每区停留15秒——给从没打开过剪映的人看的第一条视频", "estimated_duration": "3min", "materials_needed": "剪映APP录屏", "viral_potential": "中", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t02", "title": "导入素材的3种方式：第3种最快没人说", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "方式1：从相册选→方式2：相册分享到剪映→方式3：长按拖到剪映图标一键导入。拿一段视频演示三种方式的速度差", "estimated_duration": "2min", "materials_needed": "一段手机视频素材", "viral_potential": "中", "production_time": "30min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t03", "title": "分割、删除、复制：3个最基础但每期都用的操作", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "一段素材一分三→删中间留头尾→复制一段做双屏——这三个动作合起来就是最简单的蒙太奇雏形", "estimated_duration": "2min", "materials_needed": "任意一段30秒视频", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t04", "title": "倒放效果：一个按钮让普通视频变成魔术", "category": "剪映基础操作", "difficulty": 1, "content_type": "爆款", "description": "选一段倒水/跳跃/扔东西的素材→点倒放按钮→关原声配BGM→导出。前后对比展示效果，涨粉最快的特效", "estimated_duration": "25s", "materials_needed": "方向性强的动作素材（网上下载或自己以前拍的）", "viral_potential": "高", "production_time": "20min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t05", "title": "变速技巧：快放堆叠精彩+慢放放大情绪", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "同一段素材先正常播→拖到2x加速（卡点用）→降到0.5x慢放（情绪用）→曲线变速自定义。三种变速的实际效果对比", "estimated_duration": "3min", "materials_needed": "一段有动作变化的长素材", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t06", "title": "画中画：让你的视频多一层信息量", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "底层放主画面→上层叠加文字/图片/另一段视频→调整大小位置→这是专业剪辑的起点。演示3种画中画用法", "estimated_duration": "3min", "materials_needed": "主视频+一段叠加素材+一张截图或文字", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t07", "title": "文字动画：让字幕像电影片头一样出场", "category": "剪映基础操作", "difficulty": 2, "content_type": "干货", "description": "新建文字→选动画→入场动画(弹入/淡入/打字机)/出场动画/循环动画→调速度→配合BGM节奏。字幕不只是信息，也是视觉元素", "estimated_duration": "3min", "materials_needed": "一段视频+加几行文字", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t08", "title": "滤镜的正确用法：别拉满，叠两层", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "强度调到15%-30%最自然→叠两个不同滤镜产生新风格→调节层统一调色。拿手机原片演示有滤镜 vs 没滤镜的差别", "estimated_duration": "2min", "materials_needed": "一段户外/日常素材", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t09", "title": "缩放转场：画面放大到105%的一瞬间切镜头", "category": "转场特效", "difficulty": 1, "content_type": "干货", "description": "最实用最简单的转场：每段素材开头放大到105%→结尾恢复100%→切下一段→再放大→循环。拿旅行/日常碎片演示连贯效果", "estimated_duration": "30s", "materials_needed": "3段以上短素材", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t10", "title": "遮罩转场：蒙版从左移到右的丝滑擦除", "category": "转场特效", "difficulty": 2, "content_type": "干货", "description": "A素材在上层→加矩形蒙版→打关键帧→蒙版从左移到右→B素材露出来→加羽化让边缘自然。用两段街景/室内素材演示", "estimated_duration": "40s", "materials_needed": "两段不同场景的素材", "viral_potential": "中", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t11", "title": "模糊转场：运动模糊的一瞬间完成画面切换", "category": "转场特效", "difficulty": 2, "content_type": "干货", "description": "在画面快速移动/旋转的瞬间切镜头→人眼察觉不到切换。不需要任何特效，纯靠剪辑点选择。用3组素材演示技巧", "estimated_duration": "35s", "materials_needed": "3段有运动镜头的素材", "viral_potential": "中", "production_time": "30min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t12", "title": "匹配剪辑：两个相似画面无缝衔接", "category": "转场特效", "difficulty": 2, "content_type": "爆款", "description": "前一段画面是圆形物体→下一段也是圆形→匹配形状。前一段人物伸手→下一段人物接住→匹配动作。找2组素材演示", "estimated_duration": "35s", "materials_needed": "两组有相似元素的素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t13", "title": "色温色调：冷调高级感 vs 暖调治愈感", "category": "调色教程", "difficulty": 2, "content_type": "干货", "description": "同一段素材分别调成冷调(色温-10、色调+5)和暖调(色温+8、色调-3)→并排对比→讲每种氛围适合什么内容", "estimated_duration": "40s", "materials_needed": "一段户外/室内素材", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t14", "title": "电影感调色3步：饱和度-15+色温-8+暗角-20", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "description": "拿手机直出素材→调3个参数→Before/After分屏对比。参数大字报展示让观众截图。播放量普遍10w+的爆款选题", "estimated_duration": "40s", "materials_needed": "一段日间户外素材", "viral_potential": "高", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t15", "title": "HSL调色：只改蓝天不改肤色", "category": "调色教程", "difficulty": 3, "content_type": "干货", "description": "点击蓝色→饱和度+20亮度-10→蓝天更蓝→肤色完全不受影响。再演示改绿色让草地更高级。精准控制每一种颜色", "estimated_duration": "3min", "materials_needed": "一段天空/草地/人像素材", "viral_potential": "中", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t16", "title": "港风复古调色：高对比度+绿阴影+颗粒感", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "description": "对比度+12→阴影偏绿(色调-8)→加颗粒15%→降低高光→街景人像秒变90年代港片。全程参数大字报", "estimated_duration": "45s", "materials_needed": "街景/人像素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t17", "title": "BGM卡点剪辑：自动踩点+每鼓点切一刀", "category": "卡点节奏", "difficulty": 2, "content_type": "爆款", "description": "选一首鼓点明显的BGM→用剪映「自动踩点」→每个黄点切一刀→鼓点重音处画面放大到105%→预览整条卡点效果", "estimated_duration": "45s", "materials_needed": "一首鼓点BGM+6段以上切换素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t18", "title": "变速卡点：快放堆叠节奏+慢放放大情绪", "category": "卡点节奏", "difficulty": 3, "content_type": "干货", "description": "鼓点密集段落→画面2x快放加速。鼓点稀疏段落→0.5x慢放强调。变速点对准鼓点→播放预览感受节奏变化", "estimated_duration": "50s", "materials_needed": "带BGM的素材段落", "viral_potential": "中", "production_time": "45min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t19", "title": "音效叠加：切换画面+唰声，文字出现+叮声", "category": "音频处理", "difficulty": 2, "content_type": "干货", "description": "画面切换的瞬间叠加「唰」音效→文字出现时叠加「叮」→卡点鼓点处双击共振。3组演示→关掉音效 vs 打开音效对比", "estimated_duration": "2min", "materials_needed": "一段带切换的剪辑+音效包", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t20", "title": "关键帧入门：打两个点=自动生成一段动画", "category": "蒙版&关键帧", "difficulty": 2, "content_type": "干货", "description": "一张照片→开头打位置关键帧→结尾拖到别处打第二个关键帧→照片自己动了。再演示缩放关键帧+旋转关键帧+透明度关键帧", "estimated_duration": "3min", "materials_needed": "一张照片或图片", "viral_potential": "中", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t21", "title": "矩形蒙版+关键帧：做一个画面移动画框", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "干货", "description": "给视频加矩形蒙版→打关键帧→蒙版从左移到右→框里的画面跟着移动。像幻灯片一样自动切换关注点", "estimated_duration": "3min", "materials_needed": "一段大场景视频", "viral_potential": "中", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t22", "title": "双重曝光：两张照片叠出文艺片质感", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "爆款", "description": "底层放人物剪影（抠像+调暗）→上层放风景/城市→调整透明度→叠加出超高级效果。非常适合做封面和片头", "estimated_duration": "3min", "materials_needed": "人物照片+风景照片", "viral_potential": "高", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t23", "title": "从零剪一条旅行短片：碎片素材变故事", "category": "案例实战", "difficulty": 3, "content_type": "深度", "description": "下载10段免版权旅行素材→按时间线排列→找情绪节点→配BGM→加转场串联→调色统一→导出。适合没有自己素材但想练手的人", "estimated_duration": "5min", "materials_needed": "10段免版权旅行素材(pexels/pixabay)", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t24", "title": "一条视频用5种风格剪出5种感觉", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "description": "同一段素材→分别剪成快节奏卡点版/慢节奏情绪版/搞笑鬼畜版/电影感版/Vlog日常版→并排对比。展示剪辑的力量", "estimated_duration": "5min", "materials_needed": "一段2分钟的通用素材", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t25", "title": "爆款逐帧拆解：一条百万播放视频怎么剪的", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "description": "找一条抖音热门的剪辑类视频→0.5x慢放→标注时间轴(00:00钩子/00:03音乐切入/00:08高潮/00:15CTA)→分析每段用的什么技巧", "estimated_duration": "4min", "materials_needed": "一条热门视频(抖音下载或用录屏)", "viral_potential": "高", "production_time": "2h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t26", "title": "10分钟做出一个像样的片头", "category": "案例实战", "difficulty": 2, "content_type": "干货", "description": "文字动画入场→BGM切入→画面缩放或淡入→持续3-5秒→形成固定片头模板。以后每期套用只需改文字", "estimated_duration": "3min", "materials_needed": "一段短素材+文字+5秒BGM", "viral_potential": "中", "production_time": "45min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t27", "title": "美食视频怎么剪：3步让食物看起来更好吃", "category": "案例实战", "difficulty": 2, "content_type": "干货", "description": "暖色调滤镜+特写慢放+蒸汽/油花声叠加→食欲感直接拉满。拿一段美食素材演示调色→变速→音效的全过程", "estimated_duration": "3min", "materials_needed": "一段美食素材+音效包", "viral_potential": "中", "production_time": "1h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t28", "title": "用剪映复刻一个抖音热门模板", "category": "案例实战", "difficulty": 2, "content_type": "爆款", "description": "打开抖音→搜「剪映模板」→找一个本周热门的→全程演示怎么用这个模板→替换素材→调整参数→导出。观众最爱的跟练内容", "estimated_duration": "3min", "materials_needed": "对应模板要求的N段素材", "viral_potential": "高", "production_time": "1h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t29", "title": "一条视频剪完后还要做哪些事：导出设置+封面+标题", "category": "案例实战", "difficulty": 1, "content_type": "干货", "description": "导出参数(1080P/60fps/H.264)→选封面(找对比最强烈的那一帧)→写标题(3种爆款标题公式)→发布时段建议。很多新手剪完不知道这一步", "estimated_duration": "3min", "materials_needed": "一条已完成剪辑的视频", "viral_potential": "中", "production_time": "30min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t30", "title": "0素材起步：用免版权网站剪出第一条视频", "category": "案例实战", "difficulty": 1, "content_type": "干货", "description": "Pexels/Pixabay下载免费视频→导入剪映→排列顺序→配BGM→加文字→导出。对象：完全没有自己素材的新手→跟着做就能出片", "estimated_duration": "4min", "materials_needed": "Pexels/Pixabay下载的免费素材", "viral_potential": "高", "production_time": "1.5h", "status": "待发布", "created_at": "2026-06-29"}]</script><script id="data-calendar" type="application/json">[{"episode": 1, "title": "3分钟认识剪映所有功能区", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "40min", "description": "屏幕录制剪映界面，用画中画+红圈标注4个核心区域，每区停留15秒——给从没打开过剪映的人看的第一条视频", "stage": "冷启动期", "status": "待发布"}, {"episode": 2, "title": "导入素材的3种方式：第3种最快没人说", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "30min", "description": "方式1：从相册选→方式2：相册分享到剪映→方式3：长按拖到剪映图标一键导入。拿一段视频演示三种方式的速度差", "stage": "冷启动期", "status": "待发布"}, {"episode": 3, "title": "分割、删除、复制：3个最基础但每期都用的操作", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "25min", "description": "一段素材一分三→删中间留头尾→复制一段做双屏——这三个动作合起来就是最简单的蒙太奇雏形", "stage": "冷启动期", "status": "待发布"}, {"episode": 4, "title": "倒放效果：一个按钮让普通视频变成魔术", "category": "剪映基础操作", "difficulty": 1, "content_type": "爆款", "estimated_duration": "25s", "viral_potential": "高", "production_time": "20min", "description": "选一段倒水/跳跃/扔东西的素材→点倒放按钮→关原声配BGM→导出。前后对比展示效果，涨粉最快的特效", "stage": "冷启动期", "status": "待发布"}, {"episode": 5, "title": "变速技巧：快放堆叠精彩+慢放放大情绪", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "35min", "description": "同一段素材先正常播→拖到2x加速（卡点用）→降到0.5x慢放（情绪用）→曲线变速自定义。三种变速的实际效果对比", "stage": "冷启动期", "status": "待发布"}, {"episode": 6, "title": "画中画：让你的视频多一层信息量", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "35min", "description": "底层放主画面→上层叠加文字/图片/另一段视频→调整大小位置→这是专业剪辑的起点。演示3种画中画用法", "stage": "冷启动期", "status": "待发布"}, {"episode": 7, "title": "文字动画：让字幕像电影片头一样出场", "category": "剪映基础操作", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "35min", "description": "新建文字→选动画→入场动画(弹入/淡入/打字机)/出场动画/循环动画→调速度→配合BGM节奏。字幕不只是信息，也是视觉元素", "stage": "增长期", "status": "待发布"}, {"episode": 8, "title": "滤镜的正确用法：别拉满，叠两层", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "25min", "description": "强度调到15%-30%最自然→叠两个不同滤镜产生新风格→调节层统一调色。拿手机原片演示有滤镜 vs 没滤镜的差别", "stage": "冷启动期", "status": "待发布"}, {"episode": 9, "title": "缩放转场：画面放大到105%的一瞬间切镜头", "category": "转场特效", "difficulty": 1, "content_type": "干货", "estimated_duration": "30s", "viral_potential": "中", "production_time": "25min", "description": "最实用最简单的转场：每段素材开头放大到105%→结尾恢复100%→切下一段→再放大→循环。拿旅行/日常碎片演示连贯效果", "stage": "冷启动期", "status": "待发布"}, {"episode": 10, "title": "遮罩转场：蒙版从左移到右的丝滑擦除", "category": "转场特效", "difficulty": 2, "content_type": "干货", "estimated_duration": "40s", "viral_potential": "中", "production_time": "40min", "description": "A素材在上层→加矩形蒙版→打关键帧→蒙版从左移到右→B素材露出来→加羽化让边缘自然。用两段街景/室内素材演示", "stage": "增长期", "status": "待发布"}, {"episode": 11, "title": "模糊转场：运动模糊的一瞬间完成画面切换", "category": "转场特效", "difficulty": 2, "content_type": "干货", "estimated_duration": "35s", "viral_potential": "中", "production_time": "30min", "description": "在画面快速移动/旋转的瞬间切镜头→人眼察觉不到切换。不需要任何特效，纯靠剪辑点选择。用3组素材演示技巧", "stage": "增长期", "status": "待发布"}, {"episode": 12, "title": "匹配剪辑：两个相似画面无缝衔接", "category": "转场特效", "difficulty": 2, "content_type": "爆款", "estimated_duration": "35s", "viral_potential": "高", "production_time": "40min", "description": "前一段画面是圆形物体→下一段也是圆形→匹配形状。前一段人物伸手→下一段人物接住→匹配动作。找2组素材演示", "stage": "增长期", "status": "待发布"}, {"episode": 13, "title": "色温色调：冷调高级感 vs 暖调治愈感", "category": "调色教程", "difficulty": 2, "content_type": "干货", "estimated_duration": "40s", "viral_potential": "中", "production_time": "35min", "description": "同一段素材分别调成冷调(色温-10、色调+5)和暖调(色温+8、色调-3)→并排对比→讲每种氛围适合什么内容", "stage": "增长期", "status": "待发布"}, {"episode": 14, "title": "电影感调色3步：饱和度-15+色温-8+暗角-20", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "estimated_duration": "40s", "viral_potential": "高", "production_time": "35min", "description": "拿手机直出素材→调3个参数→Before/After分屏对比。参数大字报展示让观众截图。播放量普遍10w+的爆款选题", "stage": "增长期", "status": "待发布"}, {"episode": 15, "title": "HSL调色：只改蓝天不改肤色", "category": "调色教程", "difficulty": 3, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "50min", "description": "点击蓝色→饱和度+20亮度-10→蓝天更蓝→肤色完全不受影响。再演示改绿色让草地更高级。精准控制每一种颜色", "stage": "成熟期", "status": "待发布"}, {"episode": 16, "title": "港风复古调色：高对比度+绿阴影+颗粒感", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "estimated_duration": "45s", "viral_potential": "高", "production_time": "40min", "description": "对比度+12→阴影偏绿(色调-8)→加颗粒15%→降低高光→街景人像秒变90年代港片。全程参数大字报", "stage": "增长期", "status": "待发布"}, {"episode": 17, "title": "BGM卡点剪辑：自动踩点+每鼓点切一刀", "category": "卡点节奏", "difficulty": 2, "content_type": "爆款", "estimated_duration": "45s", "viral_potential": "高", "production_time": "40min", "description": "选一首鼓点明显的BGM→用剪映「自动踩点」→每个黄点切一刀→鼓点重音处画面放大到105%→预览整条卡点效果", "stage": "增长期", "status": "待发布"}, {"episode": 18, "title": "变速卡点：快放堆叠节奏+慢放放大情绪", "category": "卡点节奏", "difficulty": 3, "content_type": "干货", "estimated_duration": "50s", "viral_potential": "中", "production_time": "45min", "description": "鼓点密集段落→画面2x快放加速。鼓点稀疏段落→0.5x慢放强调。变速点对准鼓点→播放预览感受节奏变化", "stage": "成熟期", "status": "待发布"}, {"episode": 19, "title": "音效叠加：切换画面+唰声，文字出现+叮声", "category": "音频处理", "difficulty": 2, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "35min", "description": "画面切换的瞬间叠加「唰」音效→文字出现时叠加「叮」→卡点鼓点处双击共振。3组演示→关掉音效 vs 打开音效对比", "stage": "增长期", "status": "待发布"}, {"episode": 20, "title": "关键帧入门：打两个点=自动生成一段动画", "category": "蒙版&关键帧", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "40min", "description": "一张照片→开头打位置关键帧→结尾拖到别处打第二个关键帧→照片自己动了。再演示缩放关键帧+旋转关键帧+透明度关键帧", "stage": "增长期", "status": "待发布"}, {"episode": 21, "title": "矩形蒙版+关键帧：做一个画面移动画框", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "50min", "description": "给视频加矩形蒙版→打关键帧→蒙版从左移到右→框里的画面跟着移动。像幻灯片一样自动切换关注点", "stage": "成熟期", "status": "待发布"}, {"episode": 22, "title": "双重曝光：两张照片叠出文艺片质感", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "爆款", "estimated_duration": "3min", "viral_potential": "高", "production_time": "50min", "description": "底层放人物剪影（抠像+调暗）→上层放风景/城市→调整透明度→叠加出超高级效果。非常适合做封面和片头", "stage": "成熟期", "status": "待发布"}, {"episode": 23, "title": "从零剪一条旅行短片：碎片素材变故事", "category": "案例实战", "difficulty": 3, "content_type": "深度", "estimated_duration": "5min", "viral_potential": "高", "production_time": "3h", "description": "下载10段免版权旅行素材→按时间线排列→找情绪节点→配BGM→加转场串联→调色统一→导出。适合没有自己素材但想练手的人", "stage": "成熟期", "status": "待发布"}, {"episode": 24, "title": "一条视频用5种风格剪出5种感觉", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "estimated_duration": "5min", "viral_potential": "高", "production_time": "3h", "description": "同一段素材→分别剪成快节奏卡点版/慢节奏情绪版/搞笑鬼畜版/电影感版/Vlog日常版→并排对比。展示剪辑的力量", "stage": "成熟期", "status": "待发布"}, {"episode": 25, "title": "爆款逐帧拆解：一条百万播放视频怎么剪的", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "estimated_duration": "4min", "viral_potential": "高", "production_time": "2h", "description": "找一条抖音热门的剪辑类视频→0.5x慢放→标注时间轴(00:00钩子/00:03音乐切入/00:08高潮/00:15CTA)→分析每段用的什么技巧", "stage": "成熟期", "status": "待发布"}, {"episode": 26, "title": "10分钟做出一个像样的片头", "category": "案例实战", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "45min", "description": "文字动画入场→BGM切入→画面缩放或淡入→持续3-5秒→形成固定片头模板。以后每期套用只需改文字", "stage": "增长期", "status": "待发布"}, {"episode": 27, "title": "美食视频怎么剪：3步让食物看起来更好吃", "category": "案例实战", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "1h", "description": "暖色调滤镜+特写慢放+蒸汽/油花声叠加→食欲感直接拉满。拿一段美食素材演示调色→变速→音效的全过程", "stage": "增长期", "status": "待发布"}, {"episode": 28, "title": "用剪映复刻一个抖音热门模板", "category": "案例实战", "difficulty": 2, "content_type": "爆款", "estimated_duration": "3min", "viral_potential": "高", "production_time": "1h", "description": "打开抖音→搜「剪映模板」→找一个本周热门的→全程演示怎么用这个模板→替换素材→调整参数→导出。观众最爱的跟练内容", "stage": "增长期", "status": "待发布"}, {"episode": 29, "title": "一条视频剪完后还要做哪些事：导出设置+封面+标题", "category": "案例实战", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "30min", "description": "导出参数(1080P/60fps/H.264)→选封面(找对比最强烈的那一帧)→写标题(3种爆款标题公式)→发布时段建议。很多新手剪完不知道这一步", "stage": "冷启动期", "status": "待发布"}, {"episode": 30, "title": "0素材起步：用免版权网站剪出第一条视频", "category": "案例实战", "difficulty": 1, "content_type": "干货", "estimated_duration": "4min", "viral_potential": "高", "production_time": "1.5h", "description": "Pexels/Pixabay下载免费视频→导入剪映→排列顺序→配BGM→加文字→导出。对象：完全没有自己素材的新手→跟着做就能出片", "stage": "冷启动期", "status": "待发布"}]</script><script id="data-picks" type="application/json">[{"id": "t14", "title": "电影感调色3步：饱和度-15+色温-8+暗角-20", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "description": "拿手机直出素材→调3个参数→Before/After分屏对比。参数大字报展示让观众截图。播放量普遍10w+的爆款选题", "estimated_duration": "40s", "materials_needed": "一段日间户外素材", "viral_potential": "高", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t12", "title": "匹配剪辑：两个相似画面无缝衔接", "category": "转场特效", "difficulty": 2, "content_type": "爆款", "description": "前一段画面是圆形物体→下一段也是圆形→匹配形状。前一段人物伸手→下一段人物接住→匹配动作。找2组素材演示", "estimated_duration": "35s", "materials_needed": "两组有相似元素的素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t16", "title": "港风复古调色：高对比度+绿阴影+颗粒感", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "description": "对比度+12→阴影偏绿(色调-8)→加颗粒15%→降低高光→街景人像秒变90年代港片。全程参数大字报", "estimated_duration": "45s", "materials_needed": "街景/人像素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t22", "title": "双重曝光：两张照片叠出文艺片质感", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "爆款", "description": "底层放人物剪影（抠像+调暗）→上层放风景/城市→调整透明度→叠加出超高级效果。非常适合做封面和片头", "estimated_duration": "3min", "materials_needed": "人物照片+风景照片", "viral_potential": "高", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t30", "title": "0素材起步：用免版权网站剪出第一条视频", "category": "案例实战", "difficulty": 1, "content_type": "干货", "description": "Pexels/Pixabay下载免费视频→导入剪映→排列顺序→配BGM→加文字→导出。对象：完全没有自己素材的新手→跟着做就能出片", "estimated_duration": "4min", "materials_needed": "Pexels/Pixabay下载的免费素材", "viral_potential": "高", "production_time": "1.5h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t08", "title": "滤镜的正确用法：别拉满，叠两层", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "强度调到15%-30%最自然→叠两个不同滤镜产生新风格→调节层统一调色。拿手机原片演示有滤镜 vs 没滤镜的差别", "estimated_duration": "2min", "materials_needed": "一段户外/日常素材", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t05", "title": "变速技巧：快放堆叠精彩+慢放放大情绪", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "同一段素材先正常播→拖到2x加速（卡点用）→降到0.5x慢放（情绪用）→曲线变速自定义。三种变速的实际效果对比", "estimated_duration": "3min", "materials_needed": "一段有动作变化的长素材", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t13", "title": "色温色调：冷调高级感 vs 暖调治愈感", "category": "调色教程", "difficulty": 2, "content_type": "干货", "description": "同一段素材分别调成冷调(色温-10、色调+5)和暖调(色温+8、色调-3)→并排对比→讲每种氛围适合什么内容", "estimated_duration": "40s", "materials_needed": "一段户外/室内素材", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t23", "title": "从零剪一条旅行短片：碎片素材变故事", "category": "案例实战", "difficulty": 3, "content_type": "深度", "description": "下载10段免版权旅行素材→按时间线排列→找情绪节点→配BGM→加转场串联→调色统一→导出。适合没有自己素材但想练手的人", "estimated_duration": "5min", "materials_needed": "10段免版权旅行素材(pexels/pixabay)", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t24", "title": "一条视频用5种风格剪出5种感觉", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "description": "同一段素材→分别剪成快节奏卡点版/慢节奏情绪版/搞笑鬼畜版/电影感版/Vlog日常版→并排对比。展示剪辑的力量", "estimated_duration": "5min", "materials_needed": "一段2分钟的通用素材", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}]</script><script id="data-stats" type="application/json">{"total": 30, "pending": 30, "published": 0, "cal": 30, "cats": 7}</script><script id="data-bloggers" type="application/json">{"剪映基础操作": [{"n": "陆一舟剪辑", "d": "最完整体系零基础首选", "u": "https://www.douyin.com/search/陆一舟剪辑"}], "拍摄技巧": [{"n": "南门录像厅", "d": "拉片式逐帧分析", "u": "https://www.douyin.com/search/南门录像厅"}], "转场特效": [{"n": "几何生长", "d": "AE动效设计思路", "u": "https://www.douyin.com/search/几何生长"}], "调色教程": [{"n": "云桥饲羽", "d": "达芬奇调色逻辑", "u": "https://www.douyin.com/search/云桥饲羽"}], "案例实战": [{"n": "陶阿狗君", "d": "AE+实景合成", "u": "https://www.douyin.com/search/陶阿狗君"}], "Vlog实战": [{"n": "宋叔都会了", "d": "Vlog全流程", "u": "https://www.douyin.com/search/宋叔都会了Vlog"}]}</script><script id="data-cats" type="application/json">["剪映基础操作", "卡点节奏", "案例实战", "蒙版&关键帧", "调色教程", "转场特效", "音频处理"]</script><script>
-document.addEventListener("DOMContentLoaded",function(){
-var D=document;
+
+</main>
+</div>
+
+<footer><p>数据截止 2026-06-30 · 每日 <span>8:57</span> 自动刷新 · <a href="#" onclick="resetPicks()">重置今日推荐</a> · 灵感来源：王松傲寒 · 宋叔都会了 · 南门录像厅 · 四维像素 · 陶阿狗君 · 几何生长 · 百万剪辑狮</p></footer>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box" id="modal-box"></div>
+</div>
+
+<script id="data-topics" type="application/json">[{"id": "t01", "title": "3分钟认识剪映所有功能区", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "屏幕录制剪映界面，用画中画+红圈标注4个核心区域，每区停留15秒——给从没打开过剪映的人看的第一条视频", "estimated_duration": "3min", "materials_needed": "剪映APP录屏", "viral_potential": "中", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t02", "title": "导入素材的3种方式：第3种最快没人说", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "方式1：从相册选→方式2：相册分享到剪映→方式3：长按拖到剪映图标一键导入。拿一段视频演示三种方式的速度差", "estimated_duration": "2min", "materials_needed": "一段手机视频素材", "viral_potential": "中", "production_time": "30min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t03", "title": "分割、删除、复制：3个最基础但每期都用的操作", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "一段素材一分三→删中间留头尾→复制一段做双屏——这三个动作合起来就是最简单的蒙太奇雏形", "estimated_duration": "2min", "materials_needed": "任意一段30秒视频", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t04", "title": "倒放效果：一个按钮让普通视频变成魔术", "category": "剪映基础操作", "difficulty": 1, "content_type": "爆款", "description": "选一段倒水/跳跃/扔东西的素材→点倒放按钮→关原声配BGM→导出。前后对比展示效果，涨粉最快的特效", "estimated_duration": "25s", "materials_needed": "方向性强的动作素材（网上下载或自己以前拍的）", "viral_potential": "高", "production_time": "20min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t05", "title": "变速技巧：快放堆叠精彩+慢放放大情绪", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "同一段素材先正常播→拖到2x加速（卡点用）→降到0.5x慢放（情绪用）→曲线变速自定义。三种变速的实际效果对比", "estimated_duration": "3min", "materials_needed": "一段有动作变化的长素材", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t06", "title": "画中画：让你的视频多一层信息量", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "底层放主画面→上层叠加文字/图片/另一段视频→调整大小位置→这是专业剪辑的起点。演示3种画中画用法", "estimated_duration": "3min", "materials_needed": "主视频+一段叠加素材+一张截图或文字", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t07", "title": "文字动画：让字幕像电影片头一样出场", "category": "剪映基础操作", "difficulty": 2, "content_type": "干货", "description": "新建文字→选动画→入场动画(弹入/淡入/打字机)/出场动画/循环动画→调速度→配合BGM节奏。字幕不只是信息，也是视觉元素", "estimated_duration": "3min", "materials_needed": "一段视频+加几行文字", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t08", "title": "滤镜的正确用法：别拉满，叠两层", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "强度调到15%-30%最自然→叠两个不同滤镜产生新风格→调节层统一调色。拿手机原片演示有滤镜 vs 没滤镜的差别", "estimated_duration": "2min", "materials_needed": "一段户外/日常素材", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t09", "title": "缩放转场：画面放大到105%的一瞬间切镜头", "category": "转场特效", "difficulty": 1, "content_type": "干货", "description": "最实用最简单的转场：每段素材开头放大到105%→结尾恢复100%→切下一段→再放大→循环。拿旅行/日常碎片演示连贯效果", "estimated_duration": "30s", "materials_needed": "3段以上短素材", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t10", "title": "遮罩转场：蒙版从左移到右的丝滑擦除", "category": "转场特效", "difficulty": 2, "content_type": "干货", "description": "A素材在上层→加矩形蒙版→打关键帧→蒙版从左移到右→B素材露出来→加羽化让边缘自然。用两段街景/室内素材演示", "estimated_duration": "40s", "materials_needed": "两段不同场景的素材", "viral_potential": "中", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t11", "title": "模糊转场：运动模糊的一瞬间完成画面切换", "category": "转场特效", "difficulty": 2, "content_type": "干货", "description": "在画面快速移动/旋转的瞬间切镜头→人眼察觉不到切换。不需要任何特效，纯靠剪辑点选择。用3组素材演示技巧", "estimated_duration": "35s", "materials_needed": "3段有运动镜头的素材", "viral_potential": "中", "production_time": "30min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t12", "title": "匹配剪辑：两个相似画面无缝衔接", "category": "转场特效", "difficulty": 2, "content_type": "爆款", "description": "前一段画面是圆形物体→下一段也是圆形→匹配形状。前一段人物伸手→下一段人物接住→匹配动作。找2组素材演示", "estimated_duration": "35s", "materials_needed": "两组有相似元素的素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t13", "title": "色温色调：冷调高级感 vs 暖调治愈感", "category": "调色教程", "difficulty": 2, "content_type": "干货", "description": "同一段素材分别调成冷调(色温-10、色调+5)和暖调(色温+8、色调-3)→并排对比→讲每种氛围适合什么内容", "estimated_duration": "40s", "materials_needed": "一段户外/室内素材", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t14", "title": "电影感调色3步：饱和度-15+色温-8+暗角-20", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "description": "拿手机直出素材→调3个参数→Before/After分屏对比。参数大字报展示让观众截图。播放量普遍10w+的爆款选题", "estimated_duration": "40s", "materials_needed": "一段日间户外素材", "viral_potential": "高", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t15", "title": "HSL调色：只改蓝天不改肤色", "category": "调色教程", "difficulty": 3, "content_type": "干货", "description": "点击蓝色→饱和度+20亮度-10→蓝天更蓝→肤色完全不受影响。再演示改绿色让草地更高级。精准控制每一种颜色", "estimated_duration": "3min", "materials_needed": "一段天空/草地/人像素材", "viral_potential": "中", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t16", "title": "港风复古调色：高对比度+绿阴影+颗粒感", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "description": "对比度+12→阴影偏绿(色调-8)→加颗粒15%→降低高光→街景人像秒变90年代港片。全程参数大字报", "estimated_duration": "45s", "materials_needed": "街景/人像素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t17", "title": "BGM卡点剪辑：自动踩点+每鼓点切一刀", "category": "卡点节奏", "difficulty": 2, "content_type": "爆款", "description": "选一首鼓点明显的BGM→用剪映「自动踩点」→每个黄点切一刀→鼓点重音处画面放大到105%→预览整条卡点效果", "estimated_duration": "45s", "materials_needed": "一首鼓点BGM+6段以上切换素材", "viral_potential": "高", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t18", "title": "变速卡点：快放堆叠节奏+慢放放大情绪", "category": "卡点节奏", "difficulty": 3, "content_type": "干货", "description": "鼓点密集段落→画面2x快放加速。鼓点稀疏段落→0.5x慢放强调。变速点对准鼓点→播放预览感受节奏变化", "estimated_duration": "50s", "materials_needed": "带BGM的素材段落", "viral_potential": "中", "production_time": "45min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t19", "title": "音效叠加：切换画面+唰声，文字出现+叮声", "category": "音频处理", "difficulty": 2, "content_type": "干货", "description": "画面切换的瞬间叠加「唰」音效→文字出现时叠加「叮」→卡点鼓点处双击共振。3组演示→关掉音效 vs 打开音效对比", "estimated_duration": "2min", "materials_needed": "一段带切换的剪辑+音效包", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t20", "title": "关键帧入门：打两个点=自动生成一段动画", "category": "蒙版&关键帧", "difficulty": 2, "content_type": "干货", "description": "一张照片→开头打位置关键帧→结尾拖到别处打第二个关键帧→照片自己动了。再演示缩放关键帧+旋转关键帧+透明度关键帧", "estimated_duration": "3min", "materials_needed": "一张照片或图片", "viral_potential": "中", "production_time": "40min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t21", "title": "矩形蒙版+关键帧：做一个画面移动画框", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "干货", "description": "给视频加矩形蒙版→打关键帧→蒙版从左移到右→框里的画面跟着移动。像幻灯片一样自动切换关注点", "estimated_duration": "3min", "materials_needed": "一段大场景视频", "viral_potential": "中", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t22", "title": "双重曝光：两张照片叠出文艺片质感", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "爆款", "description": "底层放人物剪影（抠像+调暗）→上层放风景/城市→调整透明度→叠加出超高级效果。非常适合做封面和片头", "estimated_duration": "3min", "materials_needed": "人物照片+风景照片", "viral_potential": "高", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t23", "title": "从零剪一条旅行短片：碎片素材变故事", "category": "案例实战", "difficulty": 3, "content_type": "深度", "description": "下载10段免版权旅行素材→按时间线排列→找情绪节点→配BGM→加转场串联→调色统一→导出。适合没有自己素材但想练手的人", "estimated_duration": "5min", "materials_needed": "10段免版权旅行素材(pexels/pixabay)", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t24", "title": "一条视频用5种风格剪出5种感觉", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "description": "同一段素材→分别剪成快节奏卡点版/慢节奏情绪版/搞笑鬼畜版/电影感版/Vlog日常版→并排对比。展示剪辑的力量", "estimated_duration": "5min", "materials_needed": "一段2分钟的通用素材", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t25", "title": "爆款逐帧拆解：一条百万播放视频怎么剪的", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "description": "找一条抖音热门的剪辑类视频→0.5x慢放→标注时间轴(00:00钩子/00:03音乐切入/00:08高潮/00:15CTA)→分析每段用的什么技巧", "estimated_duration": "4min", "materials_needed": "一条热门视频(抖音下载或用录屏)", "viral_potential": "高", "production_time": "2h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t26", "title": "10分钟做出一个像样的片头", "category": "案例实战", "difficulty": 2, "content_type": "干货", "description": "文字动画入场→BGM切入→画面缩放或淡入→持续3-5秒→形成固定片头模板。以后每期套用只需改文字", "estimated_duration": "3min", "materials_needed": "一段短素材+文字+5秒BGM", "viral_potential": "中", "production_time": "45min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t27", "title": "美食视频怎么剪：3步让食物看起来更好吃", "category": "案例实战", "difficulty": 2, "content_type": "干货", "description": "暖色调滤镜+特写慢放+蒸汽/油花声叠加→食欲感直接拉满。拿一段美食素材演示调色→变速→音效的全过程", "estimated_duration": "3min", "materials_needed": "一段美食素材+音效包", "viral_potential": "中", "production_time": "1h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t28", "title": "用剪映复刻一个抖音热门模板", "category": "案例实战", "difficulty": 2, "content_type": "爆款", "description": "打开抖音→搜「剪映模板」→找一个本周热门的→全程演示怎么用这个模板→替换素材→调整参数→导出。观众最爱的跟练内容", "estimated_duration": "3min", "materials_needed": "对应模板要求的N段素材", "viral_potential": "高", "production_time": "1h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t29", "title": "一条视频剪完后还要做哪些事：导出设置+封面+标题", "category": "案例实战", "difficulty": 1, "content_type": "干货", "description": "导出参数(1080P/60fps/H.264)→选封面(找对比最强烈的那一帧)→写标题(3种爆款标题公式)→发布时段建议。很多新手剪完不知道这一步", "estimated_duration": "3min", "materials_needed": "一条已完成剪辑的视频", "viral_potential": "中", "production_time": "30min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t30", "title": "0素材起步：用免版权网站剪出第一条视频", "category": "案例实战", "difficulty": 1, "content_type": "干货", "description": "Pexels/Pixabay下载免费视频→导入剪映→排列顺序→配BGM→加文字→导出。对象：完全没有自己素材的新手→跟着做就能出片", "estimated_duration": "4min", "materials_needed": "Pexels/Pixabay下载的免费素材", "viral_potential": "高", "production_time": "1.5h", "status": "待发布", "created_at": "2026-06-29"}]</script>
+<script id="data-calendar" type="application/json">[{"episode": 1, "title": "3分钟认识剪映所有功能区", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "40min", "description": "屏幕录制剪映界面，用画中画+红圈标注4个核心区域，每区停留15秒——给从没打开过剪映的人看的第一条视频", "stage": "冷启动期", "status": "待发布"}, {"episode": 2, "title": "导入素材的3种方式：第3种最快没人说", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "30min", "description": "方式1：从相册选→方式2：相册分享到剪映→方式3：长按拖到剪映图标一键导入。拿一段视频演示三种方式的速度差", "stage": "冷启动期", "status": "待发布"}, {"episode": 3, "title": "分割、删除、复制：3个最基础但每期都用的操作", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "25min", "description": "一段素材一分三→删中间留头尾→复制一段做双屏——这三个动作合起来就是最简单的蒙太奇雏形", "stage": "冷启动期", "status": "待发布"}, {"episode": 4, "title": "倒放效果：一个按钮让普通视频变成魔术", "category": "剪映基础操作", "difficulty": 1, "content_type": "爆款", "estimated_duration": "25s", "viral_potential": "高", "production_time": "20min", "description": "选一段倒水/跳跃/扔东西的素材→点倒放按钮→关原声配BGM→导出。前后对比展示效果，涨粉最快的特效", "stage": "冷启动期", "status": "待发布"}, {"episode": 5, "title": "变速技巧：快放堆叠精彩+慢放放大情绪", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "35min", "description": "同一段素材先正常播→拖到2x加速（卡点用）→降到0.5x慢放（情绪用）→曲线变速自定义。三种变速的实际效果对比", "stage": "冷启动期", "status": "待发布"}, {"episode": 6, "title": "画中画：让你的视频多一层信息量", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "35min", "description": "底层放主画面→上层叠加文字/图片/另一段视频→调整大小位置→这是专业剪辑的起点。演示3种画中画用法", "stage": "冷启动期", "status": "待发布"}, {"episode": 7, "title": "文字动画：让字幕像电影片头一样出场", "category": "剪映基础操作", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "35min", "description": "新建文字→选动画→入场动画(弹入/淡入/打字机)/出场动画/循环动画→调速度→配合BGM节奏。字幕不只是信息，也是视觉元素", "stage": "增长期", "status": "待发布"}, {"episode": 8, "title": "滤镜的正确用法：别拉满，叠两层", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "25min", "description": "强度调到15%-30%最自然→叠两个不同滤镜产生新风格→调节层统一调色。拿手机原片演示有滤镜 vs 没滤镜的差别", "stage": "冷启动期", "status": "待发布"}, {"episode": 9, "title": "缩放转场：画面放大到105%的一瞬间切镜头", "category": "转场特效", "difficulty": 1, "content_type": "干货", "estimated_duration": "30s", "viral_potential": "中", "production_time": "25min", "description": "最实用最简单的转场：每段素材开头放大到105%→结尾恢复100%→切下一段→再放大→循环。拿旅行/日常碎片演示连贯效果", "stage": "冷启动期", "status": "待发布"}, {"episode": 10, "title": "遮罩转场：蒙版从左移到右的丝滑擦除", "category": "转场特效", "difficulty": 2, "content_type": "干货", "estimated_duration": "40s", "viral_potential": "中", "production_time": "40min", "description": "A素材在上层→加矩形蒙版→打关键帧→蒙版从左移到右→B素材露出来→加羽化让边缘自然。用两段街景/室内素材演示", "stage": "增长期", "status": "待发布"}, {"episode": 11, "title": "模糊转场：运动模糊的一瞬间完成画面切换", "category": "转场特效", "difficulty": 2, "content_type": "干货", "estimated_duration": "35s", "viral_potential": "中", "production_time": "30min", "description": "在画面快速移动/旋转的瞬间切镜头→人眼察觉不到切换。不需要任何特效，纯靠剪辑点选择。用3组素材演示技巧", "stage": "增长期", "status": "待发布"}, {"episode": 12, "title": "匹配剪辑：两个相似画面无缝衔接", "category": "转场特效", "difficulty": 2, "content_type": "爆款", "estimated_duration": "35s", "viral_potential": "高", "production_time": "40min", "description": "前一段画面是圆形物体→下一段也是圆形→匹配形状。前一段人物伸手→下一段人物接住→匹配动作。找2组素材演示", "stage": "增长期", "status": "待发布"}, {"episode": 13, "title": "色温色调：冷调高级感 vs 暖调治愈感", "category": "调色教程", "difficulty": 2, "content_type": "干货", "estimated_duration": "40s", "viral_potential": "中", "production_time": "35min", "description": "同一段素材分别调成冷调(色温-10、色调+5)和暖调(色温+8、色调-3)→并排对比→讲每种氛围适合什么内容", "stage": "增长期", "status": "待发布"}, {"episode": 14, "title": "电影感调色3步：饱和度-15+色温-8+暗角-20", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "estimated_duration": "40s", "viral_potential": "高", "production_time": "35min", "description": "拿手机直出素材→调3个参数→Before/After分屏对比。参数大字报展示让观众截图。播放量普遍10w+的爆款选题", "stage": "增长期", "status": "待发布"}, {"episode": 15, "title": "HSL调色：只改蓝天不改肤色", "category": "调色教程", "difficulty": 3, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "50min", "description": "点击蓝色→饱和度+20亮度-10→蓝天更蓝→肤色完全不受影响。再演示改绿色让草地更高级。精准控制每一种颜色", "stage": "成熟期", "status": "待发布"}, {"episode": 16, "title": "港风复古调色：高对比度+绿阴影+颗粒感", "category": "调色教程", "difficulty": 2, "content_type": "爆款", "estimated_duration": "45s", "viral_potential": "高", "production_time": "40min", "description": "对比度+12→阴影偏绿(色调-8)→加颗粒15%→降低高光→街景人像秒变90年代港片。全程参数大字报", "stage": "增长期", "status": "待发布"}, {"episode": 17, "title": "BGM卡点剪辑：自动踩点+每鼓点切一刀", "category": "卡点节奏", "difficulty": 2, "content_type": "爆款", "estimated_duration": "45s", "viral_potential": "高", "production_time": "40min", "description": "选一首鼓点明显的BGM→用剪映「自动踩点」→每个黄点切一刀→鼓点重音处画面放大到105%→预览整条卡点效果", "stage": "增长期", "status": "待发布"}, {"episode": 18, "title": "变速卡点：快放堆叠节奏+慢放放大情绪", "category": "卡点节奏", "difficulty": 3, "content_type": "干货", "estimated_duration": "50s", "viral_potential": "中", "production_time": "45min", "description": "鼓点密集段落→画面2x快放加速。鼓点稀疏段落→0.5x慢放强调。变速点对准鼓点→播放预览感受节奏变化", "stage": "成熟期", "status": "待发布"}, {"episode": 19, "title": "音效叠加：切换画面+唰声，文字出现+叮声", "category": "音频处理", "difficulty": 2, "content_type": "干货", "estimated_duration": "2min", "viral_potential": "中", "production_time": "35min", "description": "画面切换的瞬间叠加「唰」音效→文字出现时叠加「叮」→卡点鼓点处双击共振。3组演示→关掉音效 vs 打开音效对比", "stage": "增长期", "status": "待发布"}, {"episode": 20, "title": "关键帧入门：打两个点=自动生成一段动画", "category": "蒙版&关键帧", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "40min", "description": "一张照片→开头打位置关键帧→结尾拖到别处打第二个关键帧→照片自己动了。再演示缩放关键帧+旋转关键帧+透明度关键帧", "stage": "增长期", "status": "待发布"}, {"episode": 21, "title": "矩形蒙版+关键帧：做一个画面移动画框", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "50min", "description": "给视频加矩形蒙版→打关键帧→蒙版从左移到右→框里的画面跟着移动。像幻灯片一样自动切换关注点", "stage": "成熟期", "status": "待发布"}, {"episode": 22, "title": "双重曝光：两张照片叠出文艺片质感", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "爆款", "estimated_duration": "3min", "viral_potential": "高", "production_time": "50min", "description": "底层放人物剪影（抠像+调暗）→上层放风景/城市→调整透明度→叠加出超高级效果。非常适合做封面和片头", "stage": "成熟期", "status": "待发布"}, {"episode": 23, "title": "从零剪一条旅行短片：碎片素材变故事", "category": "案例实战", "difficulty": 3, "content_type": "深度", "estimated_duration": "5min", "viral_potential": "高", "production_time": "3h", "description": "下载10段免版权旅行素材→按时间线排列→找情绪节点→配BGM→加转场串联→调色统一→导出。适合没有自己素材但想练手的人", "stage": "成熟期", "status": "待发布"}, {"episode": 24, "title": "一条视频用5种风格剪出5种感觉", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "estimated_duration": "5min", "viral_potential": "高", "production_time": "3h", "description": "同一段素材→分别剪成快节奏卡点版/慢节奏情绪版/搞笑鬼畜版/电影感版/Vlog日常版→并排对比。展示剪辑的力量", "stage": "成熟期", "status": "待发布"}, {"episode": 25, "title": "爆款逐帧拆解：一条百万播放视频怎么剪的", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "estimated_duration": "4min", "viral_potential": "高", "production_time": "2h", "description": "找一条抖音热门的剪辑类视频→0.5x慢放→标注时间轴(00:00钩子/00:03音乐切入/00:08高潮/00:15CTA)→分析每段用的什么技巧", "stage": "成熟期", "status": "待发布"}, {"episode": 26, "title": "10分钟做出一个像样的片头", "category": "案例实战", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "45min", "description": "文字动画入场→BGM切入→画面缩放或淡入→持续3-5秒→形成固定片头模板。以后每期套用只需改文字", "stage": "增长期", "status": "待发布"}, {"episode": 27, "title": "美食视频怎么剪：3步让食物看起来更好吃", "category": "案例实战", "difficulty": 2, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "1h", "description": "暖色调滤镜+特写慢放+蒸汽/油花声叠加→食欲感直接拉满。拿一段美食素材演示调色→变速→音效的全过程", "stage": "增长期", "status": "待发布"}, {"episode": 28, "title": "用剪映复刻一个抖音热门模板", "category": "案例实战", "difficulty": 2, "content_type": "爆款", "estimated_duration": "3min", "viral_potential": "高", "production_time": "1h", "description": "打开抖音→搜「剪映模板」→找一个本周热门的→全程演示怎么用这个模板→替换素材→调整参数→导出。观众最爱的跟练内容", "stage": "增长期", "status": "待发布"}, {"episode": 29, "title": "一条视频剪完后还要做哪些事：导出设置+封面+标题", "category": "案例实战", "difficulty": 1, "content_type": "干货", "estimated_duration": "3min", "viral_potential": "中", "production_time": "30min", "description": "导出参数(1080P/60fps/H.264)→选封面(找对比最强烈的那一帧)→写标题(3种爆款标题公式)→发布时段建议。很多新手剪完不知道这一步", "stage": "冷启动期", "status": "待发布"}, {"episode": 30, "title": "0素材起步：用免版权网站剪出第一条视频", "category": "案例实战", "difficulty": 1, "content_type": "干货", "estimated_duration": "4min", "viral_potential": "高", "production_time": "1.5h", "description": "Pexels/Pixabay下载免费视频→导入剪映→排列顺序→配BGM→加文字→导出。对象：完全没有自己素材的新手→跟着做就能出片", "stage": "冷启动期", "status": "待发布"}]</script>
+<script id="data-picks" type="application/json">[{"id": "t22", "title": "双重曝光：两张照片叠出文艺片质感", "category": "蒙版&关键帧", "difficulty": 3, "content_type": "爆款", "description": "底层放人物剪影（抠像+调暗）→上层放风景/城市→调整透明度→叠加出超高级效果。非常适合做封面和片头", "estimated_duration": "3min", "materials_needed": "人物照片+风景照片", "viral_potential": "高", "production_time": "50min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t04", "title": "倒放效果：一个按钮让普通视频变成魔术", "category": "剪映基础操作", "difficulty": 1, "content_type": "爆款", "description": "选一段倒水/跳跃/扔东西的素材→点倒放按钮→关原声配BGM→导出。前后对比展示效果，涨粉最快的特效", "estimated_duration": "25s", "materials_needed": "方向性强的动作素材（网上下载或自己以前拍的）", "viral_potential": "高", "production_time": "20min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t25", "title": "爆款逐帧拆解：一条百万播放视频怎么剪的", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "description": "找一条抖音热门的剪辑类视频→0.5x慢放→标注时间轴(00:00钩子/00:03音乐切入/00:08高潮/00:15CTA)→分析每段用的什么技巧", "estimated_duration": "4min", "materials_needed": "一条热门视频(抖音下载或用录屏)", "viral_potential": "高", "production_time": "2h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t24", "title": "一条视频用5种风格剪出5种感觉", "category": "案例实战", "difficulty": 3, "content_type": "爆款", "description": "同一段素材→分别剪成快节奏卡点版/慢节奏情绪版/搞笑鬼畜版/电影感版/Vlog日常版→并排对比。展示剪辑的力量", "estimated_duration": "5min", "materials_needed": "一段2分钟的通用素材", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t30", "title": "0素材起步：用免版权网站剪出第一条视频", "category": "案例实战", "difficulty": 1, "content_type": "干货", "description": "Pexels/Pixabay下载免费视频→导入剪映→排列顺序→配BGM→加文字→导出。对象：完全没有自己素材的新手→跟着做就能出片", "estimated_duration": "4min", "materials_needed": "Pexels/Pixabay下载的免费素材", "viral_potential": "高", "production_time": "1.5h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t26", "title": "10分钟做出一个像样的片头", "category": "案例实战", "difficulty": 2, "content_type": "干货", "description": "文字动画入场→BGM切入→画面缩放或淡入→持续3-5秒→形成固定片头模板。以后每期套用只需改文字", "estimated_duration": "3min", "materials_needed": "一段短素材+文字+5秒BGM", "viral_potential": "中", "production_time": "45min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t19", "title": "音效叠加：切换画面+唰声，文字出现+叮声", "category": "音频处理", "difficulty": 2, "content_type": "干货", "description": "画面切换的瞬间叠加「唰」音效→文字出现时叠加「叮」→卡点鼓点处双击共振。3组演示→关掉音效 vs 打开音效对比", "estimated_duration": "2min", "materials_needed": "一段带切换的剪辑+音效包", "viral_potential": "中", "production_time": "35min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t03", "title": "分割、删除、复制：3个最基础但每期都用的操作", "category": "剪映基础操作", "difficulty": 1, "content_type": "干货", "description": "一段素材一分三→删中间留头尾→复制一段做双屏——这三个动作合起来就是最简单的蒙太奇雏形", "estimated_duration": "2min", "materials_needed": "任意一段30秒视频", "viral_potential": "中", "production_time": "25min", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t23", "title": "从零剪一条旅行短片：碎片素材变故事", "category": "案例实战", "difficulty": 3, "content_type": "深度", "description": "下载10段免版权旅行素材→按时间线排列→找情绪节点→配BGM→加转场串联→调色统一→导出。适合没有自己素材但想练手的人", "estimated_duration": "5min", "materials_needed": "10段免版权旅行素材(pexels/pixabay)", "viral_potential": "高", "production_time": "3h", "status": "待发布", "created_at": "2026-06-29"}, {"id": "t28", "title": "用剪映复刻一个抖音热门模板", "category": "案例实战", "difficulty": 2, "content_type": "爆款", "description": "打开抖音→搜「剪映模板」→找一个本周热门的→全程演示怎么用这个模板→替换素材→调整参数→导出。观众最爱的跟练内容", "estimated_duration": "3min", "materials_needed": "对应模板要求的N段素材", "viral_potential": "高", "production_time": "1h", "status": "待发布", "created_at": "2026-06-29"}]</script>
+<script id="data-stats" type="application/json">{"total": 30, "pending": 30, "published": 0, "skipped": 0, "calendar": 30, "categories": 7}</script>
+<script id="data-bloggers" type="application/json">{"剪映基础操作": [{"name": "陆一舟剪辑", "note": "体系最完整的剪映教学，零基础首选", "url": "https://www.douyin.com/search/陆一舟剪辑"}, {"name": "三郎老师", "note": "唠嗑式教学，完全零基础跟练", "url": "https://www.douyin.com/search/三郎老师剪映"}, {"name": "路过我的生活", "note": "全程无废话，音乐卡点+抠像拆解", "url": "https://www.douyin.com/search/路过我的生活剪辑"}], "拍摄技巧": [{"name": "南门录像厅", "note": "拉片式教学，逐帧分析镜头衔接", "url": "https://www.douyin.com/search/南门录像厅"}, {"name": "王松傲寒", "note": "剪映+AE双修，实拍+软件教学", "url": "https://www.douyin.com/search/王松傲寒"}, {"name": "宋叔都会了", "note": "既教剪映又教AE，实拍带着软件技巧", "url": "https://www.douyin.com/search/宋叔都会了"}], "转场特效": [{"name": "几何生长", "note": "AE动效拆解，转场设计思路清晰", "url": "https://www.douyin.com/search/几何生长"}, {"name": "四维像素", "note": "逐帧分析爆款视频制作方法", "url": "https://www.douyin.com/search/四维像素"}], "调色教程": [{"name": "云桥饲羽", "note": "达芬奇+无LUT调色逻辑讲解", "url": "https://www.douyin.com/search/云桥饲羽"}, {"name": "百万剪辑狮", "note": "揭秘爆款节奏和镜头衔接底层规律", "url": "https://www.douyin.com/search/百万剪辑狮"}], "案例实战": [{"name": "陶阿狗君", "note": "AE+实景合成案例拆解", "url": "https://www.douyin.com/search/陶阿狗君"}, {"name": "四维像素", "note": "AE人偶动画+实景合成教学", "url": "https://www.douyin.com/search/四维像素"}], "蒙版&关键帧": [{"name": "王松傲寒", "note": "关键帧动画+蒙版进阶", "url": "https://www.douyin.com/search/王松傲寒"}], "Vlog实战": [{"name": "宋叔都会了", "note": "Vlog从拍到剪全流程", "url": "https://www.douyin.com/search/宋叔都会了Vlog"}]}</script>
+
+<script>
+/* ═══════════════ SAFE INIT ═══════════════ */
+document.addEventListener('DOMContentLoaded',function(){
 try{
-var TOPICS=JSON.parse(D.getElementById("data-topics").textContent);
-var CALENDAR=JSON.parse(D.getElementById("data-calendar").textContent);
-var PICKS=JSON.parse(D.getElementById("data-picks").textContent);
-var STATS=JSON.parse(D.getElementById("data-stats").textContent);
-var BLOGGERS=JSON.parse(D.getElementById("data-bloggers").textContent);
-var CATS=JSON.parse(D.getElementById("data-cats").textContent);
-var MEDALS=["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
-var DM={1:"⭐",2:"⭐⭐",3:"⭐⭐⭐",4:"⭐⭐⭐⭐",5:"⭐⭐⭐⭐⭐"};
-var TE={"爆款":"🔺","干货":"🔸","深度":"🔹"};
-var TC={"爆款":"r","干货":"b","深度":"pu"};
-var SC={"冷启动期":"green","增长期":"blue","成熟期":"purple"};
+var TOPICS=JSON.parse(document.getElementById('data-topics').textContent);
+    var navBtns=document.querySelectorAll('.tabs button');
+var CALENDAR=JSON.parse(document.getElementById('data-calendar').textContent);
+var PICKS=JSON.parse(document.getElementById('data-picks').textContent);
+var STATS=JSON.parse(document.getElementById('data-stats').textContent);
+var BLOGGERS=JSON.parse(document.getElementById('data-bloggers').textContent);
 
-function esc(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+var MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
+var DIFF_MAP={1:'⭐',2:'⭐⭐',3:'⭐⭐⭐',4:'⭐⭐⭐⭐',5:'⭐⭐⭐⭐⭐'};
+var TE={'爆款':'🔺','干货':'🔸','深度':'🔹'};
+var TC={'爆款':'r','干货':'b','深度':'pu'};
+var SC={'冷启动期':'green','增长期':'blue','成熟期':'purple'};
 
+/* ── Count-up ── */
 function countUp(el,target,dur){
-    if(!el||!target)return;var s=parseInt(el.textContent)||0,st=null;
+    if(!el||!target)return;
+    var s=parseInt(el.textContent)||0,st=null;
     function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1),e=1-Math.pow(1-p,5);el.textContent=Math.round(s+(target-s)*e);if(p<1)requestAnimationFrame(step);else el.textContent=target}
     requestAnimationFrame(step);
 }
 
-function cardHTML(t,medal){
-    var cat=esc(t.category||""),ctype=t.content_type||"干货",diff=t.difficulty||2;
-    var title=esc(t.title||""),dur=esc(t.estimated_duration||"?"),viral=esc(t.viral_potential||"中");
-    var tc=TC[ctype]||"b",dc=diff<=2?"r":(diff<=3?"b":"pu"),m=medal?"<span class=card-medal>"+medal+"</span>":"";
+/* ── Escape ── */
+function esc(s){if(!s)return'';return(''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+/* ── Render card ── */
+function renderCard(t,medal){
+    var cat=esc(t.category||''),ctype=t.content_type||'干货',diff=t.difficulty||2;
+    var title=esc(t.title||''),dur=esc(t.estimated_duration||'?'),viral=esc(t.viral_potential||'中');
+    var desc=esc(t.description||'');
+    var tc=TC[ctype]||'b',dc=diff<=2?'r':(diff<=3?'b':'pu');
+    var m=medal?'<span class="card-medal">'+medal+'</span>':'';
     var delay=(Math.random()*.2).toFixed(3);
-    return "<div class=card data-id="+esc(t.id||"")+" data-cat="+cat+" data-type="+ctype+" data-diff="+diff+" data-title="+title+" style=animation-delay:"+delay+"s onclick=openCard(this)>"
-        +"<div class=\"card-bar "+dc+"\"></div>"+m+"<span class=\"tag "+tc+"\">"+(TE[ctype]||"")+" "+ctype+"</span>"
-        +"<h3>"+title+"</h3><div class=meta>"+(DM[diff]||"⭐⭐")+" · "+dur+" · 涨粉"+viral+"</div></div>";
+    var te=TE[ctype]||'',dm=DIFF_MAP[diff]||'⭐⭐';
+    return'<div class="card" data-id="'+esc(t.id||'')+'" data-cat="'+cat+'" data-type="'+ctype+'" data-diff="'+diff+'" data-title="'+title+'" style="animation-delay:'+delay+'s">'
+        +'<div class="card-bar '+dc+'"></div>'+m
+        +'<span class="tag '+tc+'">'+te+' '+ctype+'</span>'
+        +'<h3>'+title+'</h3>'
+        +'<div class="meta">'+dm+' · '+dur+' · 涨粉'+viral+'</div>'
+        +(desc?'<div class="desc">'+desc+'</div>':'')
+        +'</div>';
 }
 
-function calRow(e){
-    var title=esc(e.title||"");
-    return "<tr class=cal-row data-cat="+esc(e.category||"")+" data-stage="+esc(e.stage||"")+" data-title="+title+" onclick=\"openByTitle('"+title.replace(/'/g,"\\'")+"')\">"
-        +"<td class=ep>#"+esc(e.episode||"")+"</td><td>"+title+"</td><td>"+esc(e.category||"")+"</td><td>"+(DM[e.difficulty||2]||"")+"</td><td>"+esc(e.content_type||"")+"</td><td>"+esc(e.estimated_duration||"")+"</td>"
-        +"<td><span class=\"pill "+SC[e.stage||"冷启动期"]+"\">"+esc(e.stage||"")+"</span></td></tr>";
+/* ── Render cal row ── */
+function renderCalRow(e){
+    var ep=e.episode||'',title=esc(e.title||''),cat=esc(e.category||''),diff=e.difficulty||2;
+    var ctype=esc(e.content_type||''),dur=esc(e.estimated_duration||''),stage=esc(e.stage||'');
+    var sc=SC[stage]||'blue';
+    return'<tr class="cal-row" data-cat="'+cat+'" data-stage="'+stage+'" data-title="'+title+'">'
+        +'<td class="ep">#'+ep+'</td><td>'+title+'</td><td>'+cat+'</td><td>'+DIFF_MAP[diff]+'</td><td>'+ctype+'</td><td>'+dur+'</td>'
+        +'<td><span class="pill '+sc+'">'+stage+'</span></td></tr>';
 }
 
-/* RENDER */
-var tg=D.getElementById("today-grid");
-for(var i=0;i<PICKS.length;i++)tg.innerHTML+=cardHTML(PICKS[i],MEDALS[i]||"");
-var ct=D.getElementById("cal-tbody");
-for(var i=0;i<CALENDAR.length;i++)ct.innerHTML+=calRow(CALENDAR[i]);
-var lg=D.getElementById("lib-grid");
-for(var i=0;i<TOPICS.length;i++)lg.innerHTML+=cardHTML(TOPICS[i],"");
+/* ── Populate ── */
+var tg=document.getElementById('today-grid');
+for(var i=0;i<PICKS.length;i++)tg.innerHTML+=renderCard(PICKS[i],MEDALS[i]||'');
 
-var catOpts="";
-for(var i=0;i<CATS.length;i++)catOpts+="<option value=\""+CATS[i]+"\">"+CATS[i]+"</option>";
-D.getElementById("f-cal-cat").innerHTML+=catOpts;
-D.getElementById("f-cat").innerHTML+=catOpts;
+var ct=document.getElementById('cal-tbody');
+for(var i=0;i<CALENDAR.length;i++)ct.innerHTML+=renderCalRow(CALENDAR[i]);
 
-/* NAV */
-function switchTab(panel){
-    var btns=D.querySelectorAll(".tabs button");
-    for(var i=0;i<btns.length;i++)btns[i].classList.remove("active");
-    var secs=D.querySelectorAll("section");
-    for(var i=0;i<secs.length;i++)secs[i].classList.remove("active");
-    D.getElementById("sec-"+panel).classList.add("active");
-    var b=D.querySelector(".tabs button[data-panel=\""+panel+"\"]");
-    if(b)b.classList.add("active");
-}
-var navBtns=D.querySelectorAll(".tabs button");
-for(var ni=0;ni<navBtns.length;ni++){navBtns[ni].onclick=function(){switchTab(this.dataset.panel);};}
-var stageCards=D.querySelectorAll(".stage-card");
-for(var si=0;si<stageCards.length;si++){stageCards[si].onclick=function(){switchTab("calendar");D.getElementById("f-stage").value=this.dataset.stage;filterCal();};}
+var lg=document.getElementById('lib-grid');
+for(var i=0;i<TOPICS.length;i++)lg.innerHTML+=renderCard(TOPICS[i],'');
 
-/* FILTERS */
-function filterCal(){
-    var stage=D.getElementById("f-stage").value,cat=D.getElementById("f-cal-cat").value;
-    var q=(D.getElementById("f-cal-search").value||"").toLowerCase(),count=0;
-    var rows=D.querySelectorAll("#cal-tbody .cal-row");
-    for(var i=0;i<rows.length;i++){var r=rows[i],s=true;if(stage!=="all"&&r.dataset.stage!==stage)s=false;if(cat!=="all"&&r.dataset.cat!==cat)s=false;if(q&&r.dataset.title.toLowerCase().indexOf(q)===-1)s=false;r.classList.toggle("hidden",!s);if(s)count++;}
-    D.getElementById("cal-num").textContent=count+" 期";
-}
-function filterLib(){
-    var cat=D.getElementById("f-cat").value,type=D.getElementById("f-type").value;
-    var diff=D.getElementById("f-diff").value,q=(D.getElementById("f-search").value||"").toLowerCase(),count=0;
-    var cards=D.querySelectorAll("#lib-grid .card");
-    for(var i=0;i<cards.length;i++){var c=cards[i],s=true;if(cat!=="all"&&c.dataset.cat!==cat)s=false;if(type!=="all"&&c.dataset.type!==type)s=false;if(diff!=="all"&&c.dataset.diff!==diff)s=false;if(q&&c.dataset.title.toLowerCase().indexOf(q)===-1)s=false;c.classList.toggle("hidden",!s);if(s)count++;}
-    D.getElementById("lib-num").textContent=count+" 条";
-}
+/* ── Cat dropdowns ── */
+var cats=[];
+for(var i=0;i<TOPICS.length;i++){var c=TOPICS[i].category||'';if(cats.indexOf(c)<0)cats.push(c)}
+cats.sort();
+var catOpts='';
+for(var i=0;i<cats.length;i++)catOpts+='<option value="'+cats[i]+'">'+cats[i]+'</option>';
+document.getElementById('f-cal-cat').innerHTML+='<option value="all">全部分类</option>'+catOpts;
+document.getElementById('f-cat').innerHTML+='<option value="all">全部分类</option>'+catOpts;
 
-/* MODAL */
-function openCard(card){
-    var title=card.dataset.title,t=null;
-    for(var i=0;i<TOPICS.length;i++){if(TOPICS[i].title===title){t=TOPICS[i];break;}}
-    if(!t)return;
-    var cat=esc(t.category||""),ctype=t.content_type||"干货",diff=t.difficulty||2;
-    var dur=esc(t.estimated_duration||"?"),viral=esc(t.viral_potential||"中"),prod=esc(t.production_time||"?");
-    var desc=esc(t.description||""),mats=t.materials_needed||"",titleEsc=esc(t.title||"");
-    var refs=BLOGGERS[cat]||[{n:"抖音搜索",d:"搜索标题找参考",u:"https://www.douyin.com/search/"+encodeURIComponent(title)}];
-    var bh="<div class=ds><h4>灵感来源&博主</h4>";
-    for(var i=0;i<refs.length;i++){var r=refs[i];bh+="<a class=info-card href="+(r.u||"#")+" target=_blank style=display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);margin-bottom:6px><div style=width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px>"+(r.n.charAt(0))+"</div><div><div style=font-weight:600;font-size:13px>"+esc(r.n)+"</div><div style=font-size:11px;color:var(--text3)>"+esc(r.d)+"</div></div><span style=margin-left:auto;color:var(--text3)>↗</span></a>";}bh+="</div>";
-    var core=titleEsc.split("：")[1]||titleEsc,hook,steps,ending,bgm;
-    if(ctype==="爆款"){hook="「"+core+"」——你是不是也刷到过这种效果？";steps=["打开剪映导入素材","关键操作："+core+"的核心步骤","微调参数到最佳效果","Before→After对比展示"];ending="学会了点个赞收藏！";bgm="节奏卡点BGM";}
-    else if(ctype==="深度"){hook="完整拆解「"+titleEsc+"」的全过程。";steps=["前期构思与策划","拍摄现场还原与要点","剪辑全流程拆解","成片展示+复盘"];ending="觉得有用点关注！";bgm="叙事感配乐";}
-    else{hook="为什么别人的视频那么高级？";steps=["常见错误：90%人做错了","正确方法："+titleEsc+"的核心要点","具体操作演示","效果对比+避坑提醒"];ending="收藏起来慢慢练！";bgm="轻量Lo-Fi BGM";}
-    var sh="<ol style=padding-left:18px>";for(var i=0;i<steps.length;i++)sh+="<li style=margin-bottom:6px;font-size:14px>"+steps[i]+"</li>";sh+="</ol>";
-    var mt="";if(mats){var ps=mats.replace(/，/g,",").replace(/、/g,",").split(",");for(var i=0;i<ps.length;i++){var m=ps[i].trim();if(m)mt+="<span style=display:inline-block;padding:5px 12px;border-radius:7px;background:rgba(0,85,232,.04);color:var(--accent);font-size:12px;font-weight:600;margin:2px>"+esc(m)+"</span>";}}mt=mt||"无特殊要求";
-    D.getElementById("modal-box").innerHTML="<button class=modal-close onclick=closeModal()>✕</button><div class=modal-tag>"+cat+" · "+ctype+"</div><h2>"+titleEsc+"</h2><div class=modal-difficulty>"+DM[diff]+" · "+dur+" · 涨粉"+viral+" · 制作"+prod+"</div>"+(desc?"<div class=ds><h4>内容说明</h4><p>"+desc+"</p></div>":"")+bh+"<div class=ds><h4>脚本文案</h4><p style=font-size:15px;font-weight:600;margin-bottom:10px>"+hook+"</p>"+sh+"<p style=font-size:14px;color:var(--text2);margin-top:8px>"+ending+"</p><div style=margin-top:10px;padding:13px 18px;border-radius:10px;background:rgba(224,79,22,.04);color:var(--orange);font-size:13px>BGM: "+bgm+"</div></div><div class=ds><h4>所需素材</h4>"+mt+"</div>";
-    D.getElementById("modal-overlay").classList.add("active");D.body.style.overflow="hidden";
-}
-function openByTitle(title){if(!title)return;var cards=D.querySelectorAll(".card");for(var i=0;i<cards.length;i++){if(cards[i].dataset.title===title){openCard(cards[i]);return;}}}
-function closeModal(){D.getElementById("modal-overlay").classList.remove("active");D.body.style.overflow="";}
+/* ── Stage counts ── */
+var stageCounts={};
+for(var i=0;i<CALENDAR.length;i++){var s=CALENDAR[i].stage||'';stageCounts[s]=(stageCounts[s]||0)+1}
+var stageKeys=['冷启动期','增长期','成熟期'];
+for(var i=0;i<stageKeys.length;i++){var el=document.getElementById('stage-count-'+i);if(el)el.textContent=stageCounts[stageKeys[i]]+' 期'}
 
-/* AI */
-function runAI(){
-    var inp=D.getElementById("inspire-search"),q=inp?inp.value:"";
-    if(!q||q.length<2){var ex=["转场特效","调色教程","Vlog拍摄","蒙版抠图","卡点剪辑","电影感调色"];q=ex[Math.floor(Math.random()*ex.length)];if(inp)inp.value=q;}
-    var ql=q.toLowerCase(),matches=[],words=ql.split(/\s+/);
-    for(var i=0;i<TOPICS.length;i++){var t=TOPICS[i],title=(t.title||"").toLowerCase(),desc=(t.description||"").toLowerCase(),cat=(t.category||"").toLowerCase();var score=0;for(var w=0;w<words.length;w++){if(words[w].length<2)continue;if(title.indexOf(words[w])>=0)score+=10;if(desc.indexOf(words[w])>=0)score+=5;if(cat.indexOf(words[w])>=0)score+=4}if(score>0)matches.push({t:t,score:score});}
-    matches.sort(function(a,b){return b.score-a.score});
-    var h="<button class=modal-close onclick=closeModal()>✕</button><div class=modal-tag>AI选题助手</div>";
-    if(!matches.length)h+="<h2>未匹配</h2><p style=color:var(--text3);line-height:2>试试: 转场·调色·Vlog·蒙版·卡点·拍摄·抠像</p>";
-    else{h+="<h2>找到 "+matches.length+" 个选题</h2><div class=card-grid style=margin-top:16px>";for(var i=0;i<Math.min(matches.length,6);i++)h+=cardHTML(matches[i].t,i<3?["🥇","🥈","🥉"][i]:"");h+="</div>";}
-    D.getElementById("modal-box").innerHTML=h;D.getElementById("modal-overlay").classList.add("active");D.body.style.overflow="hidden";
-}
-
-/* Expose handlers globally for inline onclick */
-window.openCard=openCard;window.openByTitle=openByTitle;window.closeModal=closeModal;
-window.runAI=runAI;window.switchTab=switchTab;window.filterCal=filterCal;window.filterLib=filterLib;
-
-/* COUNTUP */
-setTimeout(function(){
-    countUp(D.getElementById("hero-total"),30,1800);
-    countUp(D.getElementById("hero-pending"),30,1800);
-    countUp(D.getElementById("hero-pub"),0,1800);
-    countUp(D.getElementById("hero-cats"),7,1800);
-    countUp(D.getElementById("kpi-total"),30,1800);
-    countUp(D.getElementById("kpi-pending"),30,1800);
-    countUp(D.getElementById("kpi-pub"),0,1800);
-    countUp(D.getElementById("kpi-cal"),30,1800);
-},400);
-
-/* STAT BARS */
-var cc={};for(var i=0;i<TOPICS.length;i++){var c=TOPICS[i].category||"";cc[c]=(cc[c]||0)+1;}
-var cn=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a];});
-var cb=D.getElementById("cat-bars"),ch="";
-for(var i=0;i<cn.length;i++){var pct=cc[cn[i]]/TOPICS.length*100;ch+="<div class=bar-row><span class=bar-label>"+cn[i]+"</span><div class=bar-track><div class=bar-fill data-w="+pct.toFixed(1)+"></div></div><span class=bar-num>"+cc[cn[i]]+"</span></div>";}cb.innerHTML=ch;
-var tc={};for(var i=0;i<TOPICS.length;i++){var ty=TOPICS[i].content_type||"?";tc[ty]=(tc[ty]||0)+1;}
-var tn=Object.keys(tc),tb=D.getElementById("type-bars"),th="",bc={"爆款":"r","干货":"b","深度":"pu"};
-for(var i=0;i<tn.length;i++){var ty=tn[i],pct=tc[ty]/TOPICS.length*100,k=bc[ty]||"";th+="<div class=bar-row><span class=bar-label>"+(TE[ty]||"")+" "+ty+"</span><div class=bar-track><div class=\"bar-fill "+k+"\" data-w="+pct.toFixed(1)+"></div></div><span class=bar-num>"+tc[ty]+"</span></div>";}tb.innerHTML=th;
-
-var bo=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++)if(es[i].isIntersecting){var bars=es[i].target.querySelectorAll("[data-w]");for(var j=0;j<bars.length;j++){(function(b,d){setTimeout(function(){b.style.width=b.getAttribute("data-w")+"%";},d);})(bars[j],j*50);}}},{threshold:.1});
-var pns=D.querySelectorAll(".stat-panel");for(var i=0;i<pns.length;i++)bo.observe(pns[i]);
-
-/* TAG CLOUD */
-var items=[];for(var k in cc)items.push({cat:k,count:cc[k]});items.sort(function(a,b){return b.count-a.count;});
-var tcs=[D.getElementById("tag-cloud")];
-for(var j=0;j<tcs.length;j++)if(tcs[j]){var h="";for(var i=0;i<items.length;i++){var sz=i<3?"s3":(i<7?"s2":"s1");h+="<span class=\"tc-item "+sz+"\" onclick=\"switchTab('library');D.getElementById('f-cat').value='"+esc(items[i].cat)+"';filterLib()\">"+items[i].cat+" ("+items[i].count+")</span>";}tcs[j].innerHTML=h;}
-
-/* QUICK CARDS */
-var refs=[{e:"📱",t:"手机拍摄6大运镜",d:"推拉摇移跟甩——每个运镜的适用场景"},{e:"🎨",t:"电影感调色公式",d:"青橙·复古港风·日系清新——万用LUT"},{e:"🔊",t:"BGM黄金法则",d:"节奏匹配+情绪共振+留白呼吸=爆款配乐"},{e:"✂️",t:"剪辑节奏控制",d:"快=短镜头+卡点·慢=长镜头+环境音"},{e:"💡",t:"爆款开头5秒公式",d:"好奇缺口+视觉冲击+承诺价值"},{e:"🎬",t:"Vlog叙事结构",d:"钩子→铺垫→高潮→CTA——4段式"}];
-var qc=D.getElementById("quick-cards"),qh="";for(var i=0;i<refs.length;i++)qh+="<div class=info-card style=cursor:pointer><h4 style=margin-bottom:6px>"+refs[i].e+" "+refs[i].t+"</h4><p style=font-size:12.5px;color:var(--text3)>"+refs[i].d+"</p></div>";qc.innerHTML=qh;
-
-/* RANDOM COMBO */
-(function refreshCombo(){
-    var i1=Math.floor(Math.random()*TOPICS.length),i2=Math.floor(Math.random()*TOPICS.length);
-    while(i2===i1)i2=Math.floor(Math.random()*TOPICS.length);
-    var a=TOPICS[i1],b=TOPICS[i2];
-    D.getElementById("rand-combo").innerHTML="<div class=info-card><strong>随机组合</strong><br><span style=color:var(--accent);font-weight:700>"+esc(a.category)+" x "+esc(b.category)+"</span><br>把"+esc(a.title)+"的技法用到"+esc(b.title)+"的场景<br><a href=# onclick=location.reload() style=color:var(--accent);font-size:12px>换一组</a></div><div class=info-card><strong>数据</strong><br>A: "+esc(a.title)+"<br>B: "+esc(b.title)+"<br>"+CATS.length+"分类 "+TOPICS.length+"条</div>";
-})();
-
-/* PARTICLES */
+/* ── Stats bars ── */
 (function(){
-    var cv=D.getElementById("particles-canvas"),ctx=cv.getContext("2d"),W=window.innerWidth,H=D.documentElement.scrollHeight,pts=[];
-    cv.width=W;cv.height=H;
-    for(var i=0;i<55;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.5,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,a:Math.random()*.45+.1});
-    function rs(){W=cv.width=window.innerWidth;H=D.documentElement.scrollHeight;}window.addEventListener("resize",rs);
-    function draw(){ctx.clearRect(0,0,W,H);for(var i=0;i<pts.length;i++){var p=pts[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle="rgba(0,85,232,"+p.a+")";ctx.fill();}for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<110){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle="rgba(0,85,232,"+(1-d/110)*.045+")";ctx.lineWidth=.6;ctx.stroke();}}requestAnimationFrame(draw);}draw();
-    var rt;window.addEventListener("scroll",function(){clearTimeout(rt);rt=setTimeout(function(){H=cv.height=D.documentElement.scrollHeight;},300);});
+    var cc={};
+    for(var i=0;i<TOPICS.length;i++){var c=TOPICS[i].category||'';cc[c]=(cc[c]||0)+1}
+    var cn=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a]});
+    var cb=document.getElementById('cat-bars'),html='';
+    for(var i=0;i<cn.length;i++){var pct=cc[cn[i]]/TOPICS.length*100;html+='<div class="bar-row"><span class="bar-label">'+cn[i]+'</span><div class="bar-track"><div class="bar-fill" data-w="'+pct.toFixed(1)+'"></div></div><span class="bar-num">'+cc[cn[i]]+'</span></div>'}
+    cb.innerHTML=html;
+
+    var tc={};
+    for(var i=0;i<TOPICS.length;i++){var ty=TOPICS[i].content_type||'?';tc[ty]=(tc[ty]||0)+1}
+    var bc={'爆款':'r','干货':'b','深度':'pu'};
+    var tn=Object.keys(tc),tb=document.getElementById('type-bars'),html2='';
+    for(var i=0;i<tn.length;i++){var ty=tn[i],pct=tc[ty]/TOPICS.length*100,klass=bc[ty]||'';html2+='<div class="bar-row"><span class="bar-label">'+(TE[ty]||'')+' '+ty+'</span><div class="bar-track"><div class="bar-fill '+klass+'" data-w="'+pct.toFixed(1)+'"></div></div><span class="bar-num">'+tc[ty]+'</span></div>'}
+    tb.innerHTML=html2;
 })();
 
-/* MOUSE GLOW */
-D.addEventListener("mousemove",function(e){var h=D.querySelectorAll(".card:hover");for(var i=0;i<h.length;i++){var r=h[i].getBoundingClientRect();h[i].style.setProperty("--mx",((e.clientX-r.left)/r.width*100)+"%");h[i].style.setProperty("--my",((e.clientY-r.top)/r.height*100)+"%");}});
+/* ── Tag cloud ── */
+(function(){
+    var freq={};
+    for(var i=0;i<TOPICS.length;i++){
+        var c=TOPICS[i].category||'';
+        freq[c]=(freq[c]||0)+1;
+    }
+    var items=[];
+    for(var k in freq)items.push({cat:k,count:freq[k]});
+    items.sort(function(a,b){return b.count-a.count});
+    var tcs=[document.getElementById('tag-cloud'),document.getElementById('inspire-tag-cloud')];
+    for(var j=0;j<tcs.length;j++){
+        var html='';
+        for(var i=0;i<items.length;i++){
+            var sz=i<3?3:(i<7?2:1);
+            html+='<span class="tc-item size'+sz+'" onclick="goToLibrary(''+esc(items[i].cat)+'')">'+items[i].cat+' ('+items[i].count+')</span>';
+        }
+        if(tcs[j])tcs[j].innerHTML=html;
+    }
+})();
 
-/* ESC */
-D.addEventListener("keydown",function(e){if(e.key==="Escape")closeModal();});
+/* ── Quick ref cards ── */
+(function(){
+    var refs=[
+        {emoji:'📱',title:'手机拍摄6大运镜',desc:'推拉摇移跟甩——每个运镜的适用场景和手把手演示'},
+        {emoji:'🎨',title:'电影感调色公式',desc:'青橙色调 · 复古港风 · 日系清新——三个万能LUT参数'},
+        {emoji:'🔊',title:'BGM选择黄金法则',desc:'爆款视频的BGM都遵循这3条规律：节奏匹配、情绪共振、留白呼吸'},
+        {emoji:'✂️',title:'剪辑节奏控制',desc:'快节奏=短镜头+卡点 · 慢节奏=长镜头+环境音——不同内容的速度公式'},
+        {emoji:'💡',title:'爆款开头5秒公式',desc:'好奇缺口+视觉冲击+承诺价值——5秒内让观众停下滑动的手指'},
+        {emoji:'🎬',title:'Vlog叙事结构',desc:'开场钩子→铺垫→高潮→结尾CTA——4段式叙事让你的Vlog不无聊'}
+    ];
+    var qc=document.getElementById('quick-cards'),html='';
+    for(var i=0;i<refs.length;i++)html+='<div class="quick-card"><div class="emoji">'+refs[i].emoji+'</div><h4>'+refs[i].title+'</h4><p>'+refs[i].desc+'</p></div>';
+    qc.innerHTML=html;
+})();
 
-console.log("Ready: "+TOPICS.length+"t "+CALENDAR.length+"c "+PICKS.length+"p");
-}catch(e){console.error(e);}
+/* ── Random combo ── */
+function refreshCombo(){
+    var rc=document.getElementById('rand-combo');
+    var idx1=Math.floor(Math.random()*TOPICS.length);
+    var idx2=Math.floor(Math.random()*TOPICS.length);
+    while(idx2===idx1)idx2=Math.floor(Math.random()*TOPICS.length);
+    var a=TOPICS[idx1],b=TOPICS[idx2];
+    var mashup=a.category+' × '+b.category;
+    var idea='试试把"'+a.title+'"的技法用到"'+b.title+'"的场景里：'+a.category+'的技巧 + '+b.category+'的视角 = 独一无二的个人风格';
+    rc.innerHTML='<div class="info-card"><strong>🎲 组合灵感</strong><br><span style="color:var(--accent);font-weight:700">'+esc(mashup)+'</span><br>'+esc(idea)+'<br><a href="#" onclick="refreshCombo();return false" style="color:var(--accent);font-size:12px">🔄 换一组</a></div><div class="info-card"><strong>📊 数据参考</strong><br>选题A: '+esc(a.title)+'<br>选题B: '+esc(b.title)+'<br>分类数: '+cats.length+' · 总计 '+TOPICS.length+' 条<br><a href="#" onclick="refreshCombo();return false" style="color:var(--accent);font-size:12px">🔄 再换一组</a></div>';
+}
+refreshCombo();
+
+/* ── Publish tracker ── */
+(function(){
+    var stored=localStorage.getItem('dj_pub_tracker');
+    var tracker=stored?JSON.parse(stored):{total:0,dates:[],streak:0};
+    var today=new Date().toISOString().slice(0,10);
+    var m=new Date().getMonth();
+    var monthPubs=0;
+    for(var i=0;i<tracker.dates.length;i++){
+        var d=tracker.dates[i];
+        if(new Date(d).getMonth()===m)monthPubs++;
+    }
+    var remain=PICKS.length;
+    setTimeout(function(){
+        countUp(document.getElementById('pub-total'),tracker.total,1200);
+        countUp(document.getElementById('pub-month'),monthPubs,1200);
+        countUp(document.getElementById('pub-streak'),tracker.streak,1200);
+        countUp(document.getElementById('pub-remain'),remain,1200);
+    },500);
+    var pct=Math.min(tracker.total/200*100,100);
+    setTimeout(function(){document.getElementById('pub-progress').style.width=pct+'%'},700);
+
+    /* Publish calendar grid */
+    var calGrid=document.getElementById('pub-cal-grid');
+    if(calGrid){
+        var daysInMonth=new Date(new Date().getFullYear(),m+1,0).getDate();
+        calGrid.innerHTML='';
+        for(var i=1;i<=daysInMonth;i++){
+            var ds=new Date().getFullYear()+'-'+String(m+1).padStart(2,'0')+'-'+String(i).padStart(2,'0');
+            var published=tracker.dates.indexOf(ds)>=0;
+            calGrid.innerHTML+='<div style="width:32px;height:32px;border-radius:6px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:600;cursor:pointer;'+(published?'background:var(--accent);color:#fff':'background:rgba(0,0,0,.03);color:var(--text3)')+'" title="'+ds+(published?'已发布':'')+'" onclick="togglePubDate(''+ds+'',this)">'+i+'</div>';
+        }
+    }
+})();
+
+/* ── Search suggestions ── */
+function searchSuggest(q){
+    var ss=document.getElementById('search-suggestions');
+    if(!q||q.length<1){ss.classList.remove('active');return}
+    var ql=q.toLowerCase();
+    var matches=[];
+    for(var i=0;i<TOPICS.length;i++){
+        var t=TOPICS[i],title=(t.title||'').toLowerCase(),desc=(t.description||'').toLowerCase(),cat=(t.category||'').toLowerCase();
+        if(title.indexOf(ql)>=0||desc.indexOf(ql)>=0||cat.indexOf(ql)>=0)matches.push(t);
+        if(matches.length>=8)break;
+    }
+    if(!matches.length){ss.classList.remove('active');return}
+    var html='';
+    for(var i=0;i<matches.length;i++){
+        var title=esc(matches[i].title||''),cat=esc(matches[i].category||'');
+        var titleHL=title.replace(new RegExp('('+ql+')','gi'),'<span class="hl">$1</span>');
+        html+='<div class="item" onclick="openDetailByTitle(''+title.replace(/'/g,"\'")+'')">'+titleHL+'<span class="cat">'+cat+'</span></div>';
+    }
+    ss.innerHTML=html;
+    ss.classList.add('active');
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.search-wrap'))document.querySelectorAll('.search-suggestions').forEach(function(s){s.classList.remove('active')})});
+
+/* ── Inspire search ── */
+function inspireSearch(){
+    var q=(document.getElementById('inspire-search').value||'').toLowerCase();
+    if(!q)return;
+    /* Score topics by text match */
+    var scored=[];
+    for(var i=0;i<TOPICS.length;i++){
+        var t=TOPICS[i],title=(t.title||'').toLowerCase(),desc=(t.description||'').toLowerCase(),cat=(t.category||'').toLowerCase();
+        var score=0;
+        if(title.indexOf(q)>=0)score+=10;
+        if(desc.indexOf(q)>=0)score+=5;
+        if(cat.indexOf(q)>=0)score+=3;
+        /* Fuzzy: split query and check each word */
+        var words=q.split(/\s+/);
+        for(var j=0;j<words.length;j++){
+            if(words[j].length<2)continue;
+            if(title.indexOf(words[j])>=0)score+=2;
+            if(desc.indexOf(words[j])>=0)score+=1;
+        }
+        if(score>0)scored.push({t:t,score:score});
+    }
+    scored.sort(function(a,b){return b.score-a.score});
+    /* Show results in a modal */
+    var html='<button class="modal-close" onclick="closeModal()">✕</button><div class="modal-tag">💭 搜索结果</div>';
+    if(scored.length===0){
+        html+='<h2>未找到匹配选题</h2><p style="color:var(--text3);margin-top:8px">试试其他关键词：剪辑、拍摄、调色、Vlog、转场、蒙版、卡点…</p>';
+    }else{
+        html+='<h2>找到 '+scored.length+' 个相关选题</h2>';
+        html+='<div class="card-grid" style="margin-top:16px">';
+        for(var i=0;i<Math.min(scored.length,10);i++)html+=renderCard(scored[i].t,'');
+        html+='</div>';
+    }
+    document.getElementById('modal-box').innerHTML=html;
+    document.getElementById('modal-overlay').classList.add('active');
+    document.body.style.overflow='hidden';
+}
+
+function jumpToSearch(){
+    var q=document.getElementById('today-search').value;
+    if(!q)return;
+    /* Switch to library tab and search */
+    document.querySelectorAll('.tabs button').forEach(function(b){b.classList.remove('active')});
+    document.querySelectorAll('section').forEach(function(s){s.classList.remove('active')});
+    document.querySelector('[data-panel="library"]').classList.add('active');
+    document.getElementById('sec-library').classList.add('active');
+    document.getElementById('f-search').value=q;
+    filterLib();
+    document.getElementById('today-search').value='';
+    document.getElementById('search-suggestions').classList.remove('active');
+}
+
+/* ═══ Animations ═══ */
+setTimeout(function(){
+    var all=[];
+    all.push({el:document.getElementById('hero-total'),t:STATS.total});all.push({el:document.getElementById('hero-pending'),t:STATS.pending});
+    all.push({el:document.getElementById('hero-pub'),t:STATS.published});all.push({el:document.getElementById('hero-cats'),t:STATS.categories});
+    all.push({el:document.getElementById('kpi-total'),t:STATS.total});all.push({el:document.getElementById('kpi-pending'),t:STATS.pending});
+    all.push({el:document.getElementById('kpi-pub'),t:STATS.published});all.push({el:document.getElementById('kpi-cal'),t:STATS.calendar});
+    for(var i=0;i<all.length;i++)if(all[i].el&&all[i].t>0)countUp(all[i].el,all[i].t,1800);
+},300);
+
+var barObserver=new IntersectionObserver(function(entries){
+    for(var i=0;i<entries.length;i++)if(entries[i].isIntersecting){
+        var bars=entries[i].target.querySelectorAll('[data-w]');
+        for(var j=0;j<bars.length;j++)(function(b,d){setTimeout(function(){b.style.width=b.getAttribute('data-w')+'%'},d)})(bars[j],j*45);
+    }
+},{threshold:.05});
+var panels=document.querySelectorAll('.stat-panel');
+for(var i=0;i<panels.length;i++)barObserver.observe(panels[i]);
+
+    document.getElementById('cal-num').textContent=count+' 期';
+}
+
+function filterLib(){
+    var cat=document.getElementById('f-cat').value,type=document.getElementById('f-type').value;
+    var diff=document.getElementById('f-diff').value,q=(document.getElementById('f-search').value||'').toLowerCase(),count=0;
+    document.querySelectorAll('#lib-grid .card').forEach(function(c){
+        var s=true;if(cat!=='all'&&c.dataset.cat!==cat)s=false;if(type!=='all'&&c.dataset.type!==type)s=false;
+        if(diff!=='all'&&c.dataset.diff!==diff)s=false;
+        if(q&&c.dataset.title.toLowerCase().indexOf(q)===-1)s=false;
+        c.classList.toggle('hidden',!s);if(s)count++;
+    });
+    document.getElementById('lib-num').textContent=count+' 条';
+}
+
+function goToLibrary(cat){
+    document.querySelectorAll('.tabs button').forEach(function(b){b.classList.remove('active')});
+    document.querySelectorAll('section').forEach(function(s){s.classList.remove('active')});
+    document.querySelector('[data-panel="library"]').classList.add('active');
+    document.getElementById('sec-library').classList.add('active');
+    document.getElementById('f-cat').value=cat;filterLib();
+}
+
+/* ═══ Detail modal ═══ */
+document.addEventListener('click',function(e){
+    var card=e.target.closest('.card');if(card)openDetail(card);
+    var row=e.target.closest('.cal-row');if(row)openDetailByTitle(row.dataset.title);
+});
+
+function openDetail(card){
+    var title=card.dataset.title,t=null;
+    for(var i=0;i<TOPICS.length;i++){if(TOPICS[i].title===title){t=TOPICS[i];break}}
+    if(!t)return;
+    var cat=esc(t.category||''),ctype=t.content_type||'干货',diff=t.difficulty||2;
+    var dur=esc(t.estimated_duration||'?'),viral=esc(t.viral_potential||'中'),prod=esc(t.production_time||'?');
+    var desc=esc(t.description||''),mats=t.materials_needed||'',titleEsc=esc(t.title||'');
+
+    /* Blogger refs */
+    var refs=BLOGGERS[cat]||[{name:'抖音搜索同名教程',note:'在抖音搜索标题关键词找最新参考',url:'https://www.douyin.com/search/'+encodeURIComponent(title)}];
+    var bloggerHtml='<div class="ds"><h4>🔗 灵感来源 & 对标博主</h4>';
+    for(var i=0;i<refs.length;i++){
+        var r=refs[i];
+        bloggerHtml+='<a class="blogger-ref" href="'+(r.url||'#')+'" target="_blank" rel="noopener"><div class="avatar">'+(r.name.charAt(0))+'</div><div class="info"><div class="name">'+esc(r.name)+'</div><div class="note">'+esc(r.note)+'</div></div><span class="arrow">↗</span></a>';
+    }
+    bloggerHtml+='</div>';
+
+    /* Platform suggestions */
+    var platforms=[];
+    if(ctype==='爆款')platforms=['抖音','快手','小红书'];
+    else if(ctype==='深度')platforms=['B站','YouTube','抖音'];
+    else platforms=['抖音','小红书','视频号'];
+    var ptHtml='<div class="ds"><h4>📤 发布建议</h4><div class="platform-tags">';
+    for(var i=0;i<platforms.length;i++)ptHtml+='<span>'+platforms[i]+'</span>';
+    ptHtml+='</div><p style="font-size:13px;color:var(--text3);margin-top:6px">预计播放：'+(ctype==='爆款'?'10万–100万+':(ctype==='深度'?'5千–3万':'1万–10万'))+' · 最佳发布时间：'+(ctype==='爆款'?'周五19:00–21:00':(ctype==='深度'?'周末10:00–12:00':'工作日12:00–14:00'))+'</p></div>';
+
+    /* Script */
+    var core=titleEsc.split('：')[1]||titleEsc,hook,stepsHtml,ending,bgm;
+    if(ctype==='爆款'){
+        hook='「'+core+'」——你是不是也刷到过这种效果？今天30秒教会你。';
+        var s1=['📱 打开剪映，导入素材','⚡ 关键操作：'+core+'的核心步骤','🎯 微调参数到最佳效果','✨ 对比展示：Before → After'];
+        stepsHtml=s1.map(function(s){return'<li>'+s+'</li>'}).join('');ending='学会了点个赞收藏，下期见！';bgm='节奏卡点BGM（Phut Hon / 病变 Remix）';
+    }else if(ctype==='深度'){
+        hook='今天不教单个技巧，带你完整拆解「'+titleEsc+'」的全过程。';
+        var s2=['📋 前期构思与策划思路','🎥 拍摄现场还原与要点','✂️ 剪辑全流程逐步拆解','📊 成片展示 + 关键技巧复盘'];
+        stepsHtml=s2.map(function(s){return'<li>'+s+'</li>'}).join('');ending='觉得有用的话点个关注，我会持续更新这样的深度拆解。';bgm='叙事感配乐（Epidemic Sound 风格）';
+    }else{
+        hook='为什么别人的视频那么高级？问题就出在这一步——';
+        var s3=['🔍 常见错误：90%的人都做错了','🛠️ 正确方法：'+titleEsc+'的核心要点','📐 具体操作演示','✅ 效果对比 + 避坑提醒'];
+        stepsHtml=s3.map(function(s){return'<li>'+s+'</li>'}).join('');ending='收藏起来慢慢练，关注我每天一个剪辑技巧。';bgm='轻量氛围BGM（Lo-Fi / Jazz Hop）';
+    }
+
+    var descBlock=desc?'<div class="ds"><h4>💡 内容说明</h4><p>'+desc+'</p></div>':'';
+    var matTags='';
+    if(mats){var parts=mats.replace(/，/g,',').replace(/、/g,',').split(',');for(var i=0;i<parts.length;i++){var m=parts[i].trim();if(m)matTags+='<span style="display:inline-block;padding:5px 12px;border-radius:7px;background:rgba(0,85,232,.04);color:var(--accent);font-size:12px;font-weight:600;margin:2px">'+esc(m)+'</span>'}}
+    if(!matTags)matTags='<span style="font-size:13px;color:var(--text3)">无特殊要求</span>';
+
+    document.getElementById('modal-box').innerHTML=
+        '<button class="modal-close" onclick="closeModal()">✕</button>'
+        +'<div class="modal-tag">'+cat+' · '+ctype+'</div>'
+        +'<h2>'+titleEsc+'</h2>'
+        +'<div class="modal-difficulty">'+DIFF_MAP[diff]+' · '+dur+' · 涨粉'+viral+' · 制作'+prod+'</div>'
+        +descBlock
+        +bloggerHtml
+        +ptHtml
+        +'<div class="ds"><h4>✍️ 脚本文案</h4>'
+        +'<p style="font-size:15px;font-weight:600;margin-bottom:10px;color:var(--text)">💬 '+hook+'</p>'
+        +'<ol style="padding-left:18px">'+stepsHtml+'</ol>'
+        +'<p style="font-size:14px;color:var(--text2);margin-top:8px">'+ending+'</p>'
+        +'<div class="bgm-tip">🎵 推荐BGM：'+bgm+'</div></div>'
+        +'<div class="ds"><h4>📦 所需素材</h4>'+matTags+'</div>';
+    document.getElementById('modal-overlay').classList.add('active');
+    document.body.style.overflow='hidden';
+}
+
+function openDetailByTitle(title){if(!title)return;var cards=document.querySelectorAll('.card');for(var i=0;i<cards.length;i++){if(cards[i].dataset.title===title){openDetail(cards[i]);return}}}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('active');document.body.style.overflow=''}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+
+/* ═══ Publish tracking ═══ */
+window.togglePubDate=function(ds,el){
+    var stored=localStorage.getItem('dj_pub_tracker');
+    var tracker=stored?JSON.parse(stored):{total:0,dates:[],streak:0};
+    var idx=tracker.dates.indexOf(ds);
+    if(idx>=0){
+        tracker.dates.splice(idx,1);tracker.total--;
+        el.style.background='rgba(0,0,0,.03)';el.style.color='var(--text3)';
+    }else{
+        tracker.dates.push(ds);tracker.total++;
+        el.style.background='var(--accent)';el.style.color='#fff';
+    }
+    localStorage.setItem('dj_pub_tracker',JSON.stringify(tracker));
+    location.reload();
+};
+
+window.resetPicks=function(){
+    localStorage.removeItem('dj_yesterday_picks');
+    location.reload();
+};
+
+/* ═══ Particles ═══ */
+(function(){
+    var cv=document.getElementById('particles-canvas');if(!cv)return;
+    var ctx=cv.getContext('2d'),W=cv.width=window.innerWidth,H=cv.height=document.documentElement.scrollHeight,pts=[];
+    for(var i=0;i<50;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+.4,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,a:Math.random()*.35+.1});
+    function rs(){W=cv.width=window.innerWidth;H=cv.height=document.documentElement.scrollHeight}
+    window.addEventListener('resize',rs);
+    function draw(){
+        ctx.clearRect(0,0,W,H);
+        for(var i=0;i<pts.length;i++){var p=pts[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,85,232,'+p.a+')';ctx.fill()}
+        for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle='rgba(0,85,232,'+(1-d/100)*.035+')';ctx.lineWidth=.5;ctx.stroke()}}
+        requestAnimationFrame(draw);
+    }draw();
+    var rt;window.addEventListener('scroll',function(){clearTimeout(rt);rt=setTimeout(function(){H=cv.height=document.documentElement.scrollHeight},300)});
+})();
+
+/* ═══ Cursor trail ═══ */
+(function(){
+    var cv=document.getElementById('cursor-trail'),ctx=cv.getContext('2d'),W,H,trail=[];
+    function rs(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}rs();window.addEventListener('resize',rs);
+    document.addEventListener('mousemove',function(e){trail.push({x:e.clientX,y:e.clientY,t:Date.now(),a:.4})});
+    function draw(){
+        ctx.clearRect(0,0,W,H);var now=Date.now();
+        var filtered=[];
+        for(var i=0;i<trail.length;i++){trail[i].a-=.015;if(trail[i].a>0)filtered.push(trail[i])}
+        trail=filtered;
+        for(var i=1;i<trail.length;i++)if(trail[i-1].a>.02){ctx.beginPath();ctx.moveTo(trail[i-1].x,trail[i-1].y);ctx.lineTo(trail[i].x,trail[i].y);ctx.strokeStyle='rgba(0,85,232,'+trail[i-1].a+')';ctx.lineWidth=2;ctx.stroke()}
+        if(trail.length>30)trail=trail.slice(-30);
+        requestAnimationFrame(draw);
+    }draw();
+})();
+
+/* ═══ Mouse glow ═══ */
+document.addEventListener('mousemove',function(e){
+    var hovered=document.querySelectorAll('.card:hover');
+    for(var i=0;i<hovered.length;i++){var r=hovered[i].getBoundingClientRect();hovered[i].style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');hovered[i].style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%')}
+});
+
+console.log('✅ Dashboard v3: '+TOPICS.length+' topics, '+CALENDAR.length+' calendar, '+PICKS.length+' picks, '+Object.keys(BLOGGERS).length+' blogger refs');
+    /* ═══ Nav ═══ */
+    for(var ni=0;ni<navBtns.length;ni++){(function(b){b.onclick=function(){
+        for(var j=0;j<navBtns.length;j++)navBtns[j].classList.remove('active');
+        var allSecs=document.querySelectorAll('section');
+        for(var k=0;k<allSecs.length;k++)allSecs[k].classList.remove('active');
+        this.classList.add('active');
+        var sec=document.getElementById('sec-'+this.dataset.panel);
+        if(sec)sec.classList.add('active');
+        if(this.dataset.panel==='stats'){
+            setTimeout(function(){
+                var allBars=document.querySelectorAll('#sec-stats [data-w]');
+                for(var bi=0;bi<allBars.length;bi++)(function(b2,d){setTimeout(function(){b2.style.width=b2.getAttribute('data-w')+'%'},d)})(allBars[bi],bi*45);
+            },400);
+        }
+    }})(navBtns[ni]);}
+}catch(e){console.error('Dashboard init error:',e)}
 });
 </script>
-</body></html>
+</body>
+</html>
